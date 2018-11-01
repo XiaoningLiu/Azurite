@@ -1,3 +1,0 @@
-[submodule "test/azure-storage-node"]
-	path = externaltests/azure-storage-node
-	url = https://github.com/Azure/azure-storage-node
