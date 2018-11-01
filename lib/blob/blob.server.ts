@@ -7,5 +7,6 @@ const server = http.createServer(app);
 // TODO: Apply configure
 server.listen(10000, "", () => {
   // TODO: Logger
+  // tslint:disable-next-line:no-console
   console.log(`[Azurite][Blob] Server successfully listens on ${10000}`);
 });

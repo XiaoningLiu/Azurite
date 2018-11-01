@@ -1,7 +1,5 @@
 package.json
 package-lock.json
-azurite-testdrive/
-externaltests/azure-storage-node/
 node_modules/
 .vscode/
 nuget/
