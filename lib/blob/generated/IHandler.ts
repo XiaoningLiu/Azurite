@@ -1,28 +1,16 @@
 import IContext from "./IContext";
+import * as Models from "./models";
 
 /**
- * This is the protocol layer interface
+ * This is the protocol layer interface.
+ * Create a new handler by implenting this interface.
+ *
  */
 interface IHandler {
   serviceListContainersSegment(
-    request: IServiceListContainersSegmentRequest,
+    options: Models.IServiceListContainersSegmentOptionalParams,
     context: IContext
-  ): Promise<IServiceListContainersSegmentResponse>;
-}
-
-export interface IServiceListContainersSegmentRequest {
-  prefix?: string;
-  marker?: string;
-  maxresults?: number;
-  include?: string;
-  timeout?: number;
-  version: string;
-  requestId?: string;
-}
-
-export interface IServiceListContainersSegmentResponse {
-  RequestId: string;
-  Version: string;
+  ): Promise<Models.IListContainersSegmentResponse>;
 }
 
 export default IHandler;

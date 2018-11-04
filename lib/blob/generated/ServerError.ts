@@ -9,6 +9,7 @@ export default class ServerError extends Error {
   constructor(
     statusCode: number,
     message: string,
+    statusMessage?: string,
     headers?: OutgoingHttpHeaders,
     body?: string
   ) {
@@ -19,7 +20,7 @@ export default class ServerError extends Error {
     this.name = "ServerError";
     this.message = message;
     this.statusCode = statusCode;
-    this.headers = headers;
+    (this.statusMessage = statusMessage), (this.headers = headers);
     this.body = body;
   }
 }

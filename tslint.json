@@ -4,9 +4,9 @@
   "jsRules": {},
   "rules": {
     "trailing-comma": false,
-    "arrow-parens": false
+    "arrow-parens": false,
+    "variable-name": false
   },
   "rulesDirectory": [],
-  "linterOptions": {
-  }
+  "linterOptions": {}
 }

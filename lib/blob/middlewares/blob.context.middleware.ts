@@ -1,13 +1,27 @@
-import express, { NextFunction, Request, Response } from "express";
+import { NextFunction, Request, Response } from "express";
 
+import { getContextFromResponse } from "../generated/IContext";
 import ServerError from "../generated/ServerError";
-import IBlobContext from "../IBlobContext";
+import { initializeBlobContext } from "../IBlobContext";
 
-const blobContextMiddleware: express.RequestHandler = (
+/**
+ * BlobContextMiddleware is a middleware extract related blob service context
+ * metadata into res.locals.context.
+ *
+ * This middleware should and only could be used after dispathMiddleware.
+ *
+ * @export
+ * @param {Request} req
+ * @param {Response} res
+ * @param {NextFunction} next
+ */
+export default function blobContextMiddleware(
   req: Request,
   res: Response,
   next: NextFunction
-) => {
+): void {
+  // TODO: Optimize container/blob name extraction alghrothim,
+  // because blob names may contain special characters
   const paths = req.path.split("/").filter((value) => value.length > 0);
   if (paths.length < 1) {
     // TODO: Error handling
@@ -21,15 +35,18 @@ const blobContextMiddleware: express.RequestHandler = (
   }
 
   const account = paths[0];
-  const containerOrRootBlob = paths[1];
+  const container = paths[1];
   const blob = paths[2];
 
-  const ctx = res.locals.context as IBlobContext;
-  ctx.account = account;
-  ctx.container = containerOrRootBlob;
-  ctx.blob = blob;
+  // TODO: Generate xMsRequestID to the blob context
+  const context = getContextFromResponse(res);
+  initializeBlobContext(res, {
+    ...context,
+    account,
+    blob,
+    container,
+    xMsRequestID: "",
+  });
 
   next();
-};
-
-export default blobContextMiddleware;
+}

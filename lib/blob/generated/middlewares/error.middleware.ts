@@ -1,18 +1,20 @@
-import { ErrorRequestHandler, NextFunction, Request } from "express";
+import { NextFunction, Request, Response } from "express";
 
-import { Response } from "express-serve-static-core";
-import ServerError from "./ServerError";
+import ServerError from "../ServerError";
 
-const errorRequestHandler: ErrorRequestHandler = (
+export default function errorMiddleware(
   err: ServerError | Error,
+  // tslint:disable-next-line:variable-name
   _req: Request,
   res: Response,
   next: NextFunction
-) => {
+): void {
   if (res.headersSent) {
     return next(err);
   }
 
+  // Only handle ServerError, for other customized error types hand over to
+  // other error handlers.
   if (err instanceof ServerError) {
     res.status(err.statusCode);
     if (err.statusMessage) {
@@ -32,6 +34,4 @@ const errorRequestHandler: ErrorRequestHandler = (
 
     res.send(err.body);
   }
-};
-
-export default errorRequestHandler;
+}

@@ -1,3 +1,8 @@
+/**
+ * Operation is an auto generated enum to host all operation IDs.
+ *
+ * @enum {number}
+ */
 enum Operation {
   Service_SetProperties,
   Service_GetProperties,

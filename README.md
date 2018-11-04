@@ -1,8 +1,19 @@
-# TODOs
+# Azurite New Architecture
 
-1. Generate service/container/blob/blockblob/ middlewares according to url tags? -> No, in protocol layer we don't know which is blockblob, which is page blob
+## Description
 
-2. Don't care about root container situation at first stage
+## Features
 
-3. blob name can be "/blob/blob22", care about the parsing
+* Auto generated protocol layer, models, serializer and handler interfaces
+* Flexiable structure to customize manually middlewares and generated middlewares
+* ES6 native promise and async methods, less dependencies
 
+## Run it
+
+```bash
+npm install
+npm run build
+node dist/blob/blob.server.js
+```
+
+Access http://localhost:10000/account/con?comp=list

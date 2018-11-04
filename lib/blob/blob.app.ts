@@ -1,35 +1,34 @@
 import express from "express";
 
-import DBHandler from "./DBHandler";
-import dispatchMiddleware from "./generated/dispatch.middleware";
-import endMiddleware from "./generated/end.middleware";
-import errorRequestHandler from "./generated/error.request.handler";
-import HandlerMiddlewareFactory from "./generated/HandlerMiddlewareFactory";
+import deserializerMiddleware from "./generated/middlewares/deserializer.middleware";
+import dispatchMiddleware from "./generated/middlewares/dispatch.middleware";
+import endMiddleware from "./generated/middlewares/end.middleware";
+import errorMiddleware from "./generated/middlewares/error.middleware";
+import HandlerMiddlewareFactory from "./generated/middlewares/HandlerMiddlewareFactory";
+import serializerMiddleware from "./generated/middlewares/serializer.middleware";
 import blobContextMiddleware from "./middlewares/blob.context.middleware";
+import SimpleHandler from "./SimpleHandler";
 
 const app = express();
 
-app.use(dispatchMiddleware);
-app.use(blobContextMiddleware);
+// Create a SimpleHandler into handler middleware factory
+// SimpleHandler implments IHandler interface, we can manually create different handlers
+// Handler will take to persistency layer
+const handlerMiddlewareFactory = new HandlerMiddlewareFactory(
+  new SimpleHandler()
+);
 
-// Validation
+// Generated middlewares should follow strict orders
+// Manually created middlewares can be injected into any points
 
-// Inject with different handlers
-const handler = new DBHandler();
-const handlerMiddlewares = new HandlerMiddlewareFactory(handler);
-
-app.use(handlerMiddlewares.newHandlerMiddleware());
-app.use(errorRequestHandler);
-app.use(endMiddleware);
-app.use((err: Error, _req: any, res: any) => {
-  console.error(err.stack);
-  res.status(500).send("Something broke!");
-});
-// Error handling
-
-// tslint:disable-next-line:variable-name
-app.all("/", (_req, res) => {
-  res.send("Hello World");
-});
+app.use(dispatchMiddleware); // Generated
+app.use(blobContextMiddleware); // Manually created
+// TODO: Auth middleware // Manually created
+app.use(deserializerMiddleware); // Generated
+// TODO: Validation middleware // Manually created
+app.use(handlerMiddlewareFactory.newHandlerMiddleware()); // Generated
+app.use(serializerMiddleware); // Generated
+app.use(errorMiddleware); // Generated
+app.use(endMiddleware); // Generated, or manually created
 
 export default app;
