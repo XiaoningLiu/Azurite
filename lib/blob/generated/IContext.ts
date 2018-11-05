@@ -2,16 +2,27 @@ import { Response } from "express";
 
 import Operation from "./operation";
 
+export interface IHandlerParameters {
+  [key: string]: any;
+}
+
+export declare type ParameterPath =
+  | string
+  | string[]
+  | {
+      [propertyName: string]: ParameterPath;
+    };
+
 /**
- * Context to host metadatas through the life of every REST API call.
+ * Context to host metadata through the life of every REST API call.
  * Use res.locals.context as the context object path, call getContextFromResponse()
  * to get a context object.
  *
  * @interface IContext
  */
-interface IContext {
+export default interface IContext {
   operation?: Operation;
-  handlerParameters?: any;
+  handlerParameters?: IHandlerParameters;
   handlerResponses?: any; // TODO: Inherit a global HTTPResponse object to control HTTP details
 }
 
@@ -59,12 +70,10 @@ export function getContextFromResponse(res: Response): IContext {
 
   if (!res.locals.context) {
     throw new TypeError(
-      `res.locals.context is undefined. Make sure it has been initilized by calling initializeContext().`
+      `res.locals.context is undefined. Make sure it has been initialized by calling initializeContext().`
     );
   }
 
   const context = res.locals.context as IContext;
   return context;
 }
-
-export default IContext;

@@ -10,7 +10,7 @@ interface IHandler {
   serviceListContainersSegment(
     options: Models.IServiceListContainersSegmentOptionalParams,
     context: IContext
-  ): Promise<Models.IListContainersSegmentResponse>;
+  ): Promise<Models.IServiceListContainersSegmentResponse>;
 }
 
 export default IHandler;

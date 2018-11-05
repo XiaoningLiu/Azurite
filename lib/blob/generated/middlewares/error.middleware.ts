@@ -32,6 +32,13 @@ export default function errorMiddleware(
       }
     }
 
+    console.error(err);
     res.send(err.body);
+  } else if (err instanceof Error) {
+    console.error(err);
+    res.status(500);
+    res.send();
   }
+
+  next();
 }

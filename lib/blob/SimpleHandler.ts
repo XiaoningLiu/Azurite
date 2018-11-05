@@ -3,7 +3,7 @@ import IHandler from "./generated/IHandler";
 import * as Models from "./generated/models";
 
 /**
- * Manually implment handlers by implmenting IHandler interface.
+ * Manually implement handlers by implementing IHandler interface.
  * Handlers will take to persistency layer directly.
  *
  * @export
@@ -14,8 +14,8 @@ export default class SimpleHandler implements IHandler {
   public async serviceListContainersSegment(
     options: Models.IServiceListContainersSegmentOptionalParams,
     _context: IContext
-  ): Promise<Models.IListContainersSegmentResponse> {
-    const res: Models.IListContainersSegmentResponse = {
+  ): Promise<Models.IServiceListContainersSegmentResponse> {
+    const res: Models.IServiceListContainersSegmentResponse = {
       maxResults: 10,
       nextMarker: "waht?",
       prefix: options.prefix || "RandomePrefix",

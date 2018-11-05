@@ -216,3 +216,33 @@ export interface IListContainersSegmentResponse {
    */
   nextMarker: string;
 }
+
+/**
+ * @interface
+ * An interface representing ServiceListContainersSegmentHeaders.
+ * Defines headers for ListContainersSegment operation.
+ *
+ */
+export interface IServiceListContainersSegmentHeaders {
+  /**
+   * @member {string} [requestId] This header uniquely identifies the request
+   * that was made and can be used for troubleshooting the request.
+   */
+  requestId?: string;
+  /**
+   * @member {string} [version] Indicates the version of the Blob service used
+   * to execute the request. This header is returned for requests made against
+   * version 2009-09-19 and above.
+   */
+  version?: string;
+  /**
+   * @member {string} [errorCode]
+   */
+  errorCode?: string;
+}
+
+/**
+ * Contains response data for the listContainersSegment operation.
+ */
+export type IServiceListContainersSegmentResponse = IListContainersSegmentResponse &
+  IServiceListContainersSegmentHeaders;

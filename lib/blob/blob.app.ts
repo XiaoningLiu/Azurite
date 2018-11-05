@@ -12,7 +12,7 @@ import SimpleHandler from "./SimpleHandler";
 const app = express();
 
 // Create a SimpleHandler into handler middleware factory
-// SimpleHandler implments IHandler interface, we can manually create different handlers
+// SimpleHandler implements IHandler interface, we can manually create different handlers
 // Handler will take to persistency layer
 const handlerMiddlewareFactory = new HandlerMiddlewareFactory(
   new SimpleHandler()

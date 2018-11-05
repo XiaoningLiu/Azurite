@@ -1,8 +1,9 @@
 import { NextFunction, Request, Response } from "express";
 
+import { deserialize } from "../../utils/serializer";
 import { getContextFromResponse } from "../IContext";
-import * as Models from "../models";
 import Operation from "../operation";
+import { listContainersSegmentOperationSpec } from "../operation.specification";
 
 /**
  * Deserializer Middleware.
@@ -14,20 +15,18 @@ import Operation from "../operation";
  * @returns {void}
  */
 export default function deserializerMiddleware(
-  // tslint:disable-next-line:variable-name
-  _req: Request,
+  req: Request,
   res: Response,
   next: NextFunction
 ): void {
   const ctx = getContextFromResponse(res);
 
   if (ctx.operation === Operation.Service_ListContainersSegment) {
-    // TODO: Deserialize models
-    const options: Models.IServiceListContainersSegmentOptionalParams = {
-      prefix: "prefix",
-    };
-    ctx.handlerParameters = [options];
+    deserialize(req, listContainersSegmentOperationSpec)
+      .then((parameters) => {
+        ctx.handlerParameters = parameters;
+        next();
+      })
+      .catch(next);
   }
-
-  next();
 }
