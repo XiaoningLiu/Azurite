@@ -32,6 +32,28 @@ export const listContainersSegmentOperationSpec: msRest.OperationSpec = {
   serializer,
 };
 
+export const containerCreateOperationSpec: msRest.OperationSpec = {
+  httpMethod: "PUT",
+  path: "{containerName}",
+  urlParameters: [Parameters.url],
+  queryParameters: [Parameters.timeout, Parameters.restype2],
+  headerParameters: [
+    Parameters.metadata,
+    Parameters.access,
+    Parameters.version,
+    Parameters.requestId,
+  ],
+  responses: {
+    201: {
+      headersMapper: Mappers.ContainerCreateHeaders,
+    },
+    default: {
+      bodyMapper: Mappers.StorageError,
+    },
+  },
+  isXML: true,
+  serializer,
+};
 export const commitBlockListOperationSpec: msRest.OperationSpec = {
   httpMethod: "PUT",
   path: "{containerName}/{blob}",

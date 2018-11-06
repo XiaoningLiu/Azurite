@@ -1,13 +1,9 @@
-import { Request } from "express";
+import { Request, Response } from "express";
 import * as msRest from "ms-rest-js";
-import * as Mappers from "../generated/mappers";
+import * as Mappers from "../mappers";
 
-import { IHandlerParameters, ParameterPath } from "../generated/IContext";
-import {
-  commitBlockListOperationSpec,
-  listContainersSegmentOperationSpec,
-} from "../generated/operation.specification";
-import { parseXML, stringifyXML } from "./xml";
+import { IHandlerParameters, ParameterPath } from "../IContext";
+import { stringifyXML } from "./xml";
 
 export async function deserialize(
   req: Request,
@@ -88,64 +84,44 @@ function setParametersValue(
   }
 }
 
-// Serialize query parameter
-let result = listContainersSegmentOperationSpec.serializer.serialize(
-  listContainersSegmentOperationSpec.queryParameters![0].mapper,
-  "con"
-);
+export async function serialize(
+  res: Response,
+  spec: msRest.OperationSpec,
+  handlerResponse: any
+): Promise<void> {
+  // TODO: handle all kinds of reponses
+  const responseStatusCode = Number.parseInt(Object.keys(spec.responses)[0]);
+  res.status(responseStatusCode);
 
-console.log(result);
+  const response = spec.responses[responseStatusCode];
 
-// Serialize response headers
-const unXMLSerializer = new msRest.Serializer(Mappers);
-result = unXMLSerializer.serialize(
-  listContainersSegmentOperationSpec.responses[200].headersMapper!,
-  { requestId: "customizedRequestID", version: "customized-version" }
-);
-console.log(result);
-
-// Serialize response XML body
-result = listContainersSegmentOperationSpec.serializer.serialize(
-  listContainersSegmentOperationSpec.responses[200].bodyMapper!,
-  {
-    requestId: "customizedRequestID",
-    version: "customized-version",
-    serviceEndpoint: "endpoint",
-    prefix: "prefix",
-    maxResults: 200,
-    nextMarker: "nextMarker",
-    containerItems: [],
-  }
-);
-console.log(result);
-
-// Serialize XML body
-result = commitBlockListOperationSpec.serializer.serialize(
-  commitBlockListOperationSpec.requestBody!.mapper,
-  {
-    committed: ["com1", "com2"],
-    latest: ["la1", "la2"],
-    uncommitted: ["un1", "un2", "un3"],
-  },
-  "path"
-);
-
-const xmlResult = stringifyXML(result, {
-  rootName:
-    commitBlockListOperationSpec.requestBody!.mapper.xmlName ||
-    commitBlockListOperationSpec.requestBody!.mapper.serializedName,
-});
-
-console.log(xmlResult);
-
-// Deserialize XML body
-
-parseXML(xmlResult).then((valueToDeserialize) => {
-  result = commitBlockListOperationSpec.serializer.deserialize(
-    commitBlockListOperationSpec.requestBody!.mapper,
-    valueToDeserialize,
-    "xxx.bodyxx"
+  // Serialize headers
+  const headerSerializer = new msRest.Serializer(Mappers);
+  const rawHeaders = headerSerializer.serialize(
+    response.headersMapper!,
+    handlerResponse
   );
 
-  console.log(result);
-});
+  for (const headerKey in rawHeaders) {
+    if (rawHeaders.hasOwnProperty(headerKey)) {
+      const headerValue = rawHeaders[headerKey];
+      res.setHeader(headerKey, headerValue);
+    }
+  }
+
+  // Serialize XML bodies
+  if (response.bodyMapper) {
+    const body = spec.serializer.serialize(
+      response.bodyMapper!,
+      handlerResponse
+    );
+    const xmlBody = stringifyXML(body, {
+      rootName:
+        response.bodyMapper!.xmlName || response.bodyMapper!.serializedName,
+    });
+    res.contentType(`application/xml`);
+
+    // TODO: Should send response in a serializer?
+    res.send(xmlBody);
+  }
+}

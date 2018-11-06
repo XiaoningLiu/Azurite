@@ -1,9 +1,12 @@
 import { NextFunction, Request, Response } from "express";
 
-import { deserialize } from "../../utils/serializer";
 import { getContextFromResponse } from "../IContext";
 import Operation from "../operation";
-import { listContainersSegmentOperationSpec } from "../operation.specification";
+import {
+  containerCreateOperationSpec,
+  listContainersSegmentOperationSpec,
+} from "../operation.specification";
+import { deserialize } from "../utils/serializer";
 
 /**
  * Deserializer Middleware.
@@ -21,12 +24,23 @@ export default function deserializerMiddleware(
 ): void {
   const ctx = getContextFromResponse(res);
 
-  if (ctx.operation === Operation.Service_ListContainersSegment) {
-    deserialize(req, listContainersSegmentOperationSpec)
-      .then((parameters) => {
-        ctx.handlerParameters = parameters;
-        next();
-      })
-      .catch(next);
+  switch (ctx.operation!) {
+    case Operation.Service_ListContainersSegment:
+      deserialize(req, listContainersSegmentOperationSpec)
+        .then((parameters) => {
+          ctx.handlerParameters = parameters;
+          next();
+        })
+        .catch(next);
+      break;
+    case Operation.Container_Create:
+      deserialize(req, containerCreateOperationSpec)
+        .then((parameters) => {
+          ctx.handlerParameters = parameters;
+          next();
+        })
+        .catch(next);
+    default:
+      break;
   }
 }

@@ -26,6 +26,11 @@ export default function dispatchMiddleware(
 
   if (req.method.toUpperCase() === "GET" && req.query.comp === "list") {
     ctx.operation = Operation.Service_ListContainersSegment;
+  } else if (
+    req.method.toUpperCase() === "PUT" &&
+    req.query.restype === "container"
+  ) {
+    ctx.operation = Operation.Container_Create;
   }
 
   // Every operation has one if condition checking

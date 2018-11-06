@@ -21,14 +21,14 @@ const handlerMiddlewareFactory = new HandlerMiddlewareFactory(
 // Generated middlewares should follow strict orders
 // Manually created middlewares can be injected into any points
 
-app.use(dispatchMiddleware); // Generated
-app.use(blobContextMiddleware); // Manually created
-// TODO: Auth middleware // Manually created
-app.use(deserializerMiddleware); // Generated
-// TODO: Validation middleware // Manually created
+app.use(dispatchMiddleware); //                              Generated
+app.use(blobContextMiddleware); //                           Manually created; generator doesn't know
+// TODO: Auth middleware //                                  Manually created
+app.use(deserializerMiddleware); //                          Generated
+// TODO: Validation middleware //                            Manually created
 app.use(handlerMiddlewareFactory.newHandlerMiddleware()); // Generated
-app.use(serializerMiddleware); // Generated
-app.use(errorMiddleware); // Generated
-app.use(endMiddleware); // Generated, or manually created
+app.use(serializerMiddleware); //                            Generated
+app.use(errorMiddleware); //                                 Generated
+app.use(endMiddleware); //                                   Generated, or manually created
 
 export default app;
