@@ -4,9 +4,10 @@
 
 ## Features
 
-* Auto generated protocol layer, models, serializer and handler interfaces
-* Flexiable structure to customize manually middlewares and generated middlewares
+* Auto generated protocol layer, models, serializer, deserializer and handler interfaces
+* Flexible structure to customize manually middlewares and generated middlewares
 * ES6 native promise and async methods, less dependencies
+* Create different handlers by implementing generated handler interface
 
 ## Run it
 
@@ -16,4 +17,12 @@ npm run build
 node dist/blob/blob.server.js
 ```
 
-Access http://localhost:10000/account/con?comp=list
+### List containers
+
+GET http://localhost:10000/account?comp=list
+
+### Create container
+
+PUT http://localhost:10000/account/containerName?restype=container
+
+Notice: `x-ms-version` is a required header.

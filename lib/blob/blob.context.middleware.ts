@@ -1,8 +1,8 @@
 import { NextFunction, Request, Response } from "express";
 
-import { getContextFromResponse } from "../generated/IContext";
-import ServerError from "../generated/ServerError";
-import { initializeBlobContext } from "../IBlobContext";
+import { getContextFromResponse } from "./generated/IContext";
+import ServerError from "./generated/ServerError";
+import { initializeBlobContext } from "./IBlobContext";
 
 /**
  * BlobContextMiddleware is a middleware extract related blob service context
