@@ -1,6 +1,6 @@
 import { OutgoingHttpHeaders } from "http";
 
-export default class ServerError extends Error {
+export default class HandlerError extends Error {
   public statusCode: number;
   public body?: string;
   public statusMessage?: string;
@@ -15,12 +15,13 @@ export default class ServerError extends Error {
   ) {
     super(message);
     // https://stackoverflow.com/questions/31626231/custom-error-class-in-typescript
-    Object.setPrototypeOf(this, ServerError.prototype);
+    Object.setPrototypeOf(this, HandlerError.prototype);
 
     this.name = "ServerError";
     this.message = message;
     this.statusCode = statusCode;
-    (this.statusMessage = statusMessage), (this.headers = headers);
+    this.statusMessage = statusMessage;
+    this.headers = headers;
     this.body = body;
   }
 }

@@ -1,15 +1,21 @@
 import { NextFunction, Request, RequestHandler, Response } from "express";
 
 import { getContextFromResponse } from "../IContext";
-import IHandler from "../IHandler";
 import Operation from "../operation";
-import ServerError from "../ServerError";
+import HandlerError from "../HandlerError";
+import IServiceHandler from "../handlers/IServiceHandler";
+import IContainerHandler from "../handlers/IContainerHandler";
 
 class HandlerMiddlewareFactory {
-  protected readonly handler: IHandler;
+  protected readonly serviceHandler: IServiceHandler;
+  protected readonly containerHandler: IContainerHandler;
 
-  constructor(handler: IHandler) {
-    this.handler = handler;
+  constructor(
+    serviceHandler: IServiceHandler,
+    containerHandler: IContainerHandler
+  ) {
+    this.serviceHandler = serviceHandler;
+    this.containerHandler = containerHandler;
   }
 
   public newHandlerMiddleware(): RequestHandler {
@@ -22,7 +28,7 @@ class HandlerMiddlewareFactory {
           `Cannot identify current operation. Please use "dispatchMiddleware" before "handlerMiddleware".`
         );
         return next(
-          new ServerError(500, "Internal Server Error", undefined, undefined)
+          new HandlerError(500, "Internal Server Error", undefined, undefined)
         );
       }
 
@@ -55,7 +61,7 @@ class HandlerMiddlewareFactory {
       ctx.operation &&
       ctx.operation === Operation.Service_ListContainersSegment
     ) {
-      this.handler
+      this.serviceHandler
         .serviceListContainersSegment(ctx.handlerParameters!.options, ctx)
         .then((response) => {
           ctx.handlerResponses = response;
@@ -73,7 +79,7 @@ class HandlerMiddlewareFactory {
   ) {
     const ctx = getContextFromResponse(res);
     if (ctx.operation && ctx.operation === Operation.Container_Create) {
-      this.handler
+      this.containerHandler
         .containerCreate(ctx.handlerParameters!.options, ctx)
         .then((response) => {
           ctx.handlerResponses = response;

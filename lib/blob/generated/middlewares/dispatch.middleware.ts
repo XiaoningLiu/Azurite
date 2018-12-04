@@ -2,7 +2,7 @@ import { NextFunction, Request, Response } from "express";
 
 import { getContextFromResponse, initializeContext } from "../IContext";
 import Operation from "../operation";
-import ServerError from "../ServerError";
+import HandlerError from "../HandlerError";
 
 /**
  * Dispath Middleware will dectet operation of current HTTP request
@@ -45,7 +45,7 @@ export default function dispatchMiddleware(
       ].join(" ")
     );
     return next(
-      new ServerError(400, "Bad Request, URL is invalid", undefined, undefined)
+      new HandlerError(400, "Bad Request, URL is invalid", undefined, undefined)
     );
   }
 

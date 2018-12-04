@@ -7,15 +7,19 @@ import endMiddleware from "./generated/middlewares/end.middleware";
 import errorMiddleware from "./generated/middlewares/error.middleware";
 import HandlerMiddlewareFactory from "./generated/middlewares/HandlerMiddlewareFactory";
 import serializerMiddleware from "./generated/middlewares/serializer.middleware";
-import SimpleHandler from "./SimpleHandler";
+import SimpleServiceHandler from "./SimpleServiceHandler";
+import SimpleContainerHandler from "./SimpleContainerHandler";
+import SimpleDataStore from "./SimpleDataStore";
 
 const app = express();
 
 // Create a SimpleHandler into handler middleware factory
 // SimpleHandler implements IHandler interface, we can manually create different handlers
 // Handler will take to persistency layer
+const dataSource = new SimpleDataStore();
 const handlerMiddlewareFactory = new HandlerMiddlewareFactory(
-  new SimpleHandler()
+  new SimpleServiceHandler(dataSource),
+  new SimpleContainerHandler(dataSource)
 );
 
 // Generated middlewares should follow strict orders

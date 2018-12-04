@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 
 import { getContextFromResponse } from "./generated/IContext";
-import ServerError from "./generated/ServerError";
+import HandlerError from "./generated/HandlerError";
 import { initializeBlobContext } from "./IBlobContext";
 
 /**
@@ -26,7 +26,7 @@ export default function blobContextMiddleware(
   if (paths.length < 1) {
     // TODO: Error handling
     // TODO: Logging
-    throw new ServerError(
+    throw new HandlerError(
       400,
       `Request URL doesn't include valid storage account name. Requested path is ${
         req.path
