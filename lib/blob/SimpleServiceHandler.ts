@@ -1,5 +1,5 @@
-import * as Models from "./generated/models";
 import IServiceHandler from "./generated/handlers/IServiceHandler";
+import * as Models from "./generated/models";
 import SimpleBaseHandler from "./SimpleBaseHandler";
 
 /**

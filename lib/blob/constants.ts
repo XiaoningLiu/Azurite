@@ -1,7 +1,9 @@
 export const SERVER_CONFIGS = {
-  LISTENING_PORT: 1000,
   HOST_NAME: "127.0.0.1",
+  LISTENING_PORT: 10000,
 };
+
+export const CONTEXT_PATH = "azurite_blob_context";
 
 export const IS_PRODUCTION = process.env.NODE_ENV === "production";
 

@@ -1,9 +1,9 @@
-import IContext from "./generated/IContext";
-import * as Models from "./generated/models";
-import IBlobContext from "./IBlobContext";
+import BlobStorageContext from "./BlobStorageContext";
+import Context from "./generated/Context";
 import IContainerHandler from "./generated/handlers/IContainerHandler";
-import SimpleBaseHandler from "./SimpleBaseHandler";
+import * as Models from "./generated/models";
 import ServerError from "./ServerError";
+import SimpleBaseHandler from "./SimpleBaseHandler";
 
 /**
  * Manually implement handlers by implementing IContainerHandler interface.
@@ -17,9 +17,10 @@ export default class SimpleContainerHandler extends SimpleBaseHandler
   implements IContainerHandler {
   public async containerCreate(
     options: Models.IContainerCreateOptionalParams,
-    context: IContext
+    context: Context
   ): Promise<Models.IContainerCreateHeaders> {
-    const blobCtx = context as IBlobContext;
+    const blobCtx = new BlobStorageContext(context);
+
     if (this.containers[blobCtx.container!]) {
       throw new ServerError(409, "Container exists");
     }

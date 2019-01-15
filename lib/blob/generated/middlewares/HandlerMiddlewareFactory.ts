@@ -1,10 +1,10 @@
 import { NextFunction, Request, RequestHandler, Response } from "express";
 
-import { getContextFromResponse } from "../IContext";
-import Operation from "../operation";
+import Context from "../Context";
 import HandlerError from "../HandlerError";
-import IServiceHandler from "../handlers/IServiceHandler";
 import IContainerHandler from "../handlers/IContainerHandler";
+import IServiceHandler from "../handlers/IServiceHandler";
+import Operation from "../Operation";
 
 class HandlerMiddlewareFactory {
   protected readonly serviceHandler: IServiceHandler;
@@ -20,7 +20,7 @@ class HandlerMiddlewareFactory {
 
   public newHandlerMiddleware(): RequestHandler {
     return (req: Request, res: Response, next: NextFunction) => {
-      const ctx = getContextFromResponse(res);
+      const ctx = new Context(res.locals);
 
       if (!ctx.operation) {
         // tslint:disable:no-console
@@ -56,7 +56,7 @@ class HandlerMiddlewareFactory {
     res: Response,
     next: NextFunction
   ) {
-    const ctx = getContextFromResponse(res);
+    const ctx = new Context(res.locals);
     if (
       ctx.operation &&
       ctx.operation === Operation.Service_ListContainersSegment
@@ -77,7 +77,7 @@ class HandlerMiddlewareFactory {
     res: Response,
     next: NextFunction
   ) {
-    const ctx = getContextFromResponse(res);
+    const ctx = new Context(res.locals);
     if (ctx.operation && ctx.operation === Operation.Container_Create) {
       this.containerHandler
         .containerCreate(ctx.handlerParameters!.options, ctx)

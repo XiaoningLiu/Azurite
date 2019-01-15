@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 
-import { getContextFromResponse } from "../IContext";
-import Operation from "../operation";
+import Context from "../Context";
+import Operation from "../Operation";
 import {
   containerCreateOperationSpec,
   listContainersSegmentOperationSpec,
@@ -23,7 +23,7 @@ export default function serializerMiddleware(
   res: Response,
   next: NextFunction
 ): void {
-  const ctx = getContextFromResponse(res);
+  const ctx = new Context(res.locals);
 
   switch (ctx.operation!) {
     case Operation.Service_ListContainersSegment:

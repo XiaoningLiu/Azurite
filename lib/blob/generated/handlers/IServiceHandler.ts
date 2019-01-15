@@ -1,9 +1,9 @@
-import IContext from "../IContext";
+import Context from "../Context";
 import * as Models from "../models";
 
 export default interface IServiceHandler {
   serviceListContainersSegment(
     options: Models.IServiceListContainersSegmentOptionalParams,
-    context: IContext
+    context: Context
   ): Promise<Models.IServiceListContainersSegmentResponse>;
 }

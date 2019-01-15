@@ -1,9 +1,16 @@
 import { Request, Response } from "express";
 import * as msRest from "ms-rest-js";
-import * as Mappers from "../mappers";
 
-import { IHandlerParameters, ParameterPath } from "../IContext";
+import { IHandlerParameters } from "../Context";
+import * as Mappers from "../mappers";
 import { stringifyXML } from "./xml";
+
+export declare type ParameterPath =
+  | string
+  | string[]
+  | {
+      [propertyName: string]: ParameterPath;
+    };
 
 export async function deserialize(
   req: Request,
@@ -90,6 +97,7 @@ export async function serialize(
   handlerResponse: any
 ): Promise<void> {
   // TODO: handle all kinds of reponses
+  // tslint:disable-next-line:radix
   const responseStatusCode = Number.parseInt(Object.keys(spec.responses)[0]);
   res.status(responseStatusCode);
 

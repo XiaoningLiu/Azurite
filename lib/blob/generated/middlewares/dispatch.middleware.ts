@@ -1,29 +1,31 @@
 import { NextFunction, Request, Response } from "express";
 
-import { getContextFromResponse, initializeContext } from "../IContext";
-import Operation from "../operation";
+import Context from "../Context";
 import HandlerError from "../HandlerError";
+import ILogger from "../ILogger";
+import Operation from "../Operation";
 
 /**
- * Dispath Middleware will dectet operation of current HTTP request
- * from operation list. Operation will be assigned to res.locals.context.
- * Make sure use dispathMiddleware before another other generated middlewares.
+ * Dispatch Middleware will delete operation of current HTTP request
+ * from operation enum. Operation will be assigned to context held in res.locals.
+ * Make sure use dispatchMiddleware is before another other generated middleware.
  *
  * @export
- * @param {Request} req
- * @param {Response} res
- * @param {NextFunction} next
+ * @param {Request} req An express compatible Request object
+ * @param {Response} res An express compatible Response object
+ * @param {NextFunction} next An express middleware next callback
  * @returns {void}
  */
 export default function dispatchMiddleware(
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
+  logger: ILogger,
+  contextPath: string
 ): void {
-  // Initialize conetxt for the first time
-  initializeContext(res, {});
-  const ctx = getContextFromResponse(res);
+  const ctx = new Context(res.locals, contextPath);
 
+  logger.verbose(`Dispatching request...`, ctx.contextID);
   if (req.method.toUpperCase() === "GET" && req.query.comp === "list") {
     ctx.operation = Operation.Service_ListContainersSegment;
   } else if (
@@ -33,21 +35,28 @@ export default function dispatchMiddleware(
     ctx.operation = Operation.Container_Create;
   }
 
-  // Every operation has one if condition checking
-  // TODO: Performance improvement to skip iterator all operations list?
-  if (!ctx.operation) {
-    // tslint:disable-next-line:no-console
-    console.warn(
+  if (ctx.operation === undefined) {
+    logger.error(
       [
         `Cannot identify operation in existing operation list.`,
-        `Please make sure "dispatchMiddleware" before "handlerMiddleware".`,
-        `Or targeting URL doesn't follow Azure Storage Blob service requirements.`,
-      ].join(" ")
+        `Targeting URL may not follow any swagger request requirements.`,
+      ].join(" "),
+      ctx.contextID
     );
-    return next(
-      new HandlerError(400, "Bad Request, URL is invalid", undefined, undefined)
+
+    const handlerError = new HandlerError(
+      400,
+      "Bad Request, URL is invalid",
+      undefined,
+      undefined
     );
+
+    logger.error(`Set HTTP code: ${handlerError.statusCode}`, ctx.contextID);
+    logger.error(`Set error message: ${handlerError.message}`, ctx.contextID);
+
+    throw handlerError;
   }
 
+  logger.info(`Operation=${Operation[ctx.operation]}`, ctx.contextID);
   next();
 }
