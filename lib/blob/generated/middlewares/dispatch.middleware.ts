@@ -1,9 +1,9 @@
 import { NextFunction, Request, Response } from "express";
 
 import Context from "../Context";
-import HandlerError from "../HandlerError";
-import ILogger from "../ILogger";
+import UnhandledURLError from "../errors/UnhandledURLError";
 import Operation from "../Operation";
+import ILogger from "../utils/ILogger";
 
 /**
  * Dispatch Middleware will delete operation of current HTTP request
@@ -26,41 +26,20 @@ export default function dispatchMiddleware(
   contextPath: string
 ): void {
   const ctx = new Context(res.locals, contextPath);
-
   logger.verbose(`DispatchMiddleware: Dispatching request...`, ctx.contextID);
+
   if (req.method.toUpperCase() === "GET" && req.query.comp === "list") {
     ctx.operation = Operation.Service_ListContainersSegment;
-  } else if (
-    req.method.toUpperCase() === "PUT" &&
-    req.query.restype === "container"
-  ) {
+  } else if (req.method.toUpperCase() === "PUT" && req.query.restype === "container") {
     ctx.operation = Operation.Container_Create;
   }
 
   if (ctx.operation === undefined) {
-    logger.error(
-      [
-        `DispatchMiddleware: Cannot identify operation in existing operation list.`,
-        `Targeting URL may not follow any swagger request requirements.`,
-      ].join(" "),
-      ctx.contextID
-    );
-
-    const handlerError = new HandlerError(
-      400,
-      "Bad Request, URL is invalid",
-      undefined,
-      undefined
-    );
-
+    const handlerError = new UnhandledURLError();
     logger.error(`DispatchMiddleware: ${handlerError.message}`, ctx.contextID);
-
     throw handlerError;
   }
 
-  logger.info(
-    `DispatchMiddleware: Operation=${Operation[ctx.operation]}`,
-    ctx.contextID
-  );
+  logger.info(`DispatchMiddleware: Operation=${Operation[ctx.operation]}`, ctx.contextID);
   next();
 }

@@ -1,17 +1,14 @@
 import { NextFunction, Request, Response } from "express";
 
 import Context from "../Context";
-import HandlerError from "../HandlerError";
-import ILogger from "../ILogger";
+import UnhandledURLError from "../errors/UnhandledURLError";
 import Operation from "../Operation";
-import {
-  containerCreateOperationSpec,
-  listContainersSegmentOperationSpec,
-} from "../operation.specification";
+import { containerCreateOperationSpec, listContainersSegmentOperationSpec } from "../artifacts/operation.specification";
+import ILogger from "../utils/ILogger";
 import { deserialize } from "../utils/serializer";
 
 /**
- * Deserializer Middleware.
+ * Deserializer Middleware. Deserialize incoming HTTP request into models.
  *
  * @export
  * @param {Request} req An express compatible Request object
@@ -27,33 +24,11 @@ export default function deserializerMiddleware(
   contextPath: string
 ): void {
   const ctx = new Context(res.locals, contextPath);
-
-  logger.verbose(
-    `DeserializerMiddleware: Start deserializing...`,
-    ctx.contextID
-  );
+  logger.verbose(`DeserializerMiddleware: Start deserializing...`, ctx.contextID);
 
   if (ctx.operation === undefined) {
-    logger.error(
-      [
-        `DeserializerMiddleware: Operation doesn't exist in context when deserializing.`,
-        `Please make sure "dispatchMiddleware" is registered before "handlerMiddleware"`,
-      ].join(),
-      ctx.contextID
-    );
-
-    const handlerError = new HandlerError(
-      400,
-      "Bad Request, URL is invalid",
-      undefined,
-      undefined
-    );
-
-    logger.error(
-      `DeserializerMiddleware: ${handlerError.message}`,
-      ctx.contextID
-    );
-
+    const handlerError = new UnhandledURLError();
+    logger.error(`DeserializerMiddleware: ${handlerError.message}`, ctx.contextID);
     throw handlerError;
   }
 
@@ -75,11 +50,7 @@ export default function deserializerMiddleware(
         .catch(next);
       break;
     default:
-      logger.warn(
-        `DeserializerMiddleware: doesn't have deserializer for operation ${
-          Operation[ctx.operation]
-        }`
-      );
+      logger.warn(`DeserializerMiddleware: cannot find deserializer for operation ${Operation[ctx.operation]}`);
       break;
   }
 }

@@ -81,11 +81,7 @@ export const action4: msRest.OperationParameter = {
   },
 };
 export const appendPosition: msRest.OperationParameter = {
-  parameterPath: [
-    "options",
-    "appendPositionAccessConditions",
-    "appendPosition",
-  ],
+  parameterPath: ["options", "appendPositionAccessConditions", "appendPosition"],
   mapper: {
     serializedName: "x-ms-blob-condition-appendpos",
     type: {
@@ -513,11 +509,7 @@ export const ifNoneMatch: msRest.OperationParameter = {
   },
 };
 export const ifSequenceNumberEqualTo: msRest.OperationParameter = {
-  parameterPath: [
-    "options",
-    "sequenceNumberAccessConditions",
-    "ifSequenceNumberEqualTo",
-  ],
+  parameterPath: ["options", "sequenceNumberAccessConditions", "ifSequenceNumberEqualTo"],
   mapper: {
     serializedName: "x-ms-if-sequence-number-eq",
     type: {
@@ -526,11 +518,7 @@ export const ifSequenceNumberEqualTo: msRest.OperationParameter = {
   },
 };
 export const ifSequenceNumberLessThan: msRest.OperationParameter = {
-  parameterPath: [
-    "options",
-    "sequenceNumberAccessConditions",
-    "ifSequenceNumberLessThan",
-  ],
+  parameterPath: ["options", "sequenceNumberAccessConditions", "ifSequenceNumberLessThan"],
   mapper: {
     serializedName: "x-ms-if-sequence-number-lt",
     type: {
@@ -539,11 +527,7 @@ export const ifSequenceNumberLessThan: msRest.OperationParameter = {
   },
 };
 export const ifSequenceNumberLessThanOrEqualTo: msRest.OperationParameter = {
-  parameterPath: [
-    "options",
-    "sequenceNumberAccessConditions",
-    "ifSequenceNumberLessThanOrEqualTo",
-  ],
+  parameterPath: ["options", "sequenceNumberAccessConditions", "ifSequenceNumberLessThanOrEqualTo"],
   mapper: {
     serializedName: "x-ms-if-sequence-number-le",
     type: {
@@ -579,13 +563,7 @@ export const include1: msRest.OperationQueryParameter = {
       element: {
         type: {
           name: "Enum",
-          allowedValues: [
-            "snapshots",
-            "metadata",
-            "uncommittedblobs",
-            "copy",
-            "deleted",
-          ],
+          allowedValues: ["snapshots", "metadata", "uncommittedblobs", "copy", "deleted"],
         },
       },
     },
@@ -831,11 +809,7 @@ export const sourceIfMatch: msRest.OperationParameter = {
   },
 };
 export const sourceIfModifiedSince: msRest.OperationParameter = {
-  parameterPath: [
-    "options",
-    "sourceModifiedAccessConditions",
-    "sourceIfModifiedSince",
-  ],
+  parameterPath: ["options", "sourceModifiedAccessConditions", "sourceIfModifiedSince"],
   mapper: {
     serializedName: "x-ms-source-if-modified-since",
     type: {
@@ -844,11 +818,7 @@ export const sourceIfModifiedSince: msRest.OperationParameter = {
   },
 };
 export const sourceIfNoneMatch: msRest.OperationParameter = {
-  parameterPath: [
-    "options",
-    "sourceModifiedAccessConditions",
-    "sourceIfNoneMatch",
-  ],
+  parameterPath: ["options", "sourceModifiedAccessConditions", "sourceIfNoneMatch"],
   mapper: {
     serializedName: "x-ms-source-if-none-match",
     type: {
@@ -857,11 +827,7 @@ export const sourceIfNoneMatch: msRest.OperationParameter = {
   },
 };
 export const sourceIfUnmodifiedSince: msRest.OperationParameter = {
-  parameterPath: [
-    "options",
-    "sourceModifiedAccessConditions",
-    "sourceIfUnmodifiedSince",
-  ],
+  parameterPath: ["options", "sourceModifiedAccessConditions", "sourceIfUnmodifiedSince"],
   mapper: {
     serializedName: "x-ms-source-if-unmodified-since",
     type: {

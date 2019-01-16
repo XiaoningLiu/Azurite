@@ -1,5 +1,5 @@
+import * as Models from "../artifacts/models";
 import Context from "../Context";
-import * as Models from "../models";
 
 // Auto generated. Service handler interface to be manually implemented.
 export default interface IServiceHandler {

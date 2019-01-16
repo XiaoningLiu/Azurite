@@ -1,20 +1,12 @@
-import {
-  ErrorRequestHandler,
-  NextFunction,
-  Request,
-  RequestHandler,
-  Response,
-} from "express";
+import { ErrorRequestHandler, NextFunction, Request, RequestHandler, Response } from "express";
 
-import ILogger from "./ILogger";
 import deserializerMiddleware from "./middlewares/deserializer.middleware";
 import dispatchMiddleware from "./middlewares/dispatch.middleware";
 import endMiddleware from "./middlewares/end.middleware";
 import errorMiddleware from "./middlewares/error.middleware";
-import HandlerMiddlewareFactory, {
-  IHandlers,
-} from "./middlewares/HandlerMiddlewareFactory";
+import HandlerMiddlewareFactory, { IHandlers } from "./middlewares/HandlerMiddlewareFactory";
 import serializerMiddleware from "./middlewares/serializer.middleware";
+import ILogger from "./utils/ILogger";
 
 /**
  * MiddlewareFactory will generate middleware according to swagger definitions.
@@ -37,10 +29,7 @@ export default class MiddlewareFactory {
    * @param {string} [contextPath="default_context"] Optional. res.locals[contextPath] will be used to hold context
    * @memberof MiddlewareFactory
    */
-  public constructor(
-    private readonly logger: ILogger,
-    private readonly contextPath: string = "default_context"
-  ) {}
+  public constructor(private readonly logger: ILogger, private readonly contextPath: string = "default_context") {}
 
   /**
    * DispatchMiddleware is the 1s middleware should be used among other generated middleware.
@@ -74,11 +63,7 @@ export default class MiddlewareFactory {
    * @memberof MiddlewareFactory
    */
   public createHandlerMiddleware(handlers: IHandlers): RequestHandler {
-    const handlerMiddlewareFactory = new HandlerMiddlewareFactory(
-      handlers,
-      this.logger,
-      this.contextPath
-    );
+    const handlerMiddlewareFactory = new HandlerMiddlewareFactory(handlers, this.logger, this.contextPath);
     return handlerMiddlewareFactory.createHandlerMiddleware();
   }
 

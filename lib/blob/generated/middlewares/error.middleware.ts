@@ -1,8 +1,8 @@
 import { NextFunction, Request, Response } from "express";
 
 import Context from "../Context";
-import HandlerError from "../HandlerError";
-import ILogger from "../ILogger";
+import HandlerError from "../errors/HandlerError";
+import ILogger from "../utils/ILogger";
 
 /**
  * ErrorMiddleware handles following 2 kinds of errors thrown from previous middleware or handlers:
@@ -44,33 +44,22 @@ export default function errorMiddleware(
   // Only handle ServerError, for other customized error types hand over to
   // other error handlers.
   if (err instanceof HandlerError) {
-    logger.error(
-      `ErrorMiddleware: received a HandlerError, fill error information to HTTP response`,
-      ctx.contextID
-    );
+    logger.error(`ErrorMiddleware: received a HandlerError, fill error information to HTTP response`, ctx.contextID);
 
     logger.error(
-      `ErrorMiddleware: ErrorName=${err.name} ErrorMessage=${
-        err.message
-      }  ErrorHTTPStatusCode=${err.statusCode} ErrorHTTPStatusMessage=${
-        err.statusMessage
-      } ErrorHTTPHeaders=${JSON.stringify(err.headers)} ErrorHTTPBody=${
+      `ErrorMiddleware: ErrorName=${err.name} ErrorMessage=${err.message}  ErrorHTTPStatusCode=${
+        err.statusCode
+      } ErrorHTTPStatusMessage=${err.statusMessage} ErrorHTTPHeaders=${JSON.stringify(err.headers)} ErrorHTTPBody=${
         err.body
       } ErrorStack=${JSON.stringify(err.stack)}`,
       ctx.contextID
     );
 
-    logger.error(
-      `ErrorMiddleware: Set HTTP code: ${err.statusCode}`,
-      ctx.contextID
-    );
+    logger.error(`ErrorMiddleware: Set HTTP code: ${err.statusCode}`, ctx.contextID);
 
     res.status(err.statusCode);
     if (err.statusMessage) {
-      logger.error(
-        `ErrorMiddleware: Set HTTP status message: ${err.statusMessage}`,
-        ctx.contextID
-      );
+      logger.error(`ErrorMiddleware: Set HTTP status message: ${err.statusMessage}`, ctx.contextID);
       res.statusMessage = err.statusMessage;
     }
 
@@ -79,20 +68,14 @@ export default function errorMiddleware(
         if (err.headers.hasOwnProperty(key)) {
           const value = err.headers[key];
           if (value) {
-            logger.error(
-              `ErrorMiddleware: Set HTTP Header: ${key}=${value}`,
-              ctx.contextID
-            );
+            logger.error(`ErrorMiddleware: Set HTTP Header: ${key}=${value}`, ctx.contextID);
             res.setHeader(key, value);
           }
         }
       }
     }
 
-    logger.error(
-      `ErrorMiddleware: Set content type: application/xml`,
-      ctx.contextID
-    );
+    logger.error(`ErrorMiddleware: Set content type: application/xml`, ctx.contextID);
     res.contentType(`application/xml`);
 
     logger.error(`ErrorMiddleware: Set HTTP body: ${err.body}`, ctx.contextID);
@@ -100,28 +83,15 @@ export default function errorMiddleware(
       res.write(err.body);
     }
   } else if (err instanceof Error) {
-    logger.error(
-      `ErrorMiddleware: received an Error, fill error information to HTTP response`,
-      ctx.contextID
-    );
-    logger.error(
-      `ErrorMiddleware: ErrorName=${err.name} ErrorMessage=${
-        err.message
-      } ErrorStack=${err.stack}`
-    );
+    logger.error(`ErrorMiddleware: received an Error, fill error information to HTTP response`, ctx.contextID);
+    logger.error(`ErrorMiddleware: ErrorName=${err.name} ErrorMessage=${err.message} ErrorStack=${err.stack}`);
     logger.error(`ErrorMiddleware: Set HTTP code: ${500}`, ctx.contextID);
-    logger.error(
-      `ErrorMiddleware: Set error message: ${err.message}`,
-      ctx.contextID
-    );
+    logger.error(`ErrorMiddleware: Set error message: ${err.message}`, ctx.contextID);
 
     res.status(500);
     res.write(err.message);
   } else {
-    logger.warn(
-      `ErrorMiddleware: received unhandled error object`,
-      ctx.contextID
-    );
+    logger.warn(`ErrorMiddleware: received unhandled error object`, ctx.contextID);
   }
 
   next();

@@ -9,6 +9,7 @@ import SimpleServiceHandler from "./SimpleServiceHandler";
 import logger from "./utils/log/Logger";
 
 const app = express();
+app.disable("x-powered-by");
 
 // MiddlewareFactory is a factory to create auto-generated middleware
 const middlewareFactory = new MiddlewareFactory(logger, CONTEXT_PATH);

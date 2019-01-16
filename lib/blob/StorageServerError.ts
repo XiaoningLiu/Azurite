@@ -1,6 +1,6 @@
 import * as xml from "fast-xml-parser";
 
-import HandlerError from "./generated/HandlerError";
+import HandlerError from "./generated/errors/HandlerError";
 
 const parser = new xml.j2xParser({});
 
@@ -24,17 +24,9 @@ export default class StorageServerError extends HandlerError {
       }
     }
 
-    const bodyInXML = `<?xml version="1.0" encoding="utf-8"?><Error>${parser.parse(
-      bodyInJSON
-    ) as string}</Error>`;
+    const bodyInXML = `<?xml version="1.0" encoding="utf-8"?><Error>${parser.parse(bodyInJSON) as string}</Error>`;
 
-    super(
-      statusCode,
-      storageErrorMessage,
-      undefined,
-      { "x-ms-error-code": storageErrorCode },
-      bodyInXML
-    );
+    super(statusCode, storageErrorMessage, undefined, { "x-ms-error-code": storageErrorCode }, bodyInXML);
 
     this.name = "StorageServerError";
   }

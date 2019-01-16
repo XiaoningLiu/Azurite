@@ -2,7 +2,6 @@ import { NextFunction, Request, Response } from "express";
 
 import BlobStorageContext from "./BlobStorageContext";
 import { CONTEXT_PATH } from "./constants";
-import StorageServerError from "./StorageServerError";
 import logger from "./utils/log/Logger";
 
 /**
@@ -13,11 +12,7 @@ import logger from "./utils/log/Logger";
  * @param {Response} res An express compatible Response object
  * @param {NextFunction} next An express middleware next callback
  */
-export default function blobStorageContextMiddleware(
-  req: Request,
-  res: Response,
-  next: NextFunction
-): void {
+export default function blobStorageContextMiddleware(req: Request, res: Response, next: NextFunction): void {
   // TODO: Use GUID for a server request ID
   const requestID = new Date().getTime().toString();
 
@@ -25,14 +20,9 @@ export default function blobStorageContextMiddleware(
   blobContext.xMsRequestID = requestID;
   blobContext.startTime = new Date();
 
-  logger.verbose(
-    `BlobStorageContextMiddleware: Initialized blob storage context...`,
-    requestID
-  );
+  logger.verbose(`BlobStorageContextMiddleware: Initialized blob storage context...`, requestID);
   logger.info(
-    `BlobStorageContextMiddleware: RequestURL=${
-      req.url
-    } RequestHeaders:${JSON.stringify(req.headers)} ClientIP=${
+    `BlobStorageContextMiddleware: RequestURL=${req.url} RequestHeaders:${JSON.stringify(req.headers)} ClientIP=${
       req.ip
     } Protocol=${req.protocol} HTTPVersion=${req.httpVersion}`,
     requestID
@@ -41,23 +31,18 @@ export default function blobStorageContextMiddleware(
   // TODO: Optimize container/blob name extraction algorithm,
   // because blob names may contain special characters
   const paths = req.path.split("/").filter((value) => value.length > 0);
-  if (paths.length < 1) {
-    const handlerError = new StorageServerError(
-      400,
-      "InvalidQueryParameterValue",
-      `Value for one of the query parameters specified in the request URI is invalid`,
-      blobContext.contextID!
-    );
+  // if (paths.length < 1) {
+  //   const handlerError = new StorageServerError(
+  //     400,
+  //     "InvalidQueryParameterValue",
+  //     `Value for one of the query parameters specified in the request URI is invalid`,
+  //     blobContext.contextID!
+  //   );
 
-    logger.error(
-      `BlobStorageContextMiddleware: BlobStorageContextMiddleware: ${
-        handlerError.message
-      }`,
-      requestID
-    );
+  //   logger.error(`BlobStorageContextMiddleware: BlobStorageContextMiddleware: ${handlerError.message}`, requestID);
 
-    throw handlerError;
-  }
+  //   throw handlerError;
+  // }
 
   const account = paths[0];
   const container = paths[1];
@@ -67,10 +52,6 @@ export default function blobStorageContextMiddleware(
   blobContext.container = container;
   blobContext.blob = blob;
 
-  logger.info(
-    `BlobStorageContextMiddleware: Account:=${account} Container=${container} Blob=${blob}`,
-    requestID
-  );
-
+  logger.info(`BlobStorageContextMiddleware: Account:=${account} Container=${container} Blob=${blob}`, requestID);
   next();
 }

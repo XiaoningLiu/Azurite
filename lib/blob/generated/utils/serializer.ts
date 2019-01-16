@@ -1,8 +1,8 @@
 import { Request, Response } from "express";
 import * as msRest from "ms-rest-js";
 
+import * as Mappers from "../artifacts/mappers";
 import { IHandlerParameters } from "../Context";
-import * as Mappers from "../mappers";
 import { stringifyXML } from "./xml";
 
 export declare type ParameterPath =
@@ -12,26 +12,17 @@ export declare type ParameterPath =
       [propertyName: string]: ParameterPath;
     };
 
-export async function deserialize(
-  req: Request,
-  spec: msRest.OperationSpec
-): Promise<IHandlerParameters> {
+export async function deserialize(req: Request, spec: msRest.OperationSpec): Promise<IHandlerParameters> {
   const parameters: IHandlerParameters = {};
 
   // Retrieve parameters in the header
   for (const queryParameter of spec.queryParameters || []) {
     if (!queryParameter.mapper.serializedName) {
-      throw new TypeError(
-        `QueryParameter mapper doesn't include valid "serializedName"`
-      );
+      throw new TypeError(`QueryParameter mapper doesn't include valid "serializedName"`);
     }
     const queryKey = queryParameter.mapper.serializedName;
     const queryValueOriginal = req.query[queryKey];
-    const queryValue = spec.serializer.deserialize(
-      queryParameter.mapper,
-      queryValueOriginal,
-      queryKey
-    );
+    const queryValue = spec.serializer.deserialize(queryParameter.mapper, queryValueOriginal, queryKey);
 
     // TODO: Currently validation is only in serialize method,
     // remove when adding validateConstraints to deserialize()
@@ -44,18 +35,12 @@ export async function deserialize(
   // Retrieve parameters in headers
   for (const headerParameter of spec.headerParameters || []) {
     if (!headerParameter.mapper.serializedName) {
-      throw new TypeError(
-        `HeaderParameter mapper doesn't include valid "serializedName"`
-      );
+      throw new TypeError(`HeaderParameter mapper doesn't include valid "serializedName"`);
     }
 
     const headerKey = headerParameter.mapper.serializedName;
     const headerValueOriginal = req.get(headerKey);
-    const headerValue = spec.serializer.deserialize(
-      headerParameter.mapper,
-      headerValueOriginal,
-      headerKey
-    );
+    const headerValue = spec.serializer.deserialize(headerParameter.mapper, headerValueOriginal, headerKey);
 
     // TODO: Currently validation is only in serialize method,
     // remove when adding validateConstraints to deserialize()
@@ -67,11 +52,7 @@ export async function deserialize(
   return parameters;
 }
 
-function setParametersValue(
-  parameters: IHandlerParameters,
-  parameterPath: ParameterPath,
-  parameterValue: any
-) {
+function setParametersValue(parameters: IHandlerParameters, parameterPath: ParameterPath, parameterValue: any) {
   if (typeof parameterPath === "string") {
     parameters[parameterPath] = parameterValue;
   } else if (Array.isArray(parameterPath)) {
@@ -91,11 +72,7 @@ function setParametersValue(
   }
 }
 
-export async function serialize(
-  res: Response,
-  spec: msRest.OperationSpec,
-  handlerResponse: any
-): Promise<void> {
+export async function serialize(res: Response, spec: msRest.OperationSpec, handlerResponse: any): Promise<void> {
   // TODO: handle all kinds of reponses
   // tslint:disable-next-line:radix
   const responseStatusCode = Number.parseInt(Object.keys(spec.responses)[0]);
@@ -105,10 +82,7 @@ export async function serialize(
 
   // Serialize headers
   const headerSerializer = new msRest.Serializer(Mappers);
-  const rawHeaders = headerSerializer.serialize(
-    response.headersMapper!,
-    handlerResponse
-  );
+  const rawHeaders = headerSerializer.serialize(response.headersMapper!, handlerResponse);
 
   for (const headerKey in rawHeaders) {
     if (rawHeaders.hasOwnProperty(headerKey)) {
@@ -119,13 +93,9 @@ export async function serialize(
 
   // Serialize XML bodies
   if (response.bodyMapper) {
-    const body = spec.serializer.serialize(
-      response.bodyMapper!,
-      handlerResponse
-    );
+    const body = spec.serializer.serialize(response.bodyMapper!, handlerResponse);
     const xmlBody = stringifyXML(body, {
-      rootName:
-        response.bodyMapper!.xmlName || response.bodyMapper!.serializedName,
+      rootName: response.bodyMapper!.xmlName || response.bodyMapper!.serializedName,
     });
     res.contentType(`application/xml`);
 

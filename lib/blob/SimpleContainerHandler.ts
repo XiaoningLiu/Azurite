@@ -1,7 +1,7 @@
 import BlobStorageContext from "./BlobStorageContext";
+import * as Models from "./generated/artifacts/models";
 import Context from "./generated/Context";
 import IContainerHandler from "./generated/handlers/IContainerHandler";
-import * as Models from "./generated/models";
 import SimpleBaseHandler from "./SimpleBaseHandler";
 import StorageServerError from "./StorageServerError";
 
@@ -13,8 +13,7 @@ import StorageServerError from "./StorageServerError";
  * @class SimpleContainerHandler
  * @implements {IHandler}
  */
-export default class SimpleContainerHandler extends SimpleBaseHandler
-  implements IContainerHandler {
+export default class SimpleContainerHandler extends SimpleBaseHandler implements IContainerHandler {
   public async containerCreate(
     options: Models.IContainerCreateOptionalParams,
     context: Context

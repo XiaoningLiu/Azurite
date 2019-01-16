@@ -5,7 +5,7 @@
 ## Features
 
 * Auto generated protocol layer, models, serializer, deserializer and handler interfaces
-* Flexible structure to customize manually middlewares and generated middlewares
+* Flexible structure to customize manually middleware and generated middleware
 * ES6 native promise and async methods, less dependencies
 * Create different handlers by implementing generated handler interface
 

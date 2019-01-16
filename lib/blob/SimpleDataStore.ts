@@ -1,4 +1,4 @@
-import { IContainerItem } from "./generated/models";
+import { IContainerItem } from "./generated/artifacts/models";
 
 /**
  * This is a simple sample of persistency layer data source.

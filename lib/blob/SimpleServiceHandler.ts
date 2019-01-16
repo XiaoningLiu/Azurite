@@ -1,5 +1,5 @@
+import * as Models from "./generated/artifacts/models";
 import IServiceHandler from "./generated/handlers/IServiceHandler";
-import * as Models from "./generated/models";
 import SimpleBaseHandler from "./SimpleBaseHandler";
 
 /**
@@ -10,8 +10,7 @@ import SimpleBaseHandler from "./SimpleBaseHandler";
  * @class SimpleHandler
  * @implements {IHandler}
  */
-export default class SimpleHandler extends SimpleBaseHandler
-  implements IServiceHandler {
+export default class SimpleHandler extends SimpleBaseHandler implements IServiceHandler {
   public async serviceListContainersSegment(
     options: Models.IServiceListContainersSegmentOptionalParams
   ): Promise<Models.IServiceListContainersSegmentResponse> {

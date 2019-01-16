@@ -1,11 +1,11 @@
 import { NextFunction, Request, RequestHandler, Response } from "express";
 
 import Context from "../Context";
-import HandlerError from "../HandlerError";
+import UnhandledURLError from "../errors/UnhandledURLError";
 import IContainerHandler from "../handlers/IContainerHandler";
 import IServiceHandler from "../handlers/IServiceHandler";
-import ILogger from "../ILogger";
 import Operation from "../Operation";
+import ILogger from "../utils/ILogger";
 
 // Auto generated
 export interface IHandlers {
@@ -32,11 +32,7 @@ export default class HandlerMiddlewareFactory {
    * @param {string} contextPath res.locals[contextPath] will be used to hold context
    * @memberof HandlerMiddlewareFactory
    */
-  constructor(
-    handlers: IHandlers,
-    private readonly logger: ILogger,
-    private readonly contextPath: string
-  ) {
+  constructor(handlers: IHandlers, private readonly logger: ILogger, private readonly contextPath: string) {
     this.serviceHandler = handlers.serviceHandler;
     this.containerHandler = handlers.containerHandler;
   }
@@ -46,18 +42,12 @@ export default class HandlerMiddlewareFactory {
       const ctx = new Context(res.locals, this.contextPath);
 
       if (!ctx.operation) {
-        this.logger.error(
-          `HandlerMiddleware: Cannot identify current operation in context.`
-        );
-
-        throw new HandlerError(500, "Internal Server Error");
+        const handlerError = new UnhandledURLError();
+        this.logger.error(`HandlerMiddleware: ${handlerError.message}`, ctx.contextID);
+        throw handlerError;
       }
 
-      this.logger.verbose(
-        `HandlerMiddleware: DeserializedParameters=${JSON.stringify(
-          ctx.handlerParameters
-        )}`
-      );
+      this.logger.verbose(`HandlerMiddleware: DeserializedParameters=${JSON.stringify(ctx.handlerParameters)}`);
 
       switch (ctx.operation) {
         case Operation.Service_ListContainersSegment:
@@ -67,11 +57,7 @@ export default class HandlerMiddlewareFactory {
           this.containerCreateMiddleware(req, res, next);
           break;
         default:
-          this.logger.warn(
-            `HandlerMiddleware: cannot find handler for operation ${
-              Operation[ctx.operation]
-            }`
-          );
+          this.logger.warn(`HandlerMiddleware: cannot find handler for operation ${Operation[ctx.operation]}`);
           break;
       }
     };
@@ -84,10 +70,8 @@ export default class HandlerMiddlewareFactory {
     next: NextFunction
   ) {
     const ctx = new Context(res.locals, this.contextPath);
-    if (
-      ctx.operation &&
-      ctx.operation === Operation.Service_ListContainersSegment
-    ) {
+
+    if (ctx.operation && ctx.operation === Operation.Service_ListContainersSegment) {
       this.serviceHandler
         .serviceListContainersSegment(ctx.handlerParameters!.options, ctx)
         .then((response) => {
