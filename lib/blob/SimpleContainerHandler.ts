@@ -2,8 +2,8 @@ import BlobStorageContext from "./BlobStorageContext";
 import Context from "./generated/Context";
 import IContainerHandler from "./generated/handlers/IContainerHandler";
 import * as Models from "./generated/models";
-import ServerError from "./ServerError";
 import SimpleBaseHandler from "./SimpleBaseHandler";
+import StorageServerError from "./StorageServerError";
 
 /**
  * Manually implement handlers by implementing IContainerHandler interface.
@@ -22,7 +22,12 @@ export default class SimpleContainerHandler extends SimpleBaseHandler
     const blobCtx = new BlobStorageContext(context);
 
     if (this.containers[blobCtx.container!]) {
-      throw new ServerError(409, "Container exists");
+      throw new StorageServerError(
+        409,
+        "ContainerAlreadyExists",
+        "The specified container already exists.",
+        context.contextID!
+      );
     }
 
     const lastModified = new Date();

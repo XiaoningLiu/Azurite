@@ -5,13 +5,22 @@ import HandlerError from "../HandlerError";
 import ILogger from "../ILogger";
 
 /**
- * errorMiddleware handles following 2 kinds of errors thrown from previous middlewares:
+ * ErrorMiddleware handles following 2 kinds of errors thrown from previous middleware or handlers:
  *
- * 1. HandlerError will be serilized and return immediatelly.
- *    Most of expected errors, such as 5XX or 4XX errors are HandlerError.
- * 2. Other unexcepted errors will be serilized to 500 Internal Server error directly.
- *    Every this kind of error should be carefully checked, and consider to make it a HandlerError.
+ * 1. HandlerError will be serialized.
+ *    This includes most of expected errors, such as 4XX or some 5xx errors are HandlerError.
  *
+ * 2. Other unexpected errors will be serialized to 500 Internal Server error directly.
+ *    Every this kind of error should be carefully checked, and consider to handle it as a HandlerError.
+ *
+ * @export
+ * @param {(HandlerError | Error)} err A HandlerError or Error object
+ * @param {Request} _req An express compatible Request object
+ * @param {Response} res An express compatible Response object
+ * @param {NextFunction} next An express middleware next callback
+ * @param {ILogger} logger A valid logger
+ * @param {string} contextPath res.locals[contextPath] will be used to hold context
+ * @returns {void}
  */
 export default function errorMiddleware(
   err: HandlerError | Error,
@@ -80,16 +89,16 @@ export default function errorMiddleware(
       }
     }
 
-    const totalTimeInMS = new Date().getTime() - ctx.startTime.getTime();
     logger.error(
-      `ErrorMiddleware: End response. TotalTimeInMS=${totalTimeInMS} Headers=${JSON.stringify(
-        res.getHeaders()
-      )}`,
+      `ErrorMiddleware: Set content type: application/xml`,
       ctx.contextID
     );
+    res.contentType(`application/xml`);
 
-    res.send(err.body);
-    return;
+    logger.error(`ErrorMiddleware: Set HTTP body: ${err.body}`, ctx.contextID);
+    if (err.body) {
+      res.write(err.body);
+    }
   } else if (err instanceof Error) {
     logger.error(
       `ErrorMiddleware: received an Error, fill error information to HTTP response`,
@@ -105,25 +114,15 @@ export default function errorMiddleware(
       `ErrorMiddleware: Set error message: ${err.message}`,
       ctx.contextID
     );
-    logger.error(`ErrorMiddleware: Return HTTP body`, ctx.contextID);
-
-    const totalTimeInMS = new Date().getTime() - ctx.startTime.getTime();
-    logger.error(
-      `ErrorMiddleware: End response. TotalTimeInMS=${totalTimeInMS} Headers=${JSON.stringify(
-        res.getHeaders()
-      )}`,
-      ctx.contextID
-    );
 
     res.status(500);
-    res.send(err.message); // TODO: Format error body
-    return;
+    res.write(err.message);
+  } else {
+    logger.warn(
+      `ErrorMiddleware: received unhandled error object`,
+      ctx.contextID
+    );
   }
-
-  logger.warn(
-    `ErrorMiddleware: received unhandled error object`,
-    ctx.contextID
-  );
 
   next();
 }

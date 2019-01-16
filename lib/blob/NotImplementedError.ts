@@ -1,10 +1,10 @@
-import ServerError from "./ServerError";
+import StorageServerError from "./StorageServerError";
 
 /**
  * Create customized error types by inheriting ServerError
  *
  * @export
  * @class UnimplementedError
- * @extends {ServerError}
+ * @extends {StorageServerError}
  */
-export default class NotImplementedError extends ServerError {}
+export default class NotImplementedError extends StorageServerError {}

@@ -10,13 +10,14 @@ import {
 import { serialize } from "../utils/serializer";
 
 /**
- * serializerMiddleware
+ * SerializerMiddleware will serialize models into HTTP responses.
  *
  * @export
- * @param {Request} req
- * @param {Response} res
- * @param {NextFunction} next
- * @returns {void}
+ * @param {Request} _req An express compatible Request object
+ * @param {Response} res An express compatible Response object
+ * @param {NextFunction} next An express middleware next callback
+ * @param {ILogger} logger A valid logger
+ * @param {string} contextPath res.locals[contextPath] will be used to hold context
  */
 export default function serializerMiddleware(
   // tslint:disable-next-line:variable-name

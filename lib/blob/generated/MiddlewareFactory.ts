@@ -6,15 +6,15 @@ import {
   Response,
 } from "express";
 
-import ILogger from "../ILogger";
-import deserializerMiddleware from "./deserializer.middleware";
-import dispatchMiddleware from "./dispatch.middleware";
-import endMiddleware from "./end.middleware";
-import errorMiddleware from "./error.middleware";
+import ILogger from "./ILogger";
+import deserializerMiddleware from "./middlewares/deserializer.middleware";
+import dispatchMiddleware from "./middlewares/dispatch.middleware";
+import endMiddleware from "./middlewares/end.middleware";
+import errorMiddleware from "./middlewares/error.middleware";
 import HandlerMiddlewareFactory, {
   IHandlers,
-} from "./HandlerMiddlewareFactory";
-import serializerMiddleware from "./serializer.middleware";
+} from "./middlewares/HandlerMiddlewareFactory";
+import serializerMiddleware from "./middlewares/serializer.middleware";
 
 /**
  * MiddlewareFactory will generate middleware according to swagger definitions.
@@ -74,7 +74,11 @@ export default class MiddlewareFactory {
    * @memberof MiddlewareFactory
    */
   public createHandlerMiddleware(handlers: IHandlers): RequestHandler {
-    const handlerMiddlewareFactory = new HandlerMiddlewareFactory(handlers);
+    const handlerMiddlewareFactory = new HandlerMiddlewareFactory(
+      handlers,
+      this.logger,
+      this.contextPath
+    );
     return handlerMiddlewareFactory.createHandlerMiddleware();
   }
 

@@ -12,9 +12,8 @@ export interface IHandlerParameters {
  * @class Context
  */
 export default class Context {
-  public readonly holder: any;
+  public readonly context: any;
   public readonly path: string;
-  public readonly startTime: Date = new Date();
 
   /**
    * Creates an instance of Context.
@@ -42,57 +41,67 @@ export default class Context {
     path: string = "context"
   ) {
     if (holderOrContext instanceof Context) {
-      this.holder = holderOrContext.holder;
+      this.context = holderOrContext.context;
       this.path = holderOrContext.path;
     } else {
-      this.holder = holderOrContext as any;
+      const context = holderOrContext as any;
       this.path = path;
 
-      if (this.holder[this.path] === undefined) {
-        this.holder[this.path] = {};
+      if (context[this.path] === undefined) {
+        context[this.path] = {};
       }
 
-      if (typeof this.holder[this.path] !== "object") {
+      if (typeof context[this.path] !== "object") {
         throw new Error(
           `Initialize Context error because holder.${
             this.path
           } is not a object.`
         );
       }
+
+      this.context = context[this.path];
     }
   }
 
   public get operation(): Operation | undefined {
-    return this.holder.operation;
+    return this.context.operation;
   }
 
   public set operation(operation: Operation | undefined) {
-    this.holder.operation = operation;
+    this.context.operation = operation;
   }
 
   public get handlerParameters(): IHandlerParameters | undefined {
-    return this.holder.handlerParameters;
+    return this.context.handlerParameters;
   }
 
   public set handlerParameters(
     handlerParameters: IHandlerParameters | undefined
   ) {
-    this.holder.handlerParameters = handlerParameters;
+    this.context.handlerParameters = handlerParameters;
   }
 
   public get handlerResponses(): any {
-    return this.holder.handlerResponses;
+    return this.context.handlerResponses;
   }
 
   public set handlerResponses(handlerResponses: any) {
-    this.holder.handlerResponses = handlerResponses;
+    this.context.handlerResponses = handlerResponses;
   }
 
   public get contextID(): string | undefined {
-    return this.holder.contextID;
+    return this.context.contextID;
   }
 
   public set contextID(contextID: string | undefined) {
-    this.holder.contextID = contextID;
+    this.context.contextID = contextID;
+  }
+
+  public set startTime(startTime: Date | undefined) {
+    this.context.startTime = startTime;
+  }
+
+  public get startTime(): Date | undefined {
+    return this.context.startTime;
   }
 }

@@ -4,6 +4,7 @@ import Context from "../Context";
 import HandlerError from "../HandlerError";
 import IContainerHandler from "../handlers/IContainerHandler";
 import IServiceHandler from "../handlers/IServiceHandler";
+import ILogger from "../ILogger";
 import Operation from "../Operation";
 
 // Auto generated
@@ -12,34 +13,51 @@ export interface IHandlers {
   containerHandler: IContainerHandler;
 }
 
+/**
+ * Auto generated. HandlerMiddlewareFactory will accept handlers and create handler middleware.
+ *
+ * @export
+ * @class HandlerMiddlewareFactory
+ */
 export default class HandlerMiddlewareFactory {
-  protected readonly serviceHandler: IServiceHandler;
-  protected readonly containerHandler: IContainerHandler;
+  private readonly serviceHandler: IServiceHandler;
+  private readonly containerHandler: IContainerHandler;
 
-  constructor(handlers: IHandlers) {
+  /**
+   * Creates an instance of HandlerMiddlewareFactory.
+   * Accept handlers and create handler middleware.
+   *
+   * @param {IHandlers} handlers Handlers implemented handler interfaces
+   * @param {ILogger} logger A valid logger
+   * @param {string} contextPath res.locals[contextPath] will be used to hold context
+   * @memberof HandlerMiddlewareFactory
+   */
+  constructor(
+    handlers: IHandlers,
+    private readonly logger: ILogger,
+    private readonly contextPath: string
+  ) {
     this.serviceHandler = handlers.serviceHandler;
     this.containerHandler = handlers.containerHandler;
   }
 
   public createHandlerMiddleware(): RequestHandler {
     return (req: Request, res: Response, next: NextFunction) => {
-      const ctx = new Context(res.locals);
+      const ctx = new Context(res.locals, this.contextPath);
 
       if (!ctx.operation) {
-        // tslint:disable:no-console
-        console.error(
-          `Cannot identify current operation. Please use "dispatchMiddleware" before "handlerMiddleware".`
+        this.logger.error(
+          `HandlerMiddleware: Cannot identify current operation in context.`
         );
-        return next(
-          new HandlerError(500, "Internal Server Error", undefined, undefined)
-        );
+
+        throw new HandlerError(500, "Internal Server Error");
       }
 
-      console.log(`[Handler Middleware]: parsed parameters are`);
-      console.log(JSON.stringify(ctx.handlerParameters));
-      if (ctx.operation === Operation.Service_ListContainersSegment) {
-        this.serviceListContainersSegmentMiddleware(req, res, next);
-      }
+      this.logger.verbose(
+        `HandlerMiddleware: DeserializedParameters=${JSON.stringify(
+          ctx.handlerParameters
+        )}`
+      );
 
       switch (ctx.operation) {
         case Operation.Service_ListContainersSegment:
@@ -47,19 +65,25 @@ export default class HandlerMiddlewareFactory {
           break;
         case Operation.Container_Create:
           this.containerCreateMiddleware(req, res, next);
+          break;
         default:
+          this.logger.warn(
+            `HandlerMiddleware: cannot find handler for operation ${
+              Operation[ctx.operation]
+            }`
+          );
           break;
       }
     };
   }
 
-  public serviceListContainersSegmentMiddleware(
+  private serviceListContainersSegmentMiddleware(
     // tslint:disable-next-line:variable-name
     _req: Request,
     res: Response,
     next: NextFunction
   ) {
-    const ctx = new Context(res.locals);
+    const ctx = new Context(res.locals, this.contextPath);
     if (
       ctx.operation &&
       ctx.operation === Operation.Service_ListContainersSegment
@@ -74,13 +98,14 @@ export default class HandlerMiddlewareFactory {
     }
   }
 
-  public containerCreateMiddleware(
+  private containerCreateMiddleware(
     // tslint:disable-next-line:variable-name
     _req: Request,
     res: Response,
     next: NextFunction
   ) {
-    const ctx = new Context(res.locals);
+    const ctx = new Context(res.locals, this.contextPath);
+
     if (ctx.operation && ctx.operation === Operation.Container_Create) {
       this.containerHandler
         .containerCreate(ctx.handlerParameters!.options, ctx)

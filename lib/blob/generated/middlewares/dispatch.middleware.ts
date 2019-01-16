@@ -14,6 +14,8 @@ import Operation from "../Operation";
  * @param {Request} req An express compatible Request object
  * @param {Response} res An express compatible Response object
  * @param {NextFunction} next An express middleware next callback
+ * @param {ILogger} logger A valid logger
+ * @param {string} contextPath res.locals[contextPath] will be used to hold context
  * @returns {void}
  */
 export default function dispatchMiddleware(

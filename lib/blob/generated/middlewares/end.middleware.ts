@@ -4,13 +4,13 @@ import ILogger from "../ILogger";
 
 /**
  * End middleware is used to send out final HTTP response.
- * TODO: Move it to outside of generated scope code?
  *
  * @export
- * @param {Request} _req
- * @param {Response} res
+ * @param {Request} _req An express compatible Request object
+ * @param {Response} res An express compatible Response object
+ * @param {ILogger} logger A valid logger
+ * @param {string} contextPath res.locals[contextPath] will be used to hold context
  */
-// tslint:disable-next-line:variable-name
 export default function endMiddleware(
   _req: Request,
   res: Response,
@@ -19,9 +19,13 @@ export default function endMiddleware(
 ): void {
   const ctx = new Context(res.locals, contextPath);
 
-  const totalTimeInMS = new Date().getTime() - ctx.startTime.getTime();
+  const totalTimeInMS = ctx.startTime
+    ? new Date().getTime() - ctx.startTime.getTime()
+    : undefined;
   logger.info(
-    `EndMiddleware: End response. TotalTimeInMS=${totalTimeInMS} Headers=${JSON.stringify(
+    `EndMiddleware: End response. TotalTimeInMS=${totalTimeInMS} StatusCode=${
+      res.statusCode
+    } StatusMessage=${res.statusMessage} Headers=${JSON.stringify(
       res.getHeaders()
     )}`,
     ctx.contextID

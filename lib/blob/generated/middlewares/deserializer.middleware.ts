@@ -14,9 +14,9 @@ import { deserialize } from "../utils/serializer";
  * Deserializer Middleware.
  *
  * @export
- * @param {Request} req
- * @param {Response} res
- * @param {NextFunction} next
+ * @param {Request} req An express compatible Request object
+ * @param {Response} res An express compatible Response object
+ * @param {NextFunction} next An express middleware next callback
  * @returns {void}
  */
 export default function deserializerMiddleware(
@@ -73,6 +73,7 @@ export default function deserializerMiddleware(
           next();
         })
         .catch(next);
+      break;
     default:
       logger.warn(
         `DeserializerMiddleware: doesn't have deserializer for operation ${

@@ -2,7 +2,7 @@ import express from "express";
 
 import blobStorageContextMiddleware from "./blobStorageContext.middleware";
 import { CONTEXT_PATH } from "./constants";
-import MiddlewareFactory from "./generated/middlewares/MiddlewareFactory";
+import MiddlewareFactory from "./generated/MiddlewareFactory";
 import SimpleContainerHandler from "./SimpleContainerHandler";
 import SimpleDataStore from "./SimpleDataStore";
 import SimpleServiceHandler from "./SimpleServiceHandler";
@@ -13,10 +13,10 @@ const app = express();
 // MiddlewareFactory is a factory to create auto-generated middleware
 const middlewareFactory = new MiddlewareFactory(logger, CONTEXT_PATH);
 
-// Create a SimpleHandler into handler middleware factory
-// SimpleHandler implements IHandler interface, we can manually create different handlers
-// Handler will take to persistency layer
+// Data source is persistency layer entry
 const dataSource = new SimpleDataStore();
+
+// Create handlers into handler middleware factory
 const handlers = {
   containerHandler: new SimpleContainerHandler(dataSource),
   serviceHandler: new SimpleServiceHandler(dataSource),

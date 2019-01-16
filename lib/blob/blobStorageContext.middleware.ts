@@ -2,7 +2,7 @@ import { NextFunction, Request, Response } from "express";
 
 import BlobStorageContext from "./BlobStorageContext";
 import { CONTEXT_PATH } from "./constants";
-import HandlerError from "./generated/HandlerError";
+import StorageServerError from "./StorageServerError";
 import logger from "./utils/log/Logger";
 
 /**
@@ -23,6 +23,7 @@ export default function blobStorageContextMiddleware(
 
   const blobContext = new BlobStorageContext(res.locals, CONTEXT_PATH);
   blobContext.xMsRequestID = requestID;
+  blobContext.startTime = new Date();
 
   logger.verbose(
     `BlobStorageContextMiddleware: Initialized blob storage context...`,
@@ -41,11 +42,11 @@ export default function blobStorageContextMiddleware(
   // because blob names may contain special characters
   const paths = req.path.split("/").filter((value) => value.length > 0);
   if (paths.length < 1) {
-    const handlerError = new HandlerError(
+    const handlerError = new StorageServerError(
       400,
-      `Request URL doesn't include valid storage account. Requested path is ${
-        req.path
-      }`
+      "InvalidQueryParameterValue",
+      `Value for one of the query parameters specified in the request URI is invalid`,
+      blobContext.contextID!
     );
 
     logger.error(
