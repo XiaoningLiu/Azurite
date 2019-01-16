@@ -6,19 +6,22 @@ import IContainerHandler from "../handlers/IContainerHandler";
 import IServiceHandler from "../handlers/IServiceHandler";
 import Operation from "../Operation";
 
-class HandlerMiddlewareFactory {
+// Auto generated
+export interface IHandlers {
+  serviceHandler: IServiceHandler;
+  containerHandler: IContainerHandler;
+}
+
+export default class HandlerMiddlewareFactory {
   protected readonly serviceHandler: IServiceHandler;
   protected readonly containerHandler: IContainerHandler;
 
-  constructor(
-    serviceHandler: IServiceHandler,
-    containerHandler: IContainerHandler
-  ) {
-    this.serviceHandler = serviceHandler;
-    this.containerHandler = containerHandler;
+  constructor(handlers: IHandlers) {
+    this.serviceHandler = handlers.serviceHandler;
+    this.containerHandler = handlers.containerHandler;
   }
 
-  public newHandlerMiddleware(): RequestHandler {
+  public createHandlerMiddleware(): RequestHandler {
     return (req: Request, res: Response, next: NextFunction) => {
       const ctx = new Context(res.locals);
 
@@ -89,5 +92,3 @@ class HandlerMiddlewareFactory {
     }
   }
 }
-
-export default HandlerMiddlewareFactory;

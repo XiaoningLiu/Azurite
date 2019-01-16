@@ -1,6 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 
 import Context from "../Context";
+import ILogger from "../ILogger";
 import Operation from "../Operation";
 import {
   containerCreateOperationSpec,
@@ -21,9 +22,13 @@ export default function serializerMiddleware(
   // tslint:disable-next-line:variable-name
   _req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
+  logger: ILogger,
+  contextPath: string
 ): void {
-  const ctx = new Context(res.locals);
+  const ctx = new Context(res.locals, contextPath);
+
+  logger.verbose(`SerializerMiddleware: Start serializing...`, ctx.contextID);
 
   switch (ctx.operation!) {
     case Operation.Service_ListContainersSegment:

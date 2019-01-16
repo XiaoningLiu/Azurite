@@ -24,13 +24,16 @@ export default function blobStorageContextMiddleware(
   const blobContext = new BlobStorageContext(res.locals, CONTEXT_PATH);
   blobContext.xMsRequestID = requestID;
 
-  logger.verbose(`Initialized blob storage context...`, requestID);
+  logger.verbose(
+    `BlobStorageContextMiddleware: Initialized blob storage context...`,
+    requestID
+  );
   logger.info(
-    `RequestURL=${req.url} RequestHeaders:${JSON.stringify(
-      req.headers
-    )} ClientIP=${req.ip} Protocol=${req.protocol} HTTPVersion=${
-      req.httpVersion
-    }`,
+    `BlobStorageContextMiddleware: RequestURL=${
+      req.url
+    } RequestHeaders:${JSON.stringify(req.headers)} ClientIP=${
+      req.ip
+    } Protocol=${req.protocol} HTTPVersion=${req.httpVersion}`,
     requestID
   );
 
@@ -45,8 +48,12 @@ export default function blobStorageContextMiddleware(
       }`
     );
 
-    logger.error(`Set HTTP code: ${handlerError.statusCode}`, requestID);
-    logger.error(`Set error message: ${handlerError.message}`, requestID);
+    logger.error(
+      `BlobStorageContextMiddleware: BlobStorageContextMiddleware: ${
+        handlerError.message
+      }`,
+      requestID
+    );
 
     throw handlerError;
   }
@@ -60,7 +67,7 @@ export default function blobStorageContextMiddleware(
   blobContext.blob = blob;
 
   logger.info(
-    `Account:=${account} Container=${container} Blob=${blob}`,
+    `BlobStorageContextMiddleware: Account:=${account} Container=${container} Blob=${blob}`,
     requestID
   );
 

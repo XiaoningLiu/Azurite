@@ -130,6 +130,6 @@ export async function serialize(
     res.contentType(`application/xml`);
 
     // TODO: Should send response in a serializer?
-    res.send(xmlBody);
+    res.write(xmlBody);
   }
 }

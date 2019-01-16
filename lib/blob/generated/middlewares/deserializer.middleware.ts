@@ -28,12 +28,15 @@ export default function deserializerMiddleware(
 ): void {
   const ctx = new Context(res.locals, contextPath);
 
-  logger.verbose(`Start deserializing...`, ctx.contextID);
+  logger.verbose(
+    `DeserializerMiddleware: Start deserializing...`,
+    ctx.contextID
+  );
 
   if (ctx.operation === undefined) {
     logger.error(
       [
-        `Operation doesn't exist in context when deserializing.`,
+        `DeserializerMiddleware: Operation doesn't exist in context when deserializing.`,
         `Please make sure "dispatchMiddleware" is registered before "handlerMiddleware"`,
       ].join(),
       ctx.contextID
@@ -46,8 +49,10 @@ export default function deserializerMiddleware(
       undefined
     );
 
-    logger.error(`Set HTTP code: ${handlerError.statusCode}`, ctx.contextID);
-    logger.error(`Set error message: ${handlerError.message}`, ctx.contextID);
+    logger.error(
+      `DeserializerMiddleware: ${handlerError.message}`,
+      ctx.contextID
+    );
 
     throw handlerError;
   }
@@ -70,7 +75,7 @@ export default function deserializerMiddleware(
         .catch(next);
     default:
       logger.warn(
-        `deserializerMiddleware doesn't have deserializer for operation ${
+        `DeserializerMiddleware: doesn't have deserializer for operation ${
           Operation[ctx.operation]
         }`
       );

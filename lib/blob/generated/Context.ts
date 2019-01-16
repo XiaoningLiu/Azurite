@@ -14,6 +14,7 @@ export interface IHandlerParameters {
 export default class Context {
   public readonly holder: any;
   public readonly path: string;
+  public readonly startTime: Date = new Date();
 
   /**
    * Creates an instance of Context.

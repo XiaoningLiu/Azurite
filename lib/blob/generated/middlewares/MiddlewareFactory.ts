@@ -1,42 +1,116 @@
-import { Express, NextFunction, Request, Response } from "express";
+import {
+  ErrorRequestHandler,
+  NextFunction,
+  Request,
+  RequestHandler,
+  Response,
+} from "express";
 
 import ILogger from "../ILogger";
 import deserializerMiddleware from "./deserializer.middleware";
 import dispatchMiddleware from "./dispatch.middleware";
-
-export declare type Middleware = (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => void;
+import endMiddleware from "./end.middleware";
+import errorMiddleware from "./error.middleware";
+import HandlerMiddlewareFactory, {
+  IHandlers,
+} from "./HandlerMiddlewareFactory";
+import serializerMiddleware from "./serializer.middleware";
 
 /**
- * MiddlewareFactory will generate necessary factories according to swagger definitions.
- * TODO: Any better name?
+ * MiddlewareFactory will generate middleware according to swagger definitions.
+ * Generated middleware MUST be used by strict order:
+ *  * dispatchMiddleware
+ *  * DeserializerMiddleware
+ *  * HandlerMiddleware
+ *  * SerializerMiddleware
+ *  * ErrorMiddleware
+ *  * EndMiddleware
  *
  * @export
  * @class MiddlewareFactory
  */
 export default class MiddlewareFactory {
+  /**
+   * Creates an instance of MiddlewareFactory.
+   *
+   * @param {ILogger} logger A valid logger
+   * @param {string} [contextPath="default_context"] Optional. res.locals[contextPath] will be used to hold context
+   * @memberof MiddlewareFactory
+   */
   public constructor(
     private readonly logger: ILogger,
     private readonly contextPath: string = "default_context"
   ) {}
 
-  public register(express: Express) {
-    express.use(this.createDispatchMiddleware);
-    express.use(this.createDeserializerMiddleware);
-  }
-
-  public createDispatchMiddleware(): Middleware {
+  /**
+   * DispatchMiddleware is the 1s middleware should be used among other generated middleware.
+   *
+   * @returns {RequestHandler}
+   * @memberof MiddlewareFactory
+   */
+  public createDispatchMiddleware(): RequestHandler {
     return (req: Request, res: Response, next: NextFunction) => {
       dispatchMiddleware(req, res, next, this.logger, this.contextPath);
     };
   }
 
-  public createDeserializerMiddleware(): Middleware {
+  /**
+   * DeserializerMiddleware is the 2nd middleware should be used among other generated middleware.
+   *
+   * @returns {RequestHandler}
+   * @memberof MiddlewareFactory
+   */
+  public createDeserializerMiddleware(): RequestHandler {
     return (req: Request, res: Response, next: NextFunction) => {
       deserializerMiddleware(req, res, next, this.logger, this.contextPath);
+    };
+  }
+
+  /**
+   * HandlerMiddleware is the 3rd middleware should be used among other generated middleware.
+   *
+   * @param {IHandlers} handlers
+   * @returns {RequestHandler}
+   * @memberof MiddlewareFactory
+   */
+  public createHandlerMiddleware(handlers: IHandlers): RequestHandler {
+    const handlerMiddlewareFactory = new HandlerMiddlewareFactory(handlers);
+    return handlerMiddlewareFactory.createHandlerMiddleware();
+  }
+
+  /**
+   * SerializerMiddleware is the 4st middleware should be used among other generated middleware.
+   *
+   * @returns {RequestHandler}
+   * @memberof MiddlewareFactory
+   */
+  public createSerializerMiddleware(): RequestHandler {
+    return (req: Request, res: Response, next: NextFunction) => {
+      serializerMiddleware(req, res, next, this.logger, this.contextPath);
+    };
+  }
+
+  /**
+   * ErrorMiddleware is the 5st middleware should be used among other generated middleware.
+   *
+   * @returns {ErrorRequestHandler}
+   * @memberof MiddlewareFactory
+   */
+  public createErrorMiddleware(): ErrorRequestHandler {
+    return (err: Error, req: Request, res: Response, next: NextFunction) => {
+      errorMiddleware(err, req, res, next, this.logger, this.contextPath);
+    };
+  }
+
+  /**
+   * EndMiddleware is the 6st middleware should be used among other generated middleware.
+   *
+   * @returns {RequestHandler}
+   * @memberof MiddlewareFactory
+   */
+  public createEndMiddleware(): RequestHandler {
+    return (req: Request, res: Response) => {
+      endMiddleware(req, res, this.logger, this.contextPath);
     };
   }
 }

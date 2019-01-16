@@ -1,4 +1,6 @@
 import { Request, Response } from "express";
+import Context from "../Context";
+import ILogger from "../ILogger";
 
 /**
  * End middleware is used to send out final HTTP response.
@@ -9,6 +11,21 @@ import { Request, Response } from "express";
  * @param {Response} res
  */
 // tslint:disable-next-line:variable-name
-export default function endMiddleware(_req: Request, res: Response): void {
-  res.send();
+export default function endMiddleware(
+  _req: Request,
+  res: Response,
+  logger: ILogger,
+  contextPath: string
+): void {
+  const ctx = new Context(res.locals, contextPath);
+
+  const totalTimeInMS = new Date().getTime() - ctx.startTime.getTime();
+  logger.info(
+    `EndMiddleware: End response. TotalTimeInMS=${totalTimeInMS} Headers=${JSON.stringify(
+      res.getHeaders()
+    )}`,
+    ctx.contextID
+  );
+
+  res.end();
 }

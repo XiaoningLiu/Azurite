@@ -25,7 +25,7 @@ export default function dispatchMiddleware(
 ): void {
   const ctx = new Context(res.locals, contextPath);
 
-  logger.verbose(`Dispatching request...`, ctx.contextID);
+  logger.verbose(`DispatchMiddleware: Dispatching request...`, ctx.contextID);
   if (req.method.toUpperCase() === "GET" && req.query.comp === "list") {
     ctx.operation = Operation.Service_ListContainersSegment;
   } else if (
@@ -38,7 +38,7 @@ export default function dispatchMiddleware(
   if (ctx.operation === undefined) {
     logger.error(
       [
-        `Cannot identify operation in existing operation list.`,
+        `DispatchMiddleware: Cannot identify operation in existing operation list.`,
         `Targeting URL may not follow any swagger request requirements.`,
       ].join(" "),
       ctx.contextID
@@ -51,12 +51,14 @@ export default function dispatchMiddleware(
       undefined
     );
 
-    logger.error(`Set HTTP code: ${handlerError.statusCode}`, ctx.contextID);
-    logger.error(`Set error message: ${handlerError.message}`, ctx.contextID);
+    logger.error(`DispatchMiddleware: ${handlerError.message}`, ctx.contextID);
 
     throw handlerError;
   }
 
-  logger.info(`Operation=${Operation[ctx.operation]}`, ctx.contextID);
+  logger.info(
+    `DispatchMiddleware: Operation=${Operation[ctx.operation]}`,
+    ctx.contextID
+  );
   next();
 }

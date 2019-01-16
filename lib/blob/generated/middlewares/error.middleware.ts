@@ -1,6 +1,8 @@
 import { NextFunction, Request, Response } from "express";
 
+import Context from "../Context";
 import HandlerError from "../HandlerError";
+import ILogger from "../ILogger";
 
 /**
  * errorMiddleware handles following 2 kinds of errors thrown from previous middlewares:
@@ -16,17 +18,50 @@ export default function errorMiddleware(
   // tslint:disable-next-line:variable-name
   _req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
+  logger: ILogger,
+  contextPath: string
 ): void {
+  const ctx = new Context(res.locals, contextPath);
+
   if (res.headersSent) {
+    logger.warn(
+      `Error middleware received an error, but response.headersSent is true, pass error to next middleware`,
+      ctx.contextID
+    );
     return next(err);
   }
 
   // Only handle ServerError, for other customized error types hand over to
   // other error handlers.
   if (err instanceof HandlerError) {
+    logger.error(
+      `ErrorMiddleware: received a HandlerError, fill error information to HTTP response`,
+      ctx.contextID
+    );
+
+    logger.error(
+      `ErrorMiddleware: ErrorName=${err.name} ErrorMessage=${
+        err.message
+      }  ErrorHTTPStatusCode=${err.statusCode} ErrorHTTPStatusMessage=${
+        err.statusMessage
+      } ErrorHTTPHeaders=${JSON.stringify(err.headers)} ErrorHTTPBody=${
+        err.body
+      } ErrorStack=${JSON.stringify(err.stack)}`,
+      ctx.contextID
+    );
+
+    logger.error(
+      `ErrorMiddleware: Set HTTP code: ${err.statusCode}`,
+      ctx.contextID
+    );
+
     res.status(err.statusCode);
     if (err.statusMessage) {
+      logger.error(
+        `ErrorMiddleware: Set HTTP status message: ${err.statusMessage}`,
+        ctx.contextID
+      );
       res.statusMessage = err.statusMessage;
     }
 
@@ -35,19 +70,60 @@ export default function errorMiddleware(
         if (err.headers.hasOwnProperty(key)) {
           const value = err.headers[key];
           if (value) {
+            logger.error(
+              `ErrorMiddleware: Set HTTP Header: ${key}=${value}`,
+              ctx.contextID
+            );
             res.setHeader(key, value);
           }
         }
       }
     }
 
-    console.error(`${err.name} ${err.message} ${err.statusCode}`);
+    const totalTimeInMS = new Date().getTime() - ctx.startTime.getTime();
+    logger.error(
+      `ErrorMiddleware: End response. TotalTimeInMS=${totalTimeInMS} Headers=${JSON.stringify(
+        res.getHeaders()
+      )}`,
+      ctx.contextID
+    );
+
     res.send(err.body);
+    return;
   } else if (err instanceof Error) {
-    console.error(`${err.name} ${err.message} ${500}`);
+    logger.error(
+      `ErrorMiddleware: received an Error, fill error information to HTTP response`,
+      ctx.contextID
+    );
+    logger.error(
+      `ErrorMiddleware: ErrorName=${err.name} ErrorMessage=${
+        err.message
+      } ErrorStack=${err.stack}`
+    );
+    logger.error(`ErrorMiddleware: Set HTTP code: ${500}`, ctx.contextID);
+    logger.error(
+      `ErrorMiddleware: Set error message: ${err.message}`,
+      ctx.contextID
+    );
+    logger.error(`ErrorMiddleware: Return HTTP body`, ctx.contextID);
+
+    const totalTimeInMS = new Date().getTime() - ctx.startTime.getTime();
+    logger.error(
+      `ErrorMiddleware: End response. TotalTimeInMS=${totalTimeInMS} Headers=${JSON.stringify(
+        res.getHeaders()
+      )}`,
+      ctx.contextID
+    );
+
     res.status(500);
-    res.send();
+    res.send(err.message); // TODO: Format error body
+    return;
   }
+
+  logger.warn(
+    `ErrorMiddleware: received unhandled error object`,
+    ctx.contextID
+  );
 
   next();
 }
