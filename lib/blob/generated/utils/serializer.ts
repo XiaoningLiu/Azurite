@@ -3,7 +3,8 @@ import * as msRest from "ms-rest-js";
 
 import * as Mappers from "../artifacts/mappers";
 import { IHandlerParameters } from "../Context";
-import { stringifyXML } from "./xml";
+import { stringifyXML, parseXML } from "./xml";
+import { MapperType } from "ms-rest-js";
 
 export declare type ParameterPath =
   | string
@@ -15,7 +16,7 @@ export declare type ParameterPath =
 export async function deserialize(req: Request, spec: msRest.OperationSpec): Promise<IHandlerParameters> {
   const parameters: IHandlerParameters = {};
 
-  // Retrieve parameters in the header
+  // Deserialize query parameters
   for (const queryParameter of spec.queryParameters || []) {
     if (!queryParameter.mapper.serializedName) {
       throw new TypeError(`QueryParameter mapper doesn't include valid "serializedName"`);
@@ -32,7 +33,7 @@ export async function deserialize(req: Request, spec: msRest.OperationSpec): Pro
     setParametersValue(parameters, queryParameter.parameterPath, queryValue);
   }
 
-  // Retrieve parameters in headers
+  // Deserialize header parameters
   for (const headerParameter of spec.headerParameters || []) {
     if (!headerParameter.mapper.serializedName) {
       throw new TypeError(`HeaderParameter mapper doesn't include valid "serializedName"`);
@@ -49,7 +50,65 @@ export async function deserialize(req: Request, spec: msRest.OperationSpec): Pro
     setParametersValue(parameters, headerParameter.parameterPath, headerValue);
   }
 
+  // Deserialize body
+  const bodyParameter = spec.requestBody;
+
+  if (bodyParameter) {
+    const jsonContentTypes = ["application/json", "text/json"];
+    const xmlContentTypes = ["application/xml", "application/atom+xml"];
+    const contentType = req.headers["content-type"] || "";
+    const contentComponents = !contentType ? [] : contentType.split(";").map((component) => component.toLowerCase());
+
+    const isRequestWithJSON = contentComponents.some((component) => jsonContentTypes.indexOf(component) !== -1); // TODO
+    const isRequestWithXML =
+      spec.isXML || contentComponents.some((component) => xmlContentTypes.indexOf(component) !== -1);
+    // const isRequestWithStream = false;
+
+    const body = await readRequestIntoText(req);
+    let parsedBody: object = {};
+    if (isRequestWithJSON) {
+      // read body
+      parsedBody = JSON.parse(body);
+    } else if (isRequestWithXML) {
+      parsedBody = await parseXML(body);
+    }
+
+    let valueToDeserialize: any = parsedBody;
+    if (spec.isXML && bodyParameter.mapper.type.name === MapperType.Sequence) {
+      valueToDeserialize =
+        typeof valueToDeserialize === "object" ? valueToDeserialize[bodyParameter.mapper.xmlElementName!] : [];
+    }
+
+    try {
+      parsedBody = spec.serializer.deserialize(
+        bodyParameter.mapper,
+        valueToDeserialize,
+        bodyParameter.mapper.serializedName!
+      );
+    } catch (error) {
+      throw error;
+    }
+
+    setParametersValue(parameters, bodyParameter.parameterPath, parsedBody);
+
+    // spec.serializer.deserialize(bodyParameter.mapper, parsedBody, bodyParameter.mapper.serializedName!);
+  }
+
   return parameters;
+}
+
+async function readRequestIntoText(req: Request): Promise<string> {
+  return new Promise<string>((resolve, reject) => {
+    const segments: string[] = [];
+    req.on("data", (buffer) => {
+      segments.push(buffer);
+    });
+    req.on("error", reject);
+    req.on("end", () => {
+      const joined = segments.join("");
+      resolve(joined);
+    });
+  });
 }
 
 function setParametersValue(parameters: IHandlerParameters, parameterPath: ParameterPath, parameterValue: any) {
@@ -73,17 +132,17 @@ function setParametersValue(parameters: IHandlerParameters, parameterPath: Param
 }
 
 export async function serialize(res: Response, spec: msRest.OperationSpec, handlerResponse: any): Promise<void> {
-  // TODO: handle all kinds of reponses
-  // tslint:disable-next-line:radix
-  const responseStatusCode = Number.parseInt(Object.keys(spec.responses)[0]);
-  res.status(responseStatusCode);
+  const statusCodeInResponse: number = handlerResponse.statusCode;
+  res.status(statusCodeInResponse);
 
-  const response = spec.responses[responseStatusCode];
+  const responseSpec = spec.responses[statusCodeInResponse];
+  if (!responseSpec) {
+    throw new TypeError(`Request specification doesn't include provided response status code`);
+  }
 
   // Serialize headers
   const headerSerializer = new msRest.Serializer(Mappers);
-  const rawHeaders = headerSerializer.serialize(response.headersMapper!, handlerResponse);
-
+  const rawHeaders = headerSerializer.serialize(responseSpec.headersMapper!, handlerResponse);
   for (const headerKey in rawHeaders) {
     if (rawHeaders.hasOwnProperty(headerKey)) {
       const headerValue = rawHeaders[headerKey];
@@ -92,10 +151,10 @@ export async function serialize(res: Response, spec: msRest.OperationSpec, handl
   }
 
   // Serialize XML bodies
-  if (response.bodyMapper) {
-    const body = spec.serializer.serialize(response.bodyMapper!, handlerResponse);
+  if (spec.isXML && responseSpec.bodyMapper) {
+    const body = spec.serializer.serialize(responseSpec.bodyMapper!, handlerResponse);
     const xmlBody = stringifyXML(body, {
-      rootName: response.bodyMapper!.xmlName || response.bodyMapper!.serializedName,
+      rootName: responseSpec.bodyMapper!.xmlName || responseSpec.bodyMapper!.serializedName,
     });
     res.contentType(`application/xml`);
 

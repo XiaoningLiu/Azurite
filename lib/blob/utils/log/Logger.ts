@@ -6,19 +6,19 @@ export class Logger implements ILogger {
   public constructor(private strategy: ILoggerStrategy) {}
 
   public error(message: string, contextID?: string) {
-    this.strategy.log("error", contextID ? `${message} CONTEXT_ID=${contextID}` : message);
+    this.strategy.log("error", message, contextID);
   }
   public warn(message: string, contextID?: string) {
-    this.strategy.log("warn", contextID ? `${message} CONTEXT_ID=${contextID}` : message);
+    this.strategy.log("warn", message, contextID);
   }
   public info(message: string, contextID?: string) {
-    this.strategy.log("info", contextID ? `${message} CONTEXT_ID=${contextID}` : message);
+    this.strategy.log("info", message, contextID);
   }
   public verbose(message: string, contextID?: string) {
-    this.strategy.log("verbose", contextID ? `${message} CONTEXT_ID=${contextID}` : message);
+    this.strategy.log("verbose", message, contextID);
   }
   public debug(message: string, contextID?: string) {
-    this.strategy.log("debug", contextID ? `${message} CONTEXT_ID=${contextID}` : message);
+    this.strategy.log("debug", message, contextID);
   }
 }
 

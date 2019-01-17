@@ -17,7 +17,7 @@ export default class SimpleContainerHandler extends SimpleBaseHandler implements
   public async containerCreate(
     options: Models.IContainerCreateOptionalParams,
     context: Context
-  ): Promise<Models.IContainerCreateHeaders> {
+  ): Promise<Models.IContainerCreateResponse_201> {
     const blobCtx = new BlobStorageContext(context);
 
     if (this.containers[blobCtx.container!]) {
@@ -41,8 +41,9 @@ export default class SimpleContainerHandler extends SimpleBaseHandler implements
       },
     };
 
-    const result: Models.IContainerCreateHeaders = {
+    const result: Models.IContainerCreateResponse_201 = {
       lastModified,
+      statusCode: 201,
     };
 
     return result;

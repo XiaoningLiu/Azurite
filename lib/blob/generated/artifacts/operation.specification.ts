@@ -89,3 +89,28 @@ export const commitBlockListOperationSpec: msRest.OperationSpec = {
   isXML: true,
   serializer,
 };
+
+export const setPropertiesOperationSpec: msRest.OperationSpec = {
+  httpMethod: "PUT",
+  urlParameters: [Parameters.url],
+  queryParameters: [Parameters.timeout, Parameters.restype0, Parameters.comp0],
+  headerParameters: [Parameters.version, Parameters.requestId],
+  requestBody: {
+    parameterPath: "storageServiceProperties",
+    mapper: {
+      ...Mappers.StorageServiceProperties,
+      required: true,
+    },
+  },
+  contentType: "application/xml; charset=utf-8",
+  responses: {
+    202: {
+      headersMapper: Mappers.ServiceSetPropertiesHeaders,
+    },
+    default: {
+      bodyMapper: Mappers.StorageError,
+    },
+  },
+  isXML: true,
+  serializer,
+};

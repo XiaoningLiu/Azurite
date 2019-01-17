@@ -314,6 +314,7 @@ export const comp15: msRest.OperationQueryParameter = {
     },
   },
 };
+
 export const comp2: msRest.OperationQueryParameter = {
   parameterPath: "comp",
   mapper: {
@@ -473,11 +474,14 @@ export const delimiter: msRest.OperationQueryParameter = {
   },
 };
 export const duration: msRest.OperationParameter = {
+  // parameterPath describes the model size part, in the generated model paths. Like to generate options.duration
   parameterPath: ["options", "duration"],
+
+  // mapper in parameter describes HTTP request side information, about from where
   mapper: {
-    serializedName: "x-ms-lease-duration",
+    serializedName: "x-ms-lease-duration", // from which header
     type: {
-      name: "Number",
+      name: "Number", // Type of value
     },
   },
 };

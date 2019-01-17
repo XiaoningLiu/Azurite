@@ -1,9 +1,13 @@
 import { NextFunction, Request, Response } from "express";
 
+import {
+  containerCreateOperationSpec,
+  listContainersSegmentOperationSpec,
+  setPropertiesOperationSpec,
+} from "../artifacts/operation.specification";
 import Context from "../Context";
 import UnhandledURLError from "../errors/UnhandledURLError";
 import Operation from "../Operation";
-import { containerCreateOperationSpec, listContainersSegmentOperationSpec } from "../artifacts/operation.specification";
 import ILogger from "../utils/ILogger";
 import { deserialize } from "../utils/serializer";
 
@@ -43,6 +47,14 @@ export default function deserializerMiddleware(
       break;
     case Operation.Container_Create:
       deserialize(req, containerCreateOperationSpec)
+        .then((parameters) => {
+          ctx.handlerParameters = parameters;
+          next();
+        })
+        .catch(next);
+      break;
+    case Operation.Service_SetProperties:
+      deserialize(req, setPropertiesOperationSpec)
         .then((parameters) => {
           ctx.handlerParameters = parameters;
           next();

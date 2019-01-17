@@ -10,5 +10,5 @@ export default interface IContainerHandler {
   containerCreate(
     options: Models.IContainerCreateOptionalParams,
     context: Context
-  ): Promise<Models.IContainerCreateResponse>;
+  ): Promise<Models.IContainerCreateResponse_201>;
 }

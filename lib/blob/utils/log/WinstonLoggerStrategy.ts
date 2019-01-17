@@ -9,7 +9,7 @@ export default class WinstonLoggerStrategy implements ILoggerStrategy {
     this.winstonLogger = createLogger({
       format: format.combine(
         format.timestamp(),
-        format.printf((info) => `${info.timestamp} ${info.level}: ${info.message}`)
+        format.printf((info) => `${info.timestamp} ${info.contextID} ${info.level}: ${info.message}`)
       ),
       level: "silly",
       transports: [new transports.Console()],
@@ -20,7 +20,7 @@ export default class WinstonLoggerStrategy implements ILoggerStrategy {
     }
   }
 
-  public log(level: string, message: string): void {
-    this.winstonLogger.log({ level, message });
+  public log(level: string, message: string, contextID: string = "\t"): void {
+    this.winstonLogger.log({ level, message, contextID });
   }
 }

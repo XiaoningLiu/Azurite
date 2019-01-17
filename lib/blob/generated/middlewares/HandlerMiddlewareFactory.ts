@@ -41,13 +41,16 @@ export default class HandlerMiddlewareFactory {
     return (req: Request, res: Response, next: NextFunction) => {
       const ctx = new Context(res.locals, this.contextPath);
 
+      this.logger.verbose(
+        `HandlerMiddleware: DeserializedParameters=${JSON.stringify(ctx.handlerParameters)}`,
+        ctx.contextID
+      );
+
       if (!ctx.operation) {
         const handlerError = new UnhandledURLError();
         this.logger.error(`HandlerMiddleware: ${handlerError.message}`, ctx.contextID);
         throw handlerError;
       }
-
-      this.logger.verbose(`HandlerMiddleware: DeserializedParameters=${JSON.stringify(ctx.handlerParameters)}`);
 
       switch (ctx.operation) {
         case Operation.Service_ListContainersSegment:

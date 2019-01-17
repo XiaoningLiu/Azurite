@@ -9,6 +9,9 @@ import serializerMiddleware from "./middlewares/serializer.middleware";
 import ILogger from "./utils/ILogger";
 
 /**
+ * TODO: Split Express related logic from MiddlewareFactory and separate middleware functions.
+ * Add children classes like ExpressMiddlewareFactory to generate Express compatible middleware.
+ *
  * MiddlewareFactory will generate middleware according to swagger definitions.
  * Generated middleware MUST be used by strict order:
  *  * dispatchMiddleware

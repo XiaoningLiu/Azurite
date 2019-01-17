@@ -32,6 +32,8 @@ export default function dispatchMiddleware(
     ctx.operation = Operation.Service_ListContainersSegment;
   } else if (req.method.toUpperCase() === "PUT" && req.query.restype === "container") {
     ctx.operation = Operation.Container_Create;
+  } else if (req.method.toUpperCase() === "PUT" && req.query.comp === "properties" && req.query.restype === "service") {
+    ctx.operation = Operation.Service_SetProperties;
   }
 
   if (ctx.operation === undefined) {
