@@ -1,5 +1,5 @@
-import { Request, Response } from "express";
 import Context from "../Context";
+import IResponse from "../IResponse";
 import ILogger from "../utils/ILogger";
 
 /**
@@ -11,15 +11,19 @@ import ILogger from "../utils/ILogger";
  * @param {ILogger} logger A valid logger
  * @param {string} contextPath res.locals[contextPath] will be used to hold context
  */
-export default function endMiddleware(_req: Request, res: Response, logger: ILogger, contextPath: string): void {
-  const ctx = new Context(res.locals, contextPath);
-
-  const totalTimeInMS = ctx.startTime ? new Date().getTime() - ctx.startTime.getTime() : undefined;
+export default function endMiddleware(
+  res: IResponse,
+  logger: ILogger,
+  context: Context
+): void {
+  const totalTimeInMS = context.startTime
+    ? new Date().getTime() - context.startTime.getTime()
+    : undefined;
   logger.info(
-    `EndMiddleware: End response. TotalTimeInMS=${totalTimeInMS} StatusCode=${res.statusCode} StatusMessage=${
-      res.statusMessage
+    `EndMiddleware: End response. TotalTimeInMS=${totalTimeInMS} StatusCode=${res.getStatusCode()} StatusMessage=${
+      res.setStatusMessage
     } Headers=${JSON.stringify(res.getHeaders())}`,
-    ctx.contextID
+    context.contextID
   );
 
   res.end();

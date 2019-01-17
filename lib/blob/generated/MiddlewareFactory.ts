@@ -1,4 +1,4 @@
-import { IHandlers } from "./middlewares/HandlerMiddlewareFactory";
+import { IHandlers } from "./middleware/HandlerMiddlewareFactory";
 import { Callback } from "./NextFunction";
 import ILogger from "./utils/ILogger";
 

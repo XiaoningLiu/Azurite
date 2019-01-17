@@ -1,5 +1,3 @@
-import { NextFunction, Request, Response } from "express";
-
 import {
   containerCreateOperationSpec,
   listContainersSegmentOperationSpec,
@@ -7,6 +5,8 @@ import {
 } from "../artifacts/operation.specification";
 import Context from "../Context";
 import UnhandledURLError from "../errors/UnhandledURLError";
+import IRequest from "../IRequest";
+import NextFunction from "../NextFunction";
 import Operation from "../Operation";
 import ILogger from "../utils/ILogger";
 import { deserialize } from "../utils/serializer";
@@ -15,54 +15,64 @@ import { deserialize } from "../utils/serializer";
  * Deserializer Middleware. Deserialize incoming HTTP request into models.
  *
  * @export
- * @param {Request} req An express compatible Request object
- * @param {Response} res An express compatible Response object
- * @param {NextFunction} next An express middleware next callback
+ * @param {IRequest} req An IRequest object
+ * @param {NextFunction} next An next callback or promise
+ * @param {ILogger} logger A valid logger
+ * @param {Context} context
  * @returns {void}
  */
 export default function deserializerMiddleware(
-  req: Request,
-  res: Response,
+  req: IRequest,
   next: NextFunction,
   logger: ILogger,
-  contextPath: string
+  context: Context
 ): void {
-  const ctx = new Context(res.locals, contextPath);
-  logger.verbose(`DeserializerMiddleware: Start deserializing...`, ctx.contextID);
+  logger.verbose(
+    `DeserializerMiddleware: Start deserializing...`,
+    context.contextID
+  );
 
-  if (ctx.operation === undefined) {
+  if (context.operation === undefined) {
     const handlerError = new UnhandledURLError();
-    logger.error(`DeserializerMiddleware: ${handlerError.message}`, ctx.contextID);
+    logger.error(
+      `DeserializerMiddleware: ${handlerError.message}`,
+      context.contextID
+    );
     throw handlerError;
   }
 
-  switch (ctx.operation) {
+  switch (context.operation) {
     case Operation.Service_ListContainersSegment:
       deserialize(req, listContainersSegmentOperationSpec)
         .then((parameters) => {
-          ctx.handlerParameters = parameters;
-          next();
+          context.handlerParameters = parameters;
         })
+        .then(next)
         .catch(next);
       break;
     case Operation.Container_Create:
       deserialize(req, containerCreateOperationSpec)
         .then((parameters) => {
-          ctx.handlerParameters = parameters;
-          next();
+          context.handlerParameters = parameters;
         })
+        .then(next)
         .catch(next);
       break;
     case Operation.Service_SetProperties:
       deserialize(req, setPropertiesOperationSpec)
         .then((parameters) => {
-          ctx.handlerParameters = parameters;
-          next();
+          context.handlerParameters = parameters;
         })
+        .then(next)
         .catch(next);
       break;
     default:
-      logger.warn(`DeserializerMiddleware: cannot find deserializer for operation ${Operation[ctx.operation]}`);
+      logger.warn(
+        `DeserializerMiddleware: cannot find deserializer for operation ${
+          Operation[context.operation]
+        }`
+      );
+      next();
       break;
   }
 }

@@ -11,8 +11,7 @@ import ILogger from "../utils/ILogger";
  * Make sure use dispatchMiddleware is before another other generated middleware.
  *
  * @export
- * @param {Request} req An IRequest object
- * @param {Response} res An IResponse object
+ * @param {IRequest} req An IRequest object
  * @param {NextFunction} next An next callback or promise
  * @param {ILogger} logger A valid logger
  * @param {Context} context
@@ -55,5 +54,5 @@ export default function dispatchMiddleware(
     context.contextID
   );
 
-  next instanceof Promise ? next.then() : next();
+  next();
 }

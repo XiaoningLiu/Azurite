@@ -6,18 +6,19 @@ import {
   Response,
 } from "express";
 
-import MiddlewareFactory from "./MiddlewareFactory";
-import deserializerMiddleware from "./middlewares/deserializer.middleware";
-import dispatchMiddleware from "./middlewares/dispatch.middleware";
-import endMiddleware from "./middlewares/end.middleware";
-import errorMiddleware from "./middlewares/error.middleware";
+import Context from "./Context";
+import ExpressRequestAdapter from "./ExpressRequestAdapter";
+import ExpressResponseAdapter from "./ExpressResponseAdapter";
+import deserializerMiddleware from "./middleware/deserializer.middleware";
+import dispatchMiddleware from "./middleware/dispatch.middleware";
+import endMiddleware from "./middleware/end.middleware";
+import errorMiddleware from "./middleware/error.middleware";
 import HandlerMiddlewareFactory, {
   IHandlers,
-} from "./middlewares/HandlerMiddlewareFactory";
-import serializerMiddleware from "./middlewares/serializer.middleware";
+} from "./middleware/HandlerMiddlewareFactory";
+import serializerMiddleware from "./middleware/serializer.middleware";
+import MiddlewareFactory from "./MiddlewareFactory";
 import ILogger from "./utils/ILogger";
-import ExpressRequestAdapter from "./ExpressRequestAdapter";
-import Context from "./Context";
 
 /**
  * ExpressMiddlewareFactory will generate Express compatible middleware according to swagger definitions.
@@ -72,7 +73,12 @@ export default class ExpressMiddlewareFactory extends MiddlewareFactory {
    */
   public createDeserializerMiddleware(): RequestHandler {
     return (req: Request, res: Response, next: NextFunction) => {
-      deserializerMiddleware(req, res, next, this.logger, this.contextPath);
+      deserializerMiddleware(
+        new ExpressRequestAdapter(req),
+        next,
+        this.logger,
+        new Context(res.locals, this.contextPath)
+      );
     };
   }
 
@@ -86,10 +92,14 @@ export default class ExpressMiddlewareFactory extends MiddlewareFactory {
   public createHandlerMiddleware(handlers: IHandlers): RequestHandler {
     const handlerMiddlewareFactory = new HandlerMiddlewareFactory(
       handlers,
-      this.logger,
-      this.contextPath
+      this.logger
     );
-    return handlerMiddlewareFactory.createHandlerMiddleware();
+    return (_req: Request, res: Response, next: NextFunction) => {
+      handlerMiddlewareFactory.createHandlerMiddleware()(
+        next,
+        new Context(res.locals, this.contextPath)
+      );
+    };
   }
 
   /**
@@ -99,8 +109,13 @@ export default class ExpressMiddlewareFactory extends MiddlewareFactory {
    * @memberof MiddlewareFactory
    */
   public createSerializerMiddleware(): RequestHandler {
-    return (req: Request, res: Response, next: NextFunction) => {
-      serializerMiddleware(req, res, next, this.logger, this.contextPath);
+    return (_req: Request, res: Response, next: NextFunction) => {
+      serializerMiddleware(
+        new ExpressResponseAdapter(res),
+        next,
+        this.logger,
+        new Context(res.locals, this.contextPath)
+      );
     };
   }
 
@@ -111,8 +126,14 @@ export default class ExpressMiddlewareFactory extends MiddlewareFactory {
    * @memberof MiddlewareFactory
    */
   public createErrorMiddleware(): ErrorRequestHandler {
-    return (err: Error, req: Request, res: Response, next: NextFunction) => {
-      errorMiddleware(err, req, res, next, this.logger, this.contextPath);
+    return (err: Error, _req: Request, res: Response, next: NextFunction) => {
+      errorMiddleware(
+        err,
+        new ExpressResponseAdapter(res),
+        next,
+        this.logger,
+        new Context(res.locals, this.contextPath)
+      );
     };
   }
 
@@ -123,8 +144,12 @@ export default class ExpressMiddlewareFactory extends MiddlewareFactory {
    * @memberof MiddlewareFactory
    */
   public createEndMiddleware(): RequestHandler {
-    return (req: Request, res: Response) => {
-      endMiddleware(req, res, this.logger, this.contextPath);
+    return (_req: Request, res: Response) => {
+      endMiddleware(
+        new ExpressResponseAdapter(res),
+        this.logger,
+        new Context(res.locals, this.contextPath)
+      );
     };
   }
 }
