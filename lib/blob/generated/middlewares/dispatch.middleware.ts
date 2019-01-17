@@ -1,7 +1,7 @@
-import { NextFunction, Request, Response } from "express";
-
 import Context from "../Context";
 import UnhandledURLError from "../errors/UnhandledURLError";
+import IRequest from "../IRequest";
+import NextFunction from "../NextFunction";
 import Operation from "../Operation";
 import ILogger from "../utils/ILogger";
 
@@ -11,37 +11,49 @@ import ILogger from "../utils/ILogger";
  * Make sure use dispatchMiddleware is before another other generated middleware.
  *
  * @export
- * @param {Request} req An express compatible Request object
- * @param {Response} res An express compatible Response object
- * @param {NextFunction} next An express middleware next callback
+ * @param {Request} req An IRequest object
+ * @param {Response} res An IResponse object
+ * @param {NextFunction} next An next callback or promise
  * @param {ILogger} logger A valid logger
- * @param {string} contextPath res.locals[contextPath] will be used to hold context
+ * @param {Context} context
  * @returns {void}
  */
 export default function dispatchMiddleware(
-  req: Request,
-  res: Response,
+  req: IRequest,
   next: NextFunction,
   logger: ILogger,
-  contextPath: string
+  context: Context
 ): void {
-  const ctx = new Context(res.locals, contextPath);
-  logger.verbose(`DispatchMiddleware: Dispatching request...`, ctx.contextID);
+  logger.verbose(
+    `DispatchMiddleware: Dispatching request...`,
+    context.contextID
+  );
 
-  if (req.method.toUpperCase() === "GET" && req.query.comp === "list") {
-    ctx.operation = Operation.Service_ListContainersSegment;
-  } else if (req.method.toUpperCase() === "PUT" && req.query.restype === "container") {
-    ctx.operation = Operation.Container_Create;
-  } else if (req.method.toUpperCase() === "PUT" && req.query.comp === "properties" && req.query.restype === "service") {
-    ctx.operation = Operation.Service_SetProperties;
+  if (req.method === "GET" && req.query("comp") === "list") {
+    context.operation = Operation.Service_ListContainersSegment;
+  } else if (req.method === "PUT" && req.query("restype") === "container") {
+    context.operation = Operation.Container_Create;
+  } else if (
+    req.method === "PUT" &&
+    req.query("comp") === "properties" &&
+    req.query("restype") === "service"
+  ) {
+    context.operation = Operation.Service_SetProperties;
   }
 
-  if (ctx.operation === undefined) {
+  if (context.operation === undefined) {
     const handlerError = new UnhandledURLError();
-    logger.error(`DispatchMiddleware: ${handlerError.message}`, ctx.contextID);
+    logger.error(
+      `DispatchMiddleware: ${handlerError.message}`,
+      context.contextID
+    );
     throw handlerError;
   }
 
-  logger.info(`DispatchMiddleware: Operation=${Operation[ctx.operation]}`, ctx.contextID);
-  next();
+  logger.info(
+    `DispatchMiddleware: Operation=${Operation[context.operation]}`,
+    context.contextID
+  );
+
+  next instanceof Promise ? next.then() : next();
 }

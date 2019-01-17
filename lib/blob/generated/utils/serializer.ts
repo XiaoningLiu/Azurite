@@ -3,8 +3,7 @@ import * as msRest from "ms-rest-js";
 
 import * as Mappers from "../artifacts/mappers";
 import { IHandlerParameters } from "../Context";
-import { stringifyXML, parseXML } from "./xml";
-import { MapperType } from "ms-rest-js";
+import { parseXML, stringifyXML } from "./xml";
 
 export declare type ParameterPath =
   | string
@@ -74,7 +73,7 @@ export async function deserialize(req: Request, spec: msRest.OperationSpec): Pro
     }
 
     let valueToDeserialize: any = parsedBody;
-    if (spec.isXML && bodyParameter.mapper.type.name === MapperType.Sequence) {
+    if (spec.isXML && bodyParameter.mapper.type.name === msRest.MapperType.Sequence) {
       valueToDeserialize =
         typeof valueToDeserialize === "object" ? valueToDeserialize[bodyParameter.mapper.xmlElementName!] : [];
     }

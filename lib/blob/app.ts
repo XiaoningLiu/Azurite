@@ -2,7 +2,7 @@ import express from "express";
 
 import blobStorageContextMiddleware from "./blobStorageContext.middleware";
 import { CONTEXT_PATH } from "./constants";
-import MiddlewareFactory from "./generated/MiddlewareFactory";
+import ExpressMiddlewareFactory from "./generated/ExpressMiddlewareFactory";
 import SimpleContainerHandler from "./SimpleContainerHandler";
 import SimpleDataStore from "./SimpleDataStore";
 import SimpleServiceHandler from "./SimpleServiceHandler";
@@ -12,7 +12,7 @@ const app = express();
 app.disable("x-powered-by");
 
 // MiddlewareFactory is a factory to create auto-generated middleware
-const middlewareFactory = new MiddlewareFactory(logger, CONTEXT_PATH);
+const middlewareFactory = new ExpressMiddlewareFactory(logger, CONTEXT_PATH);
 
 // Data source is persistency layer entry
 const dataSource = new SimpleDataStore();
