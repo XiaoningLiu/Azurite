@@ -3,6 +3,7 @@ import express from "express";
 import blobStorageContextMiddleware from "./blobStorageContext.middleware";
 import { CONTEXT_PATH } from "./constants";
 import ExpressMiddlewareFactory from "./generated/ExpressMiddlewareFactory";
+import MiddlewareFactory from "./generated/MiddlewareFactory";
 import SimpleContainerHandler from "./SimpleContainerHandler";
 import SimpleDataStore from "./SimpleDataStore";
 import SimpleServiceHandler from "./SimpleServiceHandler";
@@ -12,7 +13,10 @@ const app = express();
 app.disable("x-powered-by");
 
 // MiddlewareFactory is a factory to create auto-generated middleware
-const middlewareFactory = new ExpressMiddlewareFactory(logger, CONTEXT_PATH);
+const middlewareFactory: MiddlewareFactory = new ExpressMiddlewareFactory(
+  logger,
+  CONTEXT_PATH
+);
 
 // Data source is persistency layer entry
 const dataSource = new SimpleDataStore();
@@ -32,7 +36,12 @@ const handlers = {
 app.use(blobStorageContextMiddleware);
 
 // Dispatch incoming HTTP request to specific operation
-app.use(middlewareFactory.createDispatchMiddleware());
+// Emulator's URL pattern is like http://hostname:port/account/container
+// Create a router to exclude account name from req.path, as url path in swagger doesn't include account
+// Exclude account name from req.path for dispatchMiddleware
+const router = express.Router();
+router.use(middlewareFactory.createDispatchMiddleware());
+app.use("/:account", router);
 
 // TODO: AuthN middleware, like shared key auth or SAS auth
 

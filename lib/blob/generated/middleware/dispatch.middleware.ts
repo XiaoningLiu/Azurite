@@ -1,3 +1,5 @@
+// import * as msRest from "ms-rest-js";
+
 import Operation from "../artifacts/Operation";
 import Context from "../Context";
 import InvalidUrlError from "../errors/InvalidUrlError";
@@ -57,3 +59,9 @@ export default function dispatchMiddleware(
 
   next();
 }
+
+// function isRequestSuitSpec(req: IRequest, spec: msRest.OperationSpec): boolean {
+//   // Test URL path
+
+//   return false;
+// }
