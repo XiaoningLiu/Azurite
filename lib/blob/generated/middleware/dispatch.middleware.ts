@@ -1,8 +1,8 @@
+import Operation from "../artifacts/Operation";
 import Context from "../Context";
 import UnhandledURLError from "../errors/UnhandledURLError";
 import IRequest from "../IRequest";
-import NextFunction from "../NextFunction";
-import Operation from "../Operation";
+import { NextFunction } from "../MiddlewareFactory";
 import ILogger from "../utils/ILogger";
 
 /**
@@ -28,14 +28,15 @@ export default function dispatchMiddleware(
     context.contextID
   );
 
-  if (req.method === "GET" && req.query("comp") === "list") {
+  const method = req.getMethod();
+  if (method === "GET" && req.getQuery("comp") === "list") {
     context.operation = Operation.Service_ListContainersSegment;
-  } else if (req.method === "PUT" && req.query("restype") === "container") {
+  } else if (method === "PUT" && req.getQuery("restype") === "container") {
     context.operation = Operation.Container_Create;
   } else if (
-    req.method === "PUT" &&
-    req.query("comp") === "properties" &&
-    req.query("restype") === "service"
+    method === "PUT" &&
+    req.getQuery("comp") === "properties" &&
+    req.getQuery("restype") === "service"
   ) {
     context.operation = Operation.Service_SetProperties;
   }
@@ -46,7 +47,7 @@ export default function dispatchMiddleware(
       `DispatchMiddleware: ${handlerError.message}`,
       context.contextID
     );
-    throw handlerError;
+    return next(handlerError);
   }
 
   logger.info(

@@ -22,6 +22,10 @@ export default class ExpressResponseAdapter implements IResponse {
     return this;
   }
 
+  public getStatusMessage(): string {
+    return this.res.statusMessage;
+  }
+
   public setHeader(
     field: string,
     value?: string | string[] | undefined

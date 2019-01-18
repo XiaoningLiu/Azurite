@@ -1,7 +1,7 @@
 import Context from "../Context";
 import HandlerError from "../errors/HandlerError";
 import IResponse from "../IResponse";
-import NextFunction from "../NextFunction";
+import { NextFunction } from "../MiddlewareFactory";
 import ILogger from "../utils/ILogger";
 
 /**

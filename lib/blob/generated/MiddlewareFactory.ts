@@ -1,8 +1,9 @@
 import { IHandlers } from "./middleware/HandlerMiddlewareFactory";
-import { Callback } from "./NextFunction";
 import ILogger from "./utils/ILogger";
 
+export type Callback = (...args: any[]) => any;
 export type MiddlewareTypes = Callback;
+export type NextFunction = Callback;
 
 /**
  * MiddlewareFactory will generate middleware according to swagger definitions.

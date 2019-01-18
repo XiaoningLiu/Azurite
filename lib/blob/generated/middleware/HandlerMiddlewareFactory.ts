@@ -1,9 +1,9 @@
+import Operation from "../artifacts/Operation";
 import Context from "../Context";
 import UnhandledURLError from "../errors/UnhandledURLError";
 import IContainerHandler from "../handlers/IContainerHandler";
 import IServiceHandler from "../handlers/IServiceHandler";
-import NextFunction from "../NextFunction";
-import Operation from "../Operation";
+import { NextFunction } from "../MiddlewareFactory";
 import ILogger from "../utils/ILogger";
 
 // Auto generated
@@ -58,7 +58,7 @@ export default class HandlerMiddlewareFactory {
           `HandlerMiddleware: ${handlerError.message}`,
           context.contextID
         );
-        throw handlerError;
+        return next(handlerError);
       }
 
       switch (context.operation) {

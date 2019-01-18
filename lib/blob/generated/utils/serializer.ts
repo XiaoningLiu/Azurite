@@ -27,7 +27,7 @@ export async function deserialize(
       );
     }
     const queryKey = queryParameter.mapper.serializedName;
-    const queryValueOriginal = req.query(queryKey);
+    const queryValueOriginal = req.getQuery(queryKey);
     const queryValue = spec.serializer.deserialize(
       queryParameter.mapper,
       queryValueOriginal,
@@ -51,7 +51,7 @@ export async function deserialize(
     }
 
     const headerKey = headerParameter.mapper.serializedName;
-    const headerValueOriginal = req.header(headerKey);
+    const headerValueOriginal = req.getHeader(headerKey);
     const headerValue = spec.serializer.deserialize(
       headerParameter.mapper,
       headerValueOriginal,
@@ -71,7 +71,7 @@ export async function deserialize(
   if (bodyParameter) {
     const jsonContentTypes = ["application/json", "text/json"];
     const xmlContentTypes = ["application/xml", "application/atom+xml"];
-    const contentType = req.header("content-type") || "";
+    const contentType = req.getHeader("content-type") || "";
     const contentComponents = !contentType
       ? []
       : contentType.split(";").map((component) => component.toLowerCase());
@@ -127,11 +127,12 @@ export async function deserialize(
 async function readRequestIntoText(req: IRequest): Promise<string> {
   return new Promise<string>((resolve, reject) => {
     const segments: string[] = [];
-    req.bodyStream.on("data", (buffer) => {
+    const bodyStream = req.getBodyStream();
+    bodyStream.on("data", (buffer) => {
       segments.push(buffer);
     });
-    req.bodyStream.on("error", reject);
-    req.bodyStream.on("end", () => {
+    bodyStream.on("error", reject);
+    bodyStream.on("end", () => {
       const joined = segments.join("");
       resolve(joined);
     });

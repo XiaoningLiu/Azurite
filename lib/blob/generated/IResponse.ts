@@ -4,6 +4,7 @@ export default interface IResponse {
   setStatusCode(code: number): IResponse;
   getStatusCode(): number;
   setStatusMessage(message: string): IResponse;
+  getStatusMessage(): string;
   setHeader(
     field: string,
     value?: string | string[] | undefined | number

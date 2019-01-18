@@ -1,34 +1,40 @@
 import { Request } from "express";
 
-import IRequest from "./IRequest";
+import IRequest, { HttpMethod } from "./IRequest";
 
 export default class ExpressRequestAdapter implements IRequest {
-  public readonly method:
-    | "GET"
-    | "HEAD"
-    | "POST"
-    | "PUT"
-    | "DELETE"
-    | "CONNECT"
-    | "OPTIONS"
-    | "TRACE"
-    | "PATCH";
-  public readonly url: string;
-  public readonly path: string;
-  public readonly bodyStream: NodeJS.ReadableStream;
+  public constructor(private readonly req: Request) {}
 
-  public constructor(private readonly req: Request) {
-    this.method = req.method.toUpperCase() as any;
-    this.url = req.url;
-    this.path = req.path;
-    this.bodyStream = req;
+  public getMethod(): HttpMethod {
+    return this.req.method.toUpperCase() as HttpMethod;
   }
 
-  public header(field: string): string | undefined {
+  public getUrl(): string {
+    return this.req.url;
+  }
+
+  public getPath(): string {
+    return this.req.path;
+  }
+
+  public getBodyStream(): NodeJS.ReadableStream {
+    return this.req;
+  }
+
+  public getBody(): string | undefined {
+    return this.req.body;
+  }
+
+  public setBody(body: string | undefined): ExpressRequestAdapter {
+    this.req.body = body;
+    return this;
+  }
+
+  public getHeader(field: string): string | undefined {
     return this.req.header(field);
   }
 
-  public query(key: string): string | undefined {
+  public getQuery(key: string): string | undefined {
     return this.req.query[key];
   }
 }

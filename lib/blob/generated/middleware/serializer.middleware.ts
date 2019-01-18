@@ -1,3 +1,4 @@
+import Operation from "../artifacts/Operation";
 import {
   containerCreateOperationSpec,
   listContainersSegmentOperationSpec,
@@ -5,8 +6,7 @@ import {
 import Context from "../Context";
 import UnhandledURLError from "../errors/UnhandledURLError";
 import IResponse from "../IResponse";
-import NextFunction from "../NextFunction";
-import Operation from "../Operation";
+import { NextFunction } from "../MiddlewareFactory";
 import ILogger from "../utils/ILogger";
 import { serialize } from "../utils/serializer";
 
@@ -36,7 +36,7 @@ export default function serializerMiddleware(
       `SerializerMiddleware: ${handlerError.message}`,
       context.contextID
     );
-    throw handlerError;
+    return next(handlerError);
   }
 
   switch (context.operation!) {

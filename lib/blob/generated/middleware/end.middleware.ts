@@ -20,9 +20,10 @@ export default function endMiddleware(
     ? new Date().getTime() - context.startTime.getTime()
     : undefined;
   logger.info(
-    `EndMiddleware: End response. TotalTimeInMS=${totalTimeInMS} StatusCode=${res.getStatusCode()} StatusMessage=${
-      res.setStatusMessage
-    } Headers=${JSON.stringify(res.getHeaders())}`,
+    // tslint:disable-next-line:max-line-length
+    `EndMiddleware: End response. TotalTimeInMS=${totalTimeInMS} StatusCode=${res.getStatusCode()} StatusMessage=${res.getStatusMessage()} Headers=${JSON.stringify(
+      res.getHeaders()
+    )}`,
     context.contextID
   );
 

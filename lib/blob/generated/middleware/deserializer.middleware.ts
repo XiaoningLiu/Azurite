@@ -1,3 +1,4 @@
+import Operation from "../artifacts/Operation";
 import {
   containerCreateOperationSpec,
   listContainersSegmentOperationSpec,
@@ -6,8 +7,7 @@ import {
 import Context from "../Context";
 import UnhandledURLError from "../errors/UnhandledURLError";
 import IRequest from "../IRequest";
-import NextFunction from "../NextFunction";
-import Operation from "../Operation";
+import { NextFunction } from "../MiddlewareFactory";
 import ILogger from "../utils/ILogger";
 import { deserialize } from "../utils/serializer";
 
@@ -38,7 +38,7 @@ export default function deserializerMiddleware(
       `DeserializerMiddleware: ${handlerError.message}`,
       context.contextID
     );
-    throw handlerError;
+    return next(handlerError);
   }
 
   switch (context.operation) {
