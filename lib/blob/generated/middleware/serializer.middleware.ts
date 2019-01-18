@@ -4,7 +4,7 @@ import {
   listContainersSegmentOperationSpec,
 } from "../artifacts/operation.specification";
 import Context from "../Context";
-import UnhandledURLError from "../errors/UnhandledURLError";
+import InvalidUrlError from "../errors/InvalidUrlError";
 import IResponse from "../IResponse";
 import { NextFunction } from "../MiddlewareFactory";
 import ILogger from "../utils/ILogger";
@@ -31,7 +31,7 @@ export default function serializerMiddleware(
   );
 
   if (context.operation === undefined) {
-    const handlerError = new UnhandledURLError();
+    const handlerError = new InvalidUrlError();
     logger.error(
       `SerializerMiddleware: ${handlerError.message}`,
       context.contextID

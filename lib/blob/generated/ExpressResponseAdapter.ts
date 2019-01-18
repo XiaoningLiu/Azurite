@@ -3,8 +3,6 @@ import { OutgoingHttpHeaders } from "http";
 
 import IResponse from "./IResponse";
 
-declare type StreamWriteCallback = (error: Error | null | undefined) => void;
-
 export default class ExpressResponseAdapter implements IResponse {
   public constructor(private readonly res: Response) {}
 
@@ -56,28 +54,7 @@ export default class ExpressResponseAdapter implements IResponse {
     return this;
   }
 
-  public write(
-    chunk: any,
-    cb?: (error: Error | null | undefined) => void
-  ): boolean;
-  public write(
-    chunk: any,
-    encoding?: string,
-    cb?: StreamWriteCallback
-  ): boolean;
-  public write(
-    chunk: any,
-    encodingOrCallback?: string | StreamWriteCallback,
-    cb?: StreamWriteCallback
-  ): boolean {
-    if (encodingOrCallback && typeof encodingOrCallback === "function") {
-      return this.res.write(chunk, encodingOrCallback);
-    } else {
-      return this.res.write(chunk, encodingOrCallback, cb);
-    }
-  }
-
-  public end(cb?: () => void): void {
-    this.res.end(cb);
+  public getBodyStream(): NodeJS.WritableStream {
+    return this.res;
   }
 }

@@ -1,6 +1,6 @@
 import Operation from "../artifacts/Operation";
 import Context from "../Context";
-import UnhandledURLError from "../errors/UnhandledURLError";
+import InvalidUrlError from "../errors/InvalidUrlError";
 import IContainerHandler from "../handlers/IContainerHandler";
 import IServiceHandler from "../handlers/IServiceHandler";
 import { NextFunction } from "../MiddlewareFactory";
@@ -53,7 +53,7 @@ export default class HandlerMiddlewareFactory {
       );
 
       if (!context.operation) {
-        const handlerError = new UnhandledURLError();
+        const handlerError = new InvalidUrlError();
         this.logger.error(
           `HandlerMiddleware: ${handlerError.message}`,
           context.contextID

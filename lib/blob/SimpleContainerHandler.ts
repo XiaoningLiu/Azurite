@@ -3,7 +3,7 @@ import * as Models from "./generated/artifacts/models";
 import Context from "./generated/Context";
 import IContainerHandler from "./generated/handlers/IContainerHandler";
 import SimpleBaseHandler from "./SimpleBaseHandler";
-import StorageServerError from "./StorageServerError";
+import StorageError from "./StorageError";
 
 /**
  * Manually implement handlers by implementing IContainerHandler interface.
@@ -13,7 +13,8 @@ import StorageServerError from "./StorageServerError";
  * @class SimpleContainerHandler
  * @implements {IHandler}
  */
-export default class SimpleContainerHandler extends SimpleBaseHandler implements IContainerHandler {
+export default class SimpleContainerHandler extends SimpleBaseHandler
+  implements IContainerHandler {
   public async containerCreate(
     options: Models.IContainerCreateOptionalParams,
     context: Context
@@ -21,7 +22,7 @@ export default class SimpleContainerHandler extends SimpleBaseHandler implements
     const blobCtx = new BlobStorageContext(context);
 
     if (this.containers[blobCtx.container!]) {
-      throw new StorageServerError(
+      throw new StorageError(
         409,
         "ContainerAlreadyExists",
         "The specified container already exists.",

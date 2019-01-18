@@ -27,5 +27,5 @@ export default function endMiddleware(
     context.contextID
   );
 
-  res.end();
+  res.getBodyStream().end();
 }

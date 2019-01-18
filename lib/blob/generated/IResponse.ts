@@ -12,11 +12,5 @@ export default interface IResponse {
   getHeaders(): OutgoingHttpHeaders;
   headersSent(): boolean;
   setContentType(value: string | undefined): IResponse;
-  write(chunk: any, cb?: (error: Error | null | undefined) => void): boolean;
-  write(
-    chunk: any,
-    encoding?: string,
-    cb?: (error: Error | null | undefined) => void
-  ): boolean;
-  end(cb?: () => void): void;
+  getBodyStream(): NodeJS.WritableStream;
 }

@@ -45,7 +45,7 @@ app.use(middlewareFactory.createHandlerMiddleware(handlers));
 // Generated, will serialize response models into HTTP response
 app.use(middlewareFactory.createSerializerMiddleware());
 
-// Generated, will return HandlerError and Errors thrown in previous middleware/handlers to HTTP response
+// Generated, will return MiddlewareError and Errors thrown in previous middleware/handlers to HTTP response
 app.use(middlewareFactory.createErrorMiddleware());
 
 // Generated, will end and return HTTP response immediately

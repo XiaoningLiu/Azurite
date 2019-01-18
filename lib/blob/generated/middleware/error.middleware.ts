@@ -1,5 +1,5 @@
 import Context from "../Context";
-import HandlerError from "../errors/HandlerError";
+import MiddlewareError from "../errors/MiddlewareError";
 import IResponse from "../IResponse";
 import { NextFunction } from "../MiddlewareFactory";
 import ILogger from "../utils/ILogger";
@@ -7,14 +7,14 @@ import ILogger from "../utils/ILogger";
 /**
  * ErrorMiddleware handles following 2 kinds of errors thrown from previous middleware or handlers:
  *
- * 1. HandlerError will be serialized.
- *    This includes most of expected errors, such as 4XX or some 5xx errors are HandlerError.
+ * 1. MiddlewareError will be serialized.
+ *    This includes most of expected errors, such as 4XX or some 5xx errors are MiddlewareError.
  *
  * 2. Other unexpected errors will be serialized to 500 Internal Server error directly.
- *    Every this kind of error should be carefully checked, and consider to handle it as a HandlerError.
+ *    Every this kind of error should be carefully checked, and consider to handle it as a MiddlewareError.
  *
  * @export
- * @param {(HandlerError | Error)} err A HandlerError or Error object
+ * @param {(MiddlewareError | Error)} err A MiddlewareError or Error object
  * @param {Request} _req An express compatible Request object
  * @param {Response} res An express compatible Response object
  * @param {NextFunction} next An express middleware next callback
@@ -23,7 +23,7 @@ import ILogger from "../utils/ILogger";
  * @returns {void}
  */
 export default function errorMiddleware(
-  err: HandlerError | Error,
+  err: MiddlewareError | Error,
   res: IResponse,
   next: NextFunction,
   logger: ILogger,
@@ -39,9 +39,9 @@ export default function errorMiddleware(
 
   // Only handle ServerError, for other customized error types hand over to
   // other error handlers.
-  if (err instanceof HandlerError) {
+  if (err instanceof MiddlewareError) {
     logger.error(
-      `ErrorMiddleware: received a HandlerError, fill error information to HTTP response`,
+      `ErrorMiddleware: received a MiddlewareError, fill error information to HTTP response`,
       context.contextID
     );
 
@@ -85,18 +85,20 @@ export default function errorMiddleware(
       }
     }
 
-    logger.error(
-      `ErrorMiddleware: Set content type: application/xml`,
-      context.contextID
-    );
-    res.setContentType(`application/xml`);
+    if (err.contentType) {
+      logger.error(
+        `ErrorMiddleware: Set content type: ${err.contentType}`,
+        context.contextID
+      );
+      res.setContentType(err.contentType);
+    }
 
     logger.error(
       `ErrorMiddleware: Set HTTP body: ${err.body}`,
       context.contextID
     );
     if (err.body) {
-      res.write(err.body);
+      res.getBodyStream().write(err.body);
     }
   } else if (err instanceof Error) {
     logger.error(
@@ -109,13 +111,13 @@ export default function errorMiddleware(
       } ErrorStack=${err.stack}`
     );
     logger.error(`ErrorMiddleware: Set HTTP code: ${500}`, context.contextID);
-    logger.error(
-      `ErrorMiddleware: Set error message: ${err.message}`,
-      context.contextID
-    );
-
     res.setStatusCode(500);
-    res.write(err.message);
+
+    // logger.error(
+    //   `ErrorMiddleware: Set error message: ${err.message}`,
+    //   context.contextID
+    // );
+    // res.getBodyStream().write(err.message);
   } else {
     logger.warn(
       `ErrorMiddleware: received unhandled error object`,

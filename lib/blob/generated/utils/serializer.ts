@@ -205,6 +205,6 @@ export async function serialize(
     res.setContentType(`application/xml`);
 
     // TODO: Should send response in a serializer?
-    res.write(xmlBody);
+    res.getBodyStream().write(xmlBody);
   }
 }

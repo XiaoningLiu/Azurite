@@ -28,3 +28,8 @@ export function parseXML(str: string): Promise<any> {
     });
   });
 }
+
+export function jsonToXML(json: any): string {
+  const build = new xml2js.Builder();
+  return build.buildObject(json);
+}
