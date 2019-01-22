@@ -9,7 +9,7 @@ import ILogger from "../utils/ILogger";
  * @param {Request} _req An express compatible Request object
  * @param {Response} res An express compatible Response object
  * @param {ILogger} logger A valid logger
- * @param {string} contextPath res.locals[contextPath] will be used to hold context
+ * @param {Context} context res.locals[contextPath] will be used to hold context
  */
 export default function endMiddleware(
   res: IResponse,
@@ -19,6 +19,7 @@ export default function endMiddleware(
   const totalTimeInMS = context.startTime
     ? new Date().getTime() - context.startTime.getTime()
     : undefined;
+
   logger.info(
     // tslint:disable-next-line:max-line-length
     `EndMiddleware: End response. TotalTimeInMS=${totalTimeInMS} StatusCode=${res.getStatusCode()} StatusMessage=${res.getStatusMessage()} Headers=${JSON.stringify(

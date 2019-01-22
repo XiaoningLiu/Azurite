@@ -24,6 +24,7 @@ export default class Context {
    * @memberof Context
    */
   public constructor(context: Context);
+
   /**
    * Creates an instance of Context.
    * Context holds generated server context information.
@@ -52,10 +53,10 @@ export default class Context {
       }
 
       if (typeof context[this.path] !== "object") {
-        throw new Error(
+        throw new TypeError(
           `Initialize Context error because holder.${
             this.path
-          } is not a object.`
+          } is not an object.`
         );
       }
 

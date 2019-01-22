@@ -1,3 +1,9 @@
+/**
+ * An interface of logger used by generated code.
+ *
+ * @export
+ * @interface ILogger
+ */
 export default interface ILogger {
   error(message: string, contextID?: string): void;
   warn(message: string, contextID?: string): void;

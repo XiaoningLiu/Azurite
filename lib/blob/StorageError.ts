@@ -1,7 +1,25 @@
 import MiddlewareError from "./generated/errors/MiddlewareError";
 import { jsonToXML } from "./generated/utils/xml";
 
+/**
+ * Represents an Azure Storage Server Error.
+ *
+ * @export
+ * @class StorageError
+ * @extends {MiddlewareError}
+ */
 export default class StorageError extends MiddlewareError {
+  /**
+   * Creates an instance of StorageError.
+   *
+   * @param {number} statusCode HTTP response status code
+   * @param {string} storageErrorCode Azure Storage error code, will be in response body and header
+   * @param {string} storageErrorMessage Azure Storage error message
+   * @param {string} storageRequestID Azure Storage server request ID
+   * @param {{ [key: string]: string }} [storageAdditionalErrorMessages={}]
+   *                                  Additional error messages will be included in XML body
+   * @memberof StorageError
+   */
   constructor(
     statusCode: number,
     storageErrorCode: string,
@@ -34,6 +52,6 @@ export default class StorageError extends MiddlewareError {
       "application/xml"
     );
 
-    this.name = "StorageServerError";
+    this.name = "StorageError";
   }
 }

@@ -17,5 +17,7 @@ server.listen(port, host, () => {
     address = address.address;
   }
 
-  logger.info(`Azurite Blob service successfully listens on ${address}:${port}`);
+  logger.info(
+    `Azurite Blob service successfully listens on ${address}:${port}`
+  );
 });

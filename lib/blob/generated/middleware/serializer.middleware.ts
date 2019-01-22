@@ -1,10 +1,7 @@
 import Operation from "../artifacts/Operation";
-import {
-  containerCreateOperationSpec,
-  listContainersSegmentOperationSpec,
-} from "../artifacts/operation.specification";
+import Specifications from "../artifacts/operation.specification";
 import Context from "../Context";
-import InvalidUrlError from "../errors/InvalidUrlError";
+import OperationMismatchError from "../errors/OperationMismatchError";
 import IResponse from "../IResponse";
 import { NextFunction } from "../MiddlewareFactory";
 import ILogger from "../utils/ILogger";
@@ -31,7 +28,7 @@ export default function serializerMiddleware(
   );
 
   if (context.operation === undefined) {
-    const handlerError = new InvalidUrlError();
+    const handlerError = new OperationMismatchError();
     logger.error(
       `SerializerMiddleware: ${handlerError.message}`,
       context.contextID
@@ -39,21 +36,15 @@ export default function serializerMiddleware(
     return next(handlerError);
   }
 
-  switch (context.operation!) {
-    case Operation.Service_ListContainersSegment:
-      serialize(
-        res,
-        listContainersSegmentOperationSpec,
-        context.handlerResponses
-      )
-        .then(next)
-        .catch(next);
-      break;
-    case Operation.Container_Create:
-      serialize(res, containerCreateOperationSpec, context.handlerResponses)
-        .then(next)
-        .catch(next);
-    default:
-      break;
+  if (Specifications[context.operation] === undefined) {
+    logger.warn(
+      `SerializerMiddleware: cannot find serializer for operation ${
+        Operation[context.operation]
+      }`
+    );
   }
+
+  serialize(res, Specifications[context.operation], context.handlerResponses)
+    .then(next)
+    .catch(next);
 }

@@ -61,7 +61,7 @@ export default function blobStorageContextMiddleware(
       requestID
     );
 
-    throw handlerError;
+    return next(handlerError);
   }
 
   logger.info(

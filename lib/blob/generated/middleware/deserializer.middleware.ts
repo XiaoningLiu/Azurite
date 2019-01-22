@@ -1,11 +1,7 @@
 import Operation from "../artifacts/Operation";
-import {
-  containerCreateOperationSpec,
-  listContainersSegmentOperationSpec,
-  setPropertiesOperationSpec,
-} from "../artifacts/operation.specification";
+import Specifications from "../artifacts/operation.specification";
 import Context from "../Context";
-import InvalidUrlError from "../errors/InvalidUrlError";
+import OperationMismatchError from "../errors/OperationMismatchError";
 import IRequest from "../IRequest";
 import { NextFunction } from "../MiddlewareFactory";
 import ILogger from "../utils/ILogger";
@@ -33,7 +29,7 @@ export default function deserializerMiddleware(
   );
 
   if (context.operation === undefined) {
-    const handlerError = new InvalidUrlError();
+    const handlerError = new OperationMismatchError();
     logger.error(
       `DeserializerMiddleware: ${handlerError.message}`,
       context.contextID
@@ -41,38 +37,18 @@ export default function deserializerMiddleware(
     return next(handlerError);
   }
 
-  switch (context.operation) {
-    case Operation.Service_ListContainersSegment:
-      deserialize(req, listContainersSegmentOperationSpec)
-        .then((parameters) => {
-          context.handlerParameters = parameters;
-        })
-        .then(next)
-        .catch(next);
-      break;
-    case Operation.Container_Create:
-      deserialize(req, containerCreateOperationSpec)
-        .then((parameters) => {
-          context.handlerParameters = parameters;
-        })
-        .then(next)
-        .catch(next);
-      break;
-    case Operation.Service_SetProperties:
-      deserialize(req, setPropertiesOperationSpec)
-        .then((parameters) => {
-          context.handlerParameters = parameters;
-        })
-        .then(next)
-        .catch(next);
-      break;
-    default:
-      logger.warn(
-        `DeserializerMiddleware: cannot find deserializer for operation ${
-          Operation[context.operation]
-        }`
-      );
-      next();
-      break;
+  if (Specifications[context.operation] === undefined) {
+    logger.warn(
+      `DeserializerMiddleware: cannot find deserializer for operation ${
+        Operation[context.operation]
+      }`
+    );
   }
+
+  deserialize(req, Specifications[context.operation])
+    .then((parameters) => {
+      context.handlerParameters = parameters;
+    })
+    .then(next)
+    .catch(next);
 }

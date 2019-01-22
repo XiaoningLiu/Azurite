@@ -1,4 +1,4 @@
-import { IHandlers } from "./middleware/HandlerMiddlewareFactory";
+import IHandlers from "./handlers/IHandlers";
 import ILogger from "./utils/ILogger";
 
 export type Callback = (...args: any[]) => any;
@@ -7,13 +7,26 @@ export type NextFunction = Callback;
 
 /**
  * MiddlewareFactory will generate middleware according to swagger definitions.
- * Generated middleware MUST be used by strict order:
- *  * dispatchMiddleware
+ *
+ * Generated middleware MUST be used by strict order when you build your HTTP server:
+ *  * DispatchMiddleware
  *  * DeserializerMiddleware
  *  * HandlerMiddleware
  *  * SerializerMiddleware
  *  * ErrorMiddleware
  *  * EndMiddleware
+ *
+ * To compatible with different Node.js server frameworks, such as Express or Koa,
+ * Extend this class and implement interfaces IRequest and IResponse as adapters.
+ *
+ * As above default generated middleware is callback style, you may want to wrap them into promise
+ * style for Koa like frameworks. Generated middleware will always trigger callback method at last,
+ * and pass all error object as the first parameter of callback method.
+ *
+ * We already provide implementation for Express framework. Refer to:
+ *  * ExpressMiddlewareFactory
+ *  * ExpressRequestAdapter
+ *  * ExpressResponseAdapter
  *
  * @export
  * @class MiddlewareFactory

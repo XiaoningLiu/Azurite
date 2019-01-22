@@ -1,16 +1,11 @@
 import Operation from "../artifacts/Operation";
+import Specifications from "../artifacts/operation.specification";
 import Context from "../Context";
-import InvalidUrlError from "../errors/InvalidUrlError";
-import IContainerHandler from "../handlers/IContainerHandler";
-import IServiceHandler from "../handlers/IServiceHandler";
+import OperationMismatchError from "../errors/OperationMismatchError";
+import getHandlerByOperation from "../handlers/handlerMappers";
+import IHandlers from "../handlers/IHandlers";
 import { NextFunction } from "../MiddlewareFactory";
 import ILogger from "../utils/ILogger";
-
-// Auto generated
-export interface IHandlers {
-  serviceHandler: IServiceHandler;
-  containerHandler: IContainerHandler;
-}
 
 /**
  * Auto generated. HandlerMiddlewareFactory will accept handlers and create handler middleware.
@@ -19,9 +14,6 @@ export interface IHandlers {
  * @class HandlerMiddlewareFactory
  */
 export default class HandlerMiddlewareFactory {
-  private readonly serviceHandler: IServiceHandler;
-  private readonly containerHandler: IContainerHandler;
-
   /**
    * Creates an instance of HandlerMiddlewareFactory.
    * Accept handlers and create handler middleware.
@@ -30,10 +22,10 @@ export default class HandlerMiddlewareFactory {
    * @param {ILogger} logger A valid logger
    * @memberof HandlerMiddlewareFactory
    */
-  constructor(handlers: IHandlers, private readonly logger: ILogger) {
-    this.serviceHandler = handlers.serviceHandler;
-    this.containerHandler = handlers.containerHandler;
-  }
+  constructor(
+    private readonly handlers: IHandlers,
+    private readonly logger: ILogger
+  ) {}
 
   /**
    * Creates a handler middleware from input handlers.
@@ -53,7 +45,7 @@ export default class HandlerMiddlewareFactory {
       );
 
       if (!context.operation) {
-        const handlerError = new InvalidUrlError();
+        const handlerError = new OperationMismatchError();
         this.logger.error(
           `HandlerMiddleware: ${handlerError.message}`,
           context.contextID
@@ -61,54 +53,32 @@ export default class HandlerMiddlewareFactory {
         return next(handlerError);
       }
 
-      switch (context.operation) {
-        case Operation.Service_ListContainersSegment:
-          this.serviceListContainersSegmentMiddleware(next, context);
-          break;
-        case Operation.Container_Create:
-          this.containerCreateMiddleware(next, context);
-          break;
-        default:
-          this.logger.warn(
-            `HandlerMiddleware: cannot find handler for operation ${
-              Operation[context.operation]
-            }`
-          );
-          break;
+      if (Specifications[context.operation] === undefined) {
+        this.logger.warn(
+          `HandlerMiddleware: cannot find handler for operation ${
+            Operation[context.operation]
+          }`
+        );
       }
+
+      // We assume handlerPath always exists for every generated operation in generated code
+      const handlerPath = getHandlerByOperation(context.operation)!;
+
+      const args = [];
+      for (const arg of handlerPath.arguments) {
+        args.push(context.handlerParameters![arg]);
+      }
+      args.push(context);
+
+      const handler = (this.handlers as any)[handlerPath.handler];
+      const handlerMethod = handler[handlerPath.method] as () => Promise<any>;
+      handlerMethod
+        .apply(handler, args as any)
+        .then((response: any) => {
+          context.handlerResponses = response;
+        })
+        .then(next)
+        .catch(next);
     };
-  }
-
-  private serviceListContainersSegmentMiddleware(
-    next: NextFunction,
-    context: Context
-  ) {
-    if (
-      context.operation &&
-      context.operation === Operation.Service_ListContainersSegment
-    ) {
-      this.serviceHandler
-        .serviceListContainersSegment(
-          context.handlerParameters!.options,
-          context
-        )
-        .then((response) => {
-          context.handlerResponses = response;
-        })
-        .then(next)
-        .catch(next);
-    }
-  }
-
-  private containerCreateMiddleware(next: NextFunction, context: Context) {
-    if (context.operation && context.operation === Operation.Container_Create) {
-      this.containerHandler
-        .containerCreate(context.handlerParameters!.options, context)
-        .then((response) => {
-          context.handlerResponses = response;
-        })
-        .then(next)
-        .catch(next);
-    }
   }
 }
