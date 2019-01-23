@@ -11,17 +11,17 @@ import { deserialize } from "../utils/serializer";
  * Deserializer Middleware. Deserialize incoming HTTP request into models.
  *
  * @export
+ * @param {Context} context
  * @param {IRequest} req An IRequest object
  * @param {NextFunction} next An next callback or promise
  * @param {ILogger} logger A valid logger
- * @param {Context} context
  * @returns {void}
  */
 export default function deserializerMiddleware(
+  context: Context,
   req: IRequest,
   next: NextFunction,
   logger: ILogger,
-  context: Context
 ): void {
   logger.verbose(
     `DeserializerMiddleware: Start deserializing...`,

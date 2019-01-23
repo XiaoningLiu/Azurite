@@ -106,19 +106,13 @@ export async function deserialize(
           : [];
     }
 
-    try {
-      parsedBody = spec.serializer.deserialize(
-        bodyParameter.mapper,
-        valueToDeserialize,
-        bodyParameter.mapper.serializedName!
-      );
-    } catch (error) {
-      throw error;
-    }
+    parsedBody = spec.serializer.deserialize(
+      bodyParameter.mapper,
+      valueToDeserialize,
+      bodyParameter.mapper.serializedName!
+    );
 
     setParametersValue(parameters, bodyParameter.parameterPath, parsedBody);
-
-    // spec.serializer.deserialize(bodyParameter.mapper, parsedBody, bodyParameter.mapper.serializedName!);
   }
 
   return parameters;

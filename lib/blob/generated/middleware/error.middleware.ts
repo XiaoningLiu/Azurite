@@ -14,20 +14,20 @@ import ILogger from "../utils/ILogger";
  *    Every this kind of error should be carefully checked, and consider to handle it as a MiddlewareError.
  *
  * @export
+ * @param {Context} context
  * @param {(MiddlewareError | Error)} err A MiddlewareError or Error object
  * @param {Request} _req An express compatible Request object
  * @param {Response} res An express compatible Response object
  * @param {NextFunction} next An express middleware next callback
  * @param {ILogger} logger A valid logger
- * @param {string} contextPath res.locals[contextPath] will be used to hold context
  * @returns {void}
  */
 export default function errorMiddleware(
+  context: Context,
   err: MiddlewareError | Error,
   res: IResponse,
   next: NextFunction,
   logger: ILogger,
-  context: Context
 ): void {
   if (res.headersSent()) {
     logger.warn(

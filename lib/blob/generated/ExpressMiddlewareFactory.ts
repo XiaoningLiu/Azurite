@@ -50,10 +50,10 @@ export default class ExpressMiddlewareFactory extends MiddlewareFactory {
   public createDispatchMiddleware(): RequestHandler {
     return (req: Request, res: Response, next: NextFunction) => {
       dispatchMiddleware(
+        new Context(res.locals, this.contextPath),
         new ExpressRequestAdapter(req),
         next,
         this.logger,
-        new Context(res.locals, this.contextPath)
       );
     };
   }
@@ -67,10 +67,10 @@ export default class ExpressMiddlewareFactory extends MiddlewareFactory {
   public createDeserializerMiddleware(): RequestHandler {
     return (req: Request, res: Response, next: NextFunction) => {
       deserializerMiddleware(
+        new Context(res.locals, this.contextPath),
         new ExpressRequestAdapter(req),
         next,
         this.logger,
-        new Context(res.locals, this.contextPath)
       );
     };
   }
@@ -89,8 +89,8 @@ export default class ExpressMiddlewareFactory extends MiddlewareFactory {
     );
     return (_req: Request, res: Response, next: NextFunction) => {
       handlerMiddlewareFactory.createHandlerMiddleware()(
+        new Context(res.locals, this.contextPath),
         next,
-        new Context(res.locals, this.contextPath)
       );
     };
   }
@@ -104,10 +104,10 @@ export default class ExpressMiddlewareFactory extends MiddlewareFactory {
   public createSerializerMiddleware(): RequestHandler {
     return (_req: Request, res: Response, next: NextFunction) => {
       serializerMiddleware(
+        new Context(res.locals, this.contextPath),
         new ExpressResponseAdapter(res),
         next,
         this.logger,
-        new Context(res.locals, this.contextPath)
       );
     };
   }
@@ -121,11 +121,11 @@ export default class ExpressMiddlewareFactory extends MiddlewareFactory {
   public createErrorMiddleware(): ErrorRequestHandler {
     return (err: Error, _req: Request, res: Response, next: NextFunction) => {
       errorMiddleware(
+        new Context(res.locals, this.contextPath),
         err,
         new ExpressResponseAdapter(res),
         next,
         this.logger,
-        new Context(res.locals, this.contextPath)
       );
     };
   }
@@ -139,9 +139,9 @@ export default class ExpressMiddlewareFactory extends MiddlewareFactory {
   public createEndMiddleware(): RequestHandler {
     return (_req: Request, res: Response) => {
       endMiddleware(
+        new Context(res.locals, this.contextPath),
         new ExpressResponseAdapter(res),
         this.logger,
-        new Context(res.locals, this.contextPath)
       );
     };
   }

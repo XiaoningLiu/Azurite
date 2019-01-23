@@ -17,10 +17,10 @@ import { serialize } from "../utils/serializer";
  * @param {Context} context
  */
 export default function serializerMiddleware(
+  context: Context,
   res: IResponse,
   next: NextFunction,
   logger: ILogger,
-  context: Context
 ): void {
   logger.verbose(
     `SerializerMiddleware: Start serializing...`,

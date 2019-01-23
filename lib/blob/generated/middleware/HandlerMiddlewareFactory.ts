@@ -33,10 +33,10 @@ export default class HandlerMiddlewareFactory {
    * @memberof HandlerMiddlewareFactory
    */
   public createHandlerMiddleware(): (
+    context: Context,
     next: NextFunction,
-    context: Context
   ) => void {
-    return (next: NextFunction, context: Context) => {
+    return (context: Context, next: NextFunction) => {
       this.logger.verbose(
         `HandlerMiddleware: DeserializedParameters=${JSON.stringify(
           context.handlerParameters

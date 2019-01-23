@@ -15,17 +15,17 @@ import { isURITemplateMatch } from "../utils/utils";
  * Make sure dispatchMiddleware is triggered before other generated middleware.
  *
  * @export
+ * @param {Context} context Context object
  * @param {IRequest} req An request object
  * @param {NextFunction} next A callback
  * @param {ILogger} logger A valid logger
- * @param {Context} context Context object
  * @returns {void}
  */
 export default function dispatchMiddleware(
+  context: Context,
   req: IRequest,
   next: NextFunction,
   logger: ILogger,
-  context: Context
 ): void {
   logger.verbose(
     `DispatchMiddleware: Dispatching request...`,
