@@ -113,6 +113,8 @@ export async function deserialize(
     );
 
     setParametersValue(parameters, bodyParameter.parameterPath, parsedBody);
+
+    setParametersValue(parameters, "body", req);
   }
 
   return parameters;

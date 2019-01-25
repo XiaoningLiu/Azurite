@@ -1,8 +1,8 @@
 import { NextFunction, Request, Response } from "express";
 
 import BlobStorageContext from "./BlobStorageContext";
-import { CONTEXT_PATH } from "./constants";
 import StorageError from "./StorageError";
+import { CONTEXT_PATH } from "./utils/constants";
 import logger from "./utils/log/Logger";
 
 /**
@@ -26,7 +26,7 @@ export default function blobStorageContextMiddleware(
   blobContext.startTime = new Date();
 
   logger.info(
-    `BlobStorageContextMiddleware: RequestURL=${
+    `BlobStorageContextMiddleware: RequestURL=${req.protocol}://${req.hostname}${
       req.url
     } RequestHeaders:${JSON.stringify(req.headers)} ClientIP=${
       req.ip

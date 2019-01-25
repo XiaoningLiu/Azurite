@@ -11,42 +11,49 @@ export default class BlobHandler extends BaseHandler implements IBlobHandler {
   ): Promise<Models.BlobDownloadResponse> {
     throw new NotImplementedError(context.contextID);
   }
+
   public getProperties(
     options: Models.BlobGetPropertiesOptionalParams,
     context: Context
   ): Promise<Models.BlobGetPropertiesResponse> {
     throw new NotImplementedError(context.contextID);
   }
+
   public delete(
     options: Models.BlobDeleteMethodOptionalParams,
     context: Context
   ): Promise<Models.BlobDeleteResponse> {
     throw new NotImplementedError(context.contextID);
   }
+
   public undelete(
     options: Models.BlobUndeleteOptionalParams,
     context: Context
   ): Promise<Models.BlobUndeleteResponse> {
     throw new NotImplementedError(context.contextID);
   }
+
   public setHTTPHeaders(
     options: Models.BlobSetHTTPHeadersOptionalParams,
     context: Context
   ): Promise<Models.BlobSetHTTPHeadersResponse> {
     throw new NotImplementedError(context.contextID);
   }
+
   public setMetadata(
     options: Models.BlobSetMetadataOptionalParams,
     context: Context
   ): Promise<Models.BlobSetMetadataResponse> {
     throw new NotImplementedError(context.contextID);
   }
+
   public acquireLease(
     options: Models.BlobAcquireLeaseOptionalParams,
     context: Context
   ): Promise<Models.BlobAcquireLeaseResponse> {
     throw new NotImplementedError(context.contextID);
   }
+
   public releaseLease(
     leaseId: string,
     options: Models.BlobReleaseLeaseOptionalParams,
@@ -54,6 +61,7 @@ export default class BlobHandler extends BaseHandler implements IBlobHandler {
   ): Promise<Models.BlobReleaseLeaseResponse> {
     throw new NotImplementedError(context.contextID);
   }
+
   public renewLease(
     leaseId: string,
     options: Models.BlobRenewLeaseOptionalParams,
@@ -61,6 +69,7 @@ export default class BlobHandler extends BaseHandler implements IBlobHandler {
   ): Promise<Models.BlobRenewLeaseResponse> {
     throw new NotImplementedError(context.contextID);
   }
+
   public changeLease(
     leaseId: string,
     proposedLeaseId: string,
@@ -69,18 +78,21 @@ export default class BlobHandler extends BaseHandler implements IBlobHandler {
   ): Promise<Models.BlobChangeLeaseResponse> {
     throw new NotImplementedError(context.contextID);
   }
+
   public breakLease(
     options: Models.BlobBreakLeaseOptionalParams,
     context: Context
   ): Promise<Models.BlobBreakLeaseResponse> {
     throw new NotImplementedError(context.contextID);
   }
+
   public createSnapshot(
     options: Models.BlobCreateSnapshotOptionalParams,
     context: Context
   ): Promise<Models.BlobCreateSnapshotResponse> {
     throw new NotImplementedError(context.contextID);
   }
+
   public startCopyFromURL(
     copySource: string,
     options: Models.BlobStartCopyFromURLOptionalParams,
@@ -88,6 +100,7 @@ export default class BlobHandler extends BaseHandler implements IBlobHandler {
   ): Promise<Models.BlobStartCopyFromURLResponse> {
     throw new NotImplementedError(context.contextID);
   }
+
   public abortCopyFromURL(
     copyId: string,
     options: Models.BlobAbortCopyFromURLOptionalParams,
@@ -95,6 +108,7 @@ export default class BlobHandler extends BaseHandler implements IBlobHandler {
   ): Promise<Models.BlobAbortCopyFromURLResponse> {
     throw new NotImplementedError(context.contextID);
   }
+
   public setTier(
     tier: Models.AccessTier,
     options: Models.BlobSetTierOptionalParams,
@@ -102,6 +116,7 @@ export default class BlobHandler extends BaseHandler implements IBlobHandler {
   ): Promise<Models.BlobSetTierResponse> {
     throw new NotImplementedError(context.contextID);
   }
+
   public getAccountInfo(
     context: Context
   ): Promise<Models.BlobGetAccountInfoResponse> {

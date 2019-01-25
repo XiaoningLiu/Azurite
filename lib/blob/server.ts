@@ -1,7 +1,7 @@
 import * as http from "http";
 
 import app from "./app";
-import { SERVER_CONFIGS } from "./constants";
+import { SERVER_CONFIGS } from "./utils/constants";
 import logger from "./utils/log/Logger";
 
 // Decouple server & app layer

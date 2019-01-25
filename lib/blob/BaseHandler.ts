@@ -1,4 +1,5 @@
 import { ContainerItem } from "./generated/artifacts/models";
+import ILogger from "./generated/utils/ILogger";
 import SimpleDataStore from "./SimpleDataStore";
 
 /**
@@ -14,7 +15,7 @@ import SimpleDataStore from "./SimpleDataStore";
 export default class BaseHandler {
   protected containers: { [key: string]: ContainerItem } = {};
 
-  constructor(dataSource: SimpleDataStore) {
+  constructor(dataSource: SimpleDataStore, protected readonly logger: ILogger) {
     this.containers = dataSource.containers;
   }
 }

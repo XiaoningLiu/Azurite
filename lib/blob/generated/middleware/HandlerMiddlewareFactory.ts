@@ -37,7 +37,7 @@ export default class HandlerMiddlewareFactory {
     next: NextFunction,
   ) => void {
     return (context: Context, next: NextFunction) => {
-      this.logger.verbose(
+      this.logger.info(
         `HandlerMiddleware: DeserializedParameters=${JSON.stringify(
           context.handlerParameters
         )}`,
