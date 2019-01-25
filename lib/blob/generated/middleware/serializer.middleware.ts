@@ -1,5 +1,5 @@
-import Operation from "../artifacts/Operation";
-import Specifications from "../artifacts/operation.specification";
+import Operation from "../artifacts/operation";
+import Specifications from "../artifacts/specifications";
 import Context from "../Context";
 import OperationMismatchError from "../errors/OperationMismatchError";
 import IResponse from "../IResponse";

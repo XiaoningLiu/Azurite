@@ -1,4 +1,4 @@
-import { IContainerItem } from "./generated/artifacts/models";
+import { ContainerItem } from "./generated/artifacts/models";
 import SimpleDataStore from "./SimpleDataStore";
 
 /**
@@ -12,7 +12,7 @@ import SimpleDataStore from "./SimpleDataStore";
  * @implements {IHandler}
  */
 export default class SimpleBaseHandler {
-  protected containers: { [key: string]: IContainerItem } = {};
+  protected containers: { [key: string]: ContainerItem } = {};
 
   constructor(dataSource: SimpleDataStore) {
     this.containers = dataSource.containers;

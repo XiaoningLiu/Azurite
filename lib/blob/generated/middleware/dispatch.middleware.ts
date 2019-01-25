@@ -1,7 +1,7 @@
 import * as msRest from "ms-rest-js";
 
 import Operation from "../artifacts/Operation";
-import Specifications from "../artifacts/operation.specification";
+import Specifications from "../artifacts/specifications";
 import Context from "../Context";
 import UnsupportedRequestError from "../errors/UnsupportedRequestError";
 import IRequest from "../IRequest";
