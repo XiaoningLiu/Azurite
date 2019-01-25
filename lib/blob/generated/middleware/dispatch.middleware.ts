@@ -1,4 +1,4 @@
-import * as msRest from "ms-rest-js";
+import * as msRest from "@azure/ms-rest-js";
 
 import Operation from "../artifacts/Operation";
 import Specifications from "../artifacts/specifications";

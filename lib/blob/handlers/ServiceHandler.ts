@@ -1,8 +1,9 @@
+import NotImplementedError from "../errors/NotImplementedError";
+import * as Models from "../generated/artifacts/models";
+import Context from "../generated/Context";
+import IServiceHandler from "../generated/handlers/IServiceHandler";
+import { API_VERSION } from "../utils/constants";
 import BaseHandler from "./BaseHandler";
-import * as Models from "./generated/artifacts/models";
-import Context from "./generated/Context";
-import IServiceHandler from "./generated/handlers/IServiceHandler";
-import NotImplementedError from "./NotImplementedError";
 
 /**
  * Manually implement handlers by implementing IServiceHandler interface.
@@ -19,14 +20,27 @@ export default class ServiceHandler extends BaseHandler
     options: Models.ServiceSetPropertiesOptionalParams,
     context: Context
   ): Promise<Models.ServiceSetPropertiesResponse> {
-    throw new NotImplementedError(context.contextID);
+    await this.dataSource.setServiceProperties(storageServiceProperties);
+    const response: Models.ServiceSetPropertiesResponse = {
+      requestId: context.contextID,
+      statusCode: 202,
+      version: API_VERSION,
+    };
+    return response;
   }
 
   public async getProperties(
     options: Models.ServiceGetPropertiesOptionalParams,
     context: Context
   ): Promise<Models.ServiceGetPropertiesResponse> {
-    throw new NotImplementedError(context.contextID);
+    const properties = await this.dataSource.getServiceProperties();
+    const response: Models.ServiceGetPropertiesResponse = {
+      ...properties,
+      requestId: context.contextID,
+      statusCode: 200,
+      version: API_VERSION,
+    };
+    return response;
   }
 
   public async getStatistics(
@@ -40,19 +54,18 @@ export default class ServiceHandler extends BaseHandler
     options: Models.ServiceListContainersSegmentOptionalParams,
     context: Context
   ): Promise<Models.ServiceListContainersSegmentResponse> {
-    const containerArray = [];
-    for (const key in this.containers) {
-      if (this.containers.hasOwnProperty(key)) {
-        const container = this.containers[key];
-        containerArray.push(container);
-      }
-    }
+    const LIST_CONTAINERS_MAX_RESULTS_DEFAULT = 2000;
+
+    options.maxresults = options.maxresults === undefined ? LIST_CONTAINERS_MAX_RESULTS_DEFAULT : options.maxresults;
+    options.prefix = options.prefix || "";
+
+    const containers = await this.dataSource.listContainers(options.prefix, options.maxresults);
 
     const res: Models.ServiceListContainersSegmentResponse = {
-      containerItems: containerArray,
-      maxResults: options.maxresults || 2000,
+      containerItems: containers,
+      maxResults: options.maxresults,
       nextMarker: "",
-      prefix: options.prefix || "",
+      prefix: options.prefix,
       serviceEndpoint: "serviceEndpoint",
       statusCode: 200,
     };

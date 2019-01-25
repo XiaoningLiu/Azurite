@@ -1,17 +1,18 @@
 import express from "express";
 
-import AppendBlobHandler from "./AppendBlobHandler";
-import BlobHandler from "./BlobHandler";
-import blobStorageContextMiddleware from "./blobStorageContext.middleware";
-import BlockBlobHandler from "./BlockBlobHandler";
-import ContainerHandler from "./ContainerHandler";
+import blobStorageContextMiddleware from "./context/blobStorageContext.middleware";
 import ExpressMiddlewareFactory from "./generated/ExpressMiddlewareFactory";
 import IHandlers from "./generated/handlers/IHandlers";
 import MiddlewareFactory from "./generated/MiddlewareFactory";
-import PageBlobHandler from "./PageBlobHandler";
-import ServiceHandler from "./ServiceHandler";
-import SimpleDataStore from "./SimpleDataStore";
-import { CONTEXT_PATH } from "./utils/constants";
+import AppendBlobHandler from "./handlers/AppendBlobHandler";
+import BlobHandler from "./handlers/BlobHandler";
+import BlockBlobHandler from "./handlers/BlockBlobHandler";
+import ContainerHandler from "./handlers/ContainerHandler";
+import PageBlobHandler from "./handlers/PageBlobHandler";
+import ServiceHandler from "./handlers/ServiceHandler";
+import IBlobDataStore from "./persistence/IBlobDataStore";
+import LokiBlobDataStore from "./persistence/LokiBlobDataStore";
+import { CONTEXT_PATH, LOKI_DB_PATH } from "./utils/constants";
 import logger from "./utils/log/Logger";
 
 const app = express().disable("x-powered-by");
@@ -23,7 +24,11 @@ const middlewareFactory: MiddlewareFactory = new ExpressMiddlewareFactory(
 );
 
 // Data source is persistency layer entry
-const dataSource = new SimpleDataStore();
+const dataSource: IBlobDataStore = new LokiBlobDataStore(LOKI_DB_PATH);
+
+// TODO: This is a potential async call, considering handling it with await or then
+// For Loki based implementation, it's not async actually, leave it here
+dataSource.init();
 
 // Create handlers into handler middleware factory
 const handlers: IHandlers = {

@@ -1,10 +1,11 @@
+import BlobStorageContext from "../context/BlobStorageContext";
+import NotImplementedError from "../errors/NotImplementedError";
+import StorageError from "../errors/StorageError";
+import * as Models from "../generated/artifacts/models";
+import Context from "../generated/Context";
+import IContainerHandler from "../generated/handlers/IContainerHandler";
+import { API_VERSION } from "../utils/constants";
 import BaseHandler from "./BaseHandler";
-import BlobStorageContext from "./BlobStorageContext";
-import * as Models from "./generated/artifacts/models";
-import Context from "./generated/Context";
-import IContainerHandler from "./generated/handlers/IContainerHandler";
-import NotImplementedError from "./NotImplementedError";
-import StorageError from "./StorageError";
 
 /**
  * Manually implement handlers by implementing IContainerHandler interface.
@@ -22,33 +23,36 @@ export default class ContainerHandler extends BaseHandler
   ): Promise<Models.ContainerCreateResponse> {
     const blobCtx = new BlobStorageContext(context);
 
-    if (this.containers[blobCtx.container!]) {
+    const etag = "etag";
+    const lastModified = new Date();
+
+    try {
+      await this.dataSource.createContainer({
+        metadata: options.metadata,
+        name: blobCtx.container!,
+        properties: {
+          etag,
+          lastModified,
+        }
+      });
+    } catch (err) {
       throw new StorageError(
         409,
         "ContainerAlreadyExists",
         "The specified container already exists.",
-        context.contextID!
+        blobCtx.contextID!
       );
     }
 
-    const lastModified = new Date();
-    const etag = "newEtag";
-
-    this.containers[blobCtx.container!] = {
-      metadata: options.metadata,
-      name: blobCtx.container!,
-      properties: {
-        etag,
-        lastModified,
-      },
-    };
-
-    const result: Models.ContainerCreateResponse = {
+    const resposne: Models.ContainerCreateResponse = {
+      eTag: etag,
       lastModified,
+      requestId: blobCtx.contextID,
       statusCode: 201,
+      version: API_VERSION,
     };
 
-    return result;
+    return resposne;
   }
 
   public async getProperties(

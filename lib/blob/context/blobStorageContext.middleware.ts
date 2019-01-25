@@ -1,9 +1,9 @@
 import { NextFunction, Request, Response } from "express";
 
+import StorageError from "../errors/StorageError";
+import { CONTEXT_PATH } from "../utils/constants";
+import logger from "../utils/log/Logger";
 import BlobStorageContext from "./BlobStorageContext";
-import StorageError from "./StorageError";
-import { CONTEXT_PATH } from "./utils/constants";
-import logger from "./utils/log/Logger";
 
 /**
  * A middleware extract related blob service context.

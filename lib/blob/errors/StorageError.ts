@@ -1,5 +1,5 @@
-import MiddlewareError from "./generated/errors/MiddlewareError";
-import { jsonToXML } from "./generated/utils/xml";
+import MiddlewareError from "../generated/errors/MiddlewareError";
+import { jsonToXML } from "../generated/utils/xml";
 
 /**
  * Represents an Azure Storage Server Error.

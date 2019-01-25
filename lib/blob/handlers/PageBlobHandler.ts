@@ -1,8 +1,8 @@
+import NotImplementedError from "../errors/NotImplementedError";
+import * as Models from "../generated/artifacts/models";
+import Context from "../generated/Context";
+import IPageBlobHandler from "../generated/handlers/IPageBlobHandler";
 import BaseHandler from "./BaseHandler";
-import * as Models from "./generated/artifacts/models";
-import Context from "./generated/Context";
-import IPageBlobHandler from "./generated/handlers/IPageBlobHandler";
-import NotImplementedError from "./NotImplementedError";
 
 export default class PageBlobHandler extends BaseHandler
   implements IPageBlobHandler {

@@ -1,4 +1,4 @@
-import Context from "./generated/Context";
+import Context from "../generated/Context";
 
 export default class BlobStorageContext extends Context {
   public getContainer(): string | undefined {

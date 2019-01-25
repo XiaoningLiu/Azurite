@@ -1,6 +1,5 @@
-import { ContainerItem } from "./generated/artifacts/models";
-import ILogger from "./generated/utils/ILogger";
-import SimpleDataStore from "./SimpleDataStore";
+import ILogger from "../generated/utils/ILogger";
+import IBlobDataStore from "../persistence/IBlobDataStore";
 
 /**
  * SimpleBaseHandler is a simple sample of the base handler class for inherited business handlers.
@@ -13,9 +12,6 @@ import SimpleDataStore from "./SimpleDataStore";
  * @implements {IHandler}
  */
 export default class BaseHandler {
-  protected containers: { [key: string]: ContainerItem } = {};
-
-  constructor(dataSource: SimpleDataStore, protected readonly logger: ILogger) {
-    this.containers = dataSource.containers;
+  constructor(protected readonly dataSource: IBlobDataStore, protected readonly logger: ILogger) {
   }
 }

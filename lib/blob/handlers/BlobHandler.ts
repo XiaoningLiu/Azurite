@@ -1,8 +1,8 @@
+import NotImplementedError from "../errors/NotImplementedError";
+import * as Models from "../generated/artifacts/models";
+import Context from "../generated/Context";
+import IBlobHandler from "../generated/handlers/IBlobHandler";
 import BaseHandler from "./BaseHandler";
-import * as Models from "./generated/artifacts/models";
-import Context from "./generated/Context";
-import IBlobHandler from "./generated/handlers/IBlobHandler";
-import NotImplementedError from "./NotImplementedError";
 
 export default class BlobHandler extends BaseHandler implements IBlobHandler {
   public download(
