@@ -1,12 +1,17 @@
 import express from "express";
 
+import AppendBlobHandler from "./AppendBlobHandler";
+import BlobHandler from "./BlobHandler";
 import blobStorageContextMiddleware from "./blobStorageContext.middleware";
+import BlockBlobHandler from "./BlockBlobHandler";
 import { CONTEXT_PATH } from "./constants";
+import ContainerHandler from "./ContainerHandler";
 import ExpressMiddlewareFactory from "./generated/ExpressMiddlewareFactory";
+import IHandlers from "./generated/handlers/IHandlers";
 import MiddlewareFactory from "./generated/MiddlewareFactory";
-import SimpleContainerHandler from "./SimpleContainerHandler";
+import PageBlobHandler from "./PageBlobHandler";
+import ServiceHandler from "./ServiceHandler";
 import SimpleDataStore from "./SimpleDataStore";
-import SimpleServiceHandler from "./SimpleServiceHandler";
 import logger from "./utils/log/Logger";
 
 const app = express();
@@ -22,9 +27,13 @@ const middlewareFactory: MiddlewareFactory = new ExpressMiddlewareFactory(
 const dataSource = new SimpleDataStore();
 
 // Create handlers into handler middleware factory
-const handlers = {
-  containerHandler: new SimpleContainerHandler(dataSource),
-  serviceHandler: new SimpleServiceHandler(dataSource),
+const handlers: IHandlers = {
+  appendBlobHandler: new AppendBlobHandler(dataSource),
+  blobHandler: new BlobHandler(dataSource),
+  blockBlobHandler: new BlockBlobHandler(dataSource),
+  containerHandler: new ContainerHandler(dataSource),
+  pageBlobHandler: new PageBlobHandler(dataSource),
+  serviceHandler: new ServiceHandler(dataSource),
 };
 
 /*

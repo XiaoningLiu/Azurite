@@ -47,7 +47,7 @@ export default class StorageError extends MiddlewareError {
       statusCode,
       storageErrorMessage,
       undefined,
-      { "x-ms-error-code": storageErrorCode },
+      { "x-ms-error-code": storageErrorCode, "x-ms-request-id": storageRequestID },
       bodyInXML,
       "application/xml"
     );

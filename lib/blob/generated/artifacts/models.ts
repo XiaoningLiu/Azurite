@@ -4318,7 +4318,7 @@ export type ServiceSetPropertiesResponse = ServiceSetPropertiesHeaders & {
   /**
    * The response status code.
    */
-  statusCode: "202";
+  statusCode: 202;
 };
 
 /**
@@ -4328,7 +4328,7 @@ export type ServiceGetPropertiesResponse = StorageServiceProperties & ServiceGet
   /**
    * The response status code.
    */
-  statusCode: "200";
+  statusCode: 200;
 };
 
 /**
@@ -4338,7 +4338,7 @@ export type ServiceGetStatisticsResponse = StorageServiceStats & ServiceGetStati
   /**
    * The response status code.
    */
-  statusCode: "200";
+  statusCode: 200;
 };
 
 /**
@@ -4348,7 +4348,7 @@ export type ServiceListContainersSegmentResponse = ListContainersSegmentResponse
   /**
    * The response status code.
    */
-  statusCode: "200";
+  statusCode: 200;
 };
 
 /**
@@ -4358,7 +4358,7 @@ export type ServiceGetAccountInfoResponse = ServiceGetAccountInfoHeaders & {
   /**
    * The response status code.
    */
-  statusCode: "200";
+  statusCode: 200;
 };
 
 /**
@@ -4368,7 +4368,7 @@ export type ContainerCreateResponse = ContainerCreateHeaders & {
   /**
    * The response status code.
    */
-  statusCode: "201";
+  statusCode: 201;
 };
 
 /**
@@ -4378,7 +4378,7 @@ export type ContainerGetPropertiesResponse = ContainerGetPropertiesHeaders & {
   /**
    * The response status code.
    */
-  statusCode: "200";
+  statusCode: 200;
 };
 
 /**
@@ -4388,7 +4388,7 @@ export type ContainerDeleteResponse = ContainerDeleteHeaders & {
   /**
    * The response status code.
    */
-  statusCode: "202";
+  statusCode: 202;
 };
 
 /**
@@ -4398,7 +4398,7 @@ export type ContainerSetMetadataResponse = ContainerSetMetadataHeaders & {
   /**
    * The response status code.
    */
-  statusCode: "200";
+  statusCode: 200;
 };
 
 /**
@@ -4408,7 +4408,7 @@ export type ContainerGetAccessPolicyResponse = Array<SignedIdentifier> & Contain
   /**
    * The response status code.
    */
-  statusCode: "200";
+  statusCode: 200;
 };
 
 /**
@@ -4418,7 +4418,7 @@ export type ContainerSetAccessPolicyResponse = ContainerSetAccessPolicyHeaders &
   /**
    * The response status code.
    */
-  statusCode: "200";
+  statusCode: 200;
 };
 
 /**
@@ -4428,7 +4428,7 @@ export type ContainerAcquireLeaseResponse = ContainerAcquireLeaseHeaders & {
   /**
    * The response status code.
    */
-  statusCode: "201";
+  statusCode: 201;
 };
 
 /**
@@ -4438,7 +4438,7 @@ export type ContainerReleaseLeaseResponse = ContainerReleaseLeaseHeaders & {
   /**
    * The response status code.
    */
-  statusCode: "200";
+  statusCode: 200;
 };
 
 /**
@@ -4448,7 +4448,7 @@ export type ContainerRenewLeaseResponse = ContainerRenewLeaseHeaders & {
   /**
    * The response status code.
    */
-  statusCode: "200";
+  statusCode: 200;
 };
 
 /**
@@ -4458,7 +4458,7 @@ export type ContainerBreakLeaseResponse = ContainerBreakLeaseHeaders & {
   /**
    * The response status code.
    */
-  statusCode: "202";
+  statusCode: 202;
 };
 
 /**
@@ -4468,7 +4468,7 @@ export type ContainerChangeLeaseResponse = ContainerChangeLeaseHeaders & {
   /**
    * The response status code.
    */
-  statusCode: "200";
+  statusCode: 200;
 };
 
 /**
@@ -4478,7 +4478,7 @@ export type ContainerListBlobFlatSegmentResponse = ListBlobsFlatSegmentResponse 
   /**
    * The response status code.
    */
-  statusCode: "200";
+  statusCode: 200;
 };
 
 /**
@@ -4488,7 +4488,7 @@ export type ContainerListBlobHierarchySegmentResponse = ListBlobsHierarchySegmen
   /**
    * The response status code.
    */
-  statusCode: "200";
+  statusCode: 200;
 };
 
 /**
@@ -4498,7 +4498,7 @@ export type ContainerGetAccountInfoResponse = ContainerGetAccountInfoHeaders & {
   /**
    * The response status code.
    */
-  statusCode: "200";
+  statusCode: 200;
 };
 
 /**
@@ -4513,7 +4513,7 @@ export type BlobDownloadResponse = BlobDownloadHeaders & {
   /**
    * The response status code.
    */
-  statusCode: "200 | 206";
+  statusCode: 200 | 206;
 };
 
 /**
@@ -4523,7 +4523,7 @@ export type BlobGetPropertiesResponse = BlobGetPropertiesHeaders & {
   /**
    * The response status code.
    */
-  statusCode: "200";
+  statusCode: 200;
 };
 
 /**
@@ -4533,7 +4533,7 @@ export type BlobDeleteResponse = BlobDeleteHeaders & {
   /**
    * The response status code.
    */
-  statusCode: "202";
+  statusCode: 202;
 };
 
 /**
@@ -4543,7 +4543,7 @@ export type BlobUndeleteResponse = BlobUndeleteHeaders & {
   /**
    * The response status code.
    */
-  statusCode: "200";
+  statusCode: 200;
 };
 
 /**
@@ -4553,7 +4553,7 @@ export type BlobSetHTTPHeadersResponse = BlobSetHTTPHeadersHeaders & {
   /**
    * The response status code.
    */
-  statusCode: "200";
+  statusCode: 200;
 };
 
 /**
@@ -4563,7 +4563,7 @@ export type BlobSetMetadataResponse = BlobSetMetadataHeaders & {
   /**
    * The response status code.
    */
-  statusCode: "200";
+  statusCode: 200;
 };
 
 /**
@@ -4573,7 +4573,7 @@ export type BlobAcquireLeaseResponse = BlobAcquireLeaseHeaders & {
   /**
    * The response status code.
    */
-  statusCode: "201";
+  statusCode: 201;
 };
 
 /**
@@ -4583,7 +4583,7 @@ export type BlobReleaseLeaseResponse = BlobReleaseLeaseHeaders & {
   /**
    * The response status code.
    */
-  statusCode: "200";
+  statusCode: 200;
 };
 
 /**
@@ -4593,7 +4593,7 @@ export type BlobRenewLeaseResponse = BlobRenewLeaseHeaders & {
   /**
    * The response status code.
    */
-  statusCode: "200";
+  statusCode: 200;
 };
 
 /**
@@ -4603,7 +4603,7 @@ export type BlobChangeLeaseResponse = BlobChangeLeaseHeaders & {
   /**
    * The response status code.
    */
-  statusCode: "200";
+  statusCode: 200;
 };
 
 /**
@@ -4613,7 +4613,7 @@ export type BlobBreakLeaseResponse = BlobBreakLeaseHeaders & {
   /**
    * The response status code.
    */
-  statusCode: "202";
+  statusCode: 202;
 };
 
 /**
@@ -4623,7 +4623,7 @@ export type BlobCreateSnapshotResponse = BlobCreateSnapshotHeaders & {
   /**
    * The response status code.
    */
-  statusCode: "201";
+  statusCode: 201;
 };
 
 /**
@@ -4633,7 +4633,7 @@ export type BlobStartCopyFromURLResponse = BlobStartCopyFromURLHeaders & {
   /**
    * The response status code.
    */
-  statusCode: "202";
+  statusCode: 202;
 };
 
 /**
@@ -4643,7 +4643,7 @@ export type BlobAbortCopyFromURLResponse = BlobAbortCopyFromURLHeaders & {
   /**
    * The response status code.
    */
-  statusCode: "204";
+  statusCode: 204;
 };
 
 /**
@@ -4653,7 +4653,7 @@ export type BlobSetTierResponse = BlobSetTierHeaders & {
   /**
    * The response status code.
    */
-  statusCode: "200 | 202";
+  statusCode: 200 | 202;
 };
 
 /**
@@ -4663,7 +4663,7 @@ export type BlobGetAccountInfoResponse = BlobGetAccountInfoHeaders & {
   /**
    * The response status code.
    */
-  statusCode: "200";
+  statusCode: 200;
 };
 
 /**
@@ -4673,7 +4673,7 @@ export type PageBlobCreateResponse = PageBlobCreateHeaders & {
   /**
    * The response status code.
    */
-  statusCode: "201";
+  statusCode: 201;
 };
 
 /**
@@ -4683,7 +4683,7 @@ export type PageBlobUploadPagesResponse = PageBlobUploadPagesHeaders & {
   /**
    * The response status code.
    */
-  statusCode: "201";
+  statusCode: 201;
 };
 
 /**
@@ -4693,7 +4693,7 @@ export type PageBlobClearPagesResponse = PageBlobClearPagesHeaders & {
   /**
    * The response status code.
    */
-  statusCode: "201";
+  statusCode: 201;
 };
 
 /**
@@ -4703,7 +4703,7 @@ export type PageBlobGetPageRangesResponse = PageList & PageBlobGetPageRangesHead
   /**
    * The response status code.
    */
-  statusCode: "200";
+  statusCode: 200;
 };
 
 /**
@@ -4713,7 +4713,7 @@ export type PageBlobGetPageRangesDiffResponse = PageList & PageBlobGetPageRanges
   /**
    * The response status code.
    */
-  statusCode: "200";
+  statusCode: 200;
 };
 
 /**
@@ -4723,7 +4723,7 @@ export type PageBlobResizeResponse = PageBlobResizeHeaders & {
   /**
    * The response status code.
    */
-  statusCode: "200";
+  statusCode: 200;
 };
 
 /**
@@ -4733,7 +4733,7 @@ export type PageBlobUpdateSequenceNumberResponse = PageBlobUpdateSequenceNumberH
   /**
    * The response status code.
    */
-  statusCode: "200";
+  statusCode: 200;
 };
 
 /**
@@ -4743,7 +4743,7 @@ export type PageBlobCopyIncrementalResponse = PageBlobCopyIncrementalHeaders & {
   /**
    * The response status code.
    */
-  statusCode: "202";
+  statusCode: 202;
 };
 
 /**
@@ -4753,7 +4753,7 @@ export type AppendBlobCreateResponse = AppendBlobCreateHeaders & {
   /**
    * The response status code.
    */
-  statusCode: "201";
+  statusCode: 201;
 };
 
 /**
@@ -4763,7 +4763,7 @@ export type AppendBlobAppendBlockResponse = AppendBlobAppendBlockHeaders & {
   /**
    * The response status code.
    */
-  statusCode: "201";
+  statusCode: 201;
 };
 
 /**
@@ -4773,7 +4773,7 @@ export type BlockBlobUploadResponse = BlockBlobUploadHeaders & {
   /**
    * The response status code.
    */
-  statusCode: "201";
+  statusCode: 201;
 };
 
 /**
@@ -4783,7 +4783,7 @@ export type BlockBlobStageBlockResponse = BlockBlobStageBlockHeaders & {
   /**
    * The response status code.
    */
-  statusCode: "201";
+  statusCode: 201;
 };
 
 /**
@@ -4793,7 +4793,7 @@ export type BlockBlobStageBlockFromURLResponse = BlockBlobStageBlockFromURLHeade
   /**
    * The response status code.
    */
-  statusCode: "201";
+  statusCode: 201;
 };
 
 /**
@@ -4803,7 +4803,7 @@ export type BlockBlobCommitBlockListResponse = BlockBlobCommitBlockListHeaders &
   /**
    * The response status code.
    */
-  statusCode: "201";
+  statusCode: 201;
 };
 
 /**
@@ -4813,5 +4813,5 @@ export type BlockBlobGetBlockListResponse = BlockList & BlockBlobGetBlockListHea
   /**
    * The response status code.
    */
-  statusCode: "200";
+  statusCode: 200;
 };

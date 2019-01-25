@@ -29,8 +29,8 @@
   },
   "scripts": {
     "build": "tsc",
-    "build:autorest": "autorest ./blob/swagger/README.md --typescript --use=E:/GitHub/XiaoningLiu/autorest.typescript.server",
-    "build:autorestdebug": "autorest ./blob/swagger/README.md --typescript --typescript.debugger --use=E:/GitHub/XiaoningLiu/autorest.typescript.server",
+    "build:autorest": "autorest ./swagger/blob.md --typescript --use=E:/GitHub/XiaoningLiu/autorest.typescript.server",
+    "build:autorestdebug": "autorest ./swagger/blob.md --typescript --typescript.debugger --use=E:/GitHub/XiaoningLiu/autorest.typescript.server",
     "clean": "rimraf dist typings *.log",
     "test": "echo \"Error: no test specified\" && exit 1"
   },

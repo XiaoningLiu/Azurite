@@ -1,4 +1,4 @@
-import { IContainerItem } from "./generated/artifacts/models";
+import { ContainerItem } from "./generated/artifacts/models";
 
 /**
  * This is a simple sample of persistency layer data source.
@@ -7,5 +7,5 @@ import { IContainerItem } from "./generated/artifacts/models";
  * @class SimpleDataStore
  */
 export default class SimpleDataStore {
-  public containers: { [key: string]: IContainerItem } = {};
+  public containers: { [key: string]: ContainerItem } = {};
 }

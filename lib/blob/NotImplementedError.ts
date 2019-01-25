@@ -8,7 +8,7 @@ import StorageError from "./StorageError";
  * @extends {StorageError}
  */
 export default class NotImplementedError extends StorageError {
-  public constructor() {
-    super(500, "APINotImplemented", "Current API is not implemented yet.", "");
+  public constructor(requestID: string = "") {
+    super(500, "APINotImplemented", "Current API is not implemented yet.", requestID);
   }
 }

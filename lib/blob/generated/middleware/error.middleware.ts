@@ -51,7 +51,7 @@ export default function errorMiddleware(
       }  ErrorHTTPStatusCode=${err.statusCode} ErrorHTTPStatusMessage=${
         err.statusMessage
       } ErrorHTTPHeaders=${JSON.stringify(err.headers)} ErrorHTTPBody=${
-        err.body
+        JSON.stringify(err.body)
       } ErrorStack=${JSON.stringify(err.stack)}`,
       context.contextID
     );
@@ -94,7 +94,7 @@ export default function errorMiddleware(
     }
 
     logger.error(
-      `ErrorMiddleware: Set HTTP body: ${err.body}`,
+      `ErrorMiddleware: Set HTTP body: ${JSON.stringify(err.body)}`,
       context.contextID
     );
     if (err.body) {
@@ -108,7 +108,7 @@ export default function errorMiddleware(
     logger.error(
       `ErrorMiddleware: ErrorName=${err.name} ErrorMessage=${
         err.message
-      } ErrorStack=${err.stack}`
+      } ErrorStack=${JSON.stringify(err.stack)}`
     );
     logger.error(`ErrorMiddleware: Set HTTP code: ${500}`, context.contextID);
     res.setStatusCode(500);

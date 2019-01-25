@@ -11,7 +11,7 @@ import SimpleDataStore from "./SimpleDataStore";
  * @class SimpleHandler
  * @implements {IHandler}
  */
-export default class SimpleBaseHandler {
+export default class BaseHandler {
   protected containers: { [key: string]: ContainerItem } = {};
 
   constructor(dataSource: SimpleDataStore) {

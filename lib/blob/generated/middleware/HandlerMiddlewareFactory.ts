@@ -44,7 +44,7 @@ export default class HandlerMiddlewareFactory {
         context.contextID
       );
 
-      if (!context.operation) {
+      if (context.operation === undefined) {
         const handlerError = new OperationMismatchError();
         this.logger.error(
           `HandlerMiddleware: ${handlerError.message}`,

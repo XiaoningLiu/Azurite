@@ -8,7 +8,7 @@
     "target": "es5",
     "moduleResolution": "node",
     "noUnusedLocals": true,
-    "noUnusedParameters": true,
+    "noUnusedParameters": false,
     "strict": true,
     "module": "commonjs",
     "outDir": "./dist",
