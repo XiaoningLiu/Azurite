@@ -1,6 +1,8 @@
-import * as Models from "../generated/artifacts/models";
+export interface IContainer {
+  name: string;
+}
 
-export default interface IBlobDataStore {
+export interface IBlobDataStore {
   /**
    * Data store initial steps. Such as initial DB connections.
    *
@@ -9,15 +11,19 @@ export default interface IBlobDataStore {
    */
   init(): Promise<void>;
 
-  setServiceProperties<T>(serviceProperties: Models.StorageServiceProperties): Promise<T>;
+  setServiceProperties<T>(serviceProperties: T): Promise<T>;
 
-  getServiceProperties(): Promise<Models.StorageServiceProperties>;
+  getServiceProperties<T>(): Promise<T>;
 
-  createContainer<T>(container: Models.ContainerItem): Promise<T>;
+  createContainer<T extends IContainer>(container: T): Promise<T>;
+
+  getContainer<T>(container: string): Promise<T>;
 
   deleteContainer(container: string): Promise<void>;
 
-  listContainers(prefix?: string, maxResults?: number): Promise<Models.ContainerItem[]>;
+  updateContainer<T extends IContainer>(container: T): Promise<T>;
+
+  listContainers<T>(prefix?: string, maxResults?: number): Promise<T[]>;
 
   /**
    * Data store close steps. Such as close DB connections.
@@ -27,3 +33,5 @@ export default interface IBlobDataStore {
    */
   close(): Promise<void>;
 }
+
+export default IBlobDataStore;

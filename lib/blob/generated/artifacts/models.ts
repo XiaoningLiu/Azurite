@@ -571,7 +571,7 @@ export interface ServiceSetPropertiesOptionalParams {
    * href="https://docs.microsoft.com/en-us/rest/api/storageservices/fileservices/setting-timeouts-for-blob-service-operations">Setting
    * Timeouts for Blob Service Operations.</a>
    */
-  timeoutParameter?: number;
+  timeout?: number;
   /**
    * Provides a client-generated, opaque value with a 1 KB character limit that is recorded in the
    * analytics logs when storage analytics logging is enabled.
@@ -588,7 +588,7 @@ export interface ServiceGetPropertiesOptionalParams {
    * href="https://docs.microsoft.com/en-us/rest/api/storageservices/fileservices/setting-timeouts-for-blob-service-operations">Setting
    * Timeouts for Blob Service Operations.</a>
    */
-  timeoutParameter?: number;
+  timeout?: number;
   /**
    * Provides a client-generated, opaque value with a 1 KB character limit that is recorded in the
    * analytics logs when storage analytics logging is enabled.
@@ -605,7 +605,7 @@ export interface ServiceGetStatisticsOptionalParams {
    * href="https://docs.microsoft.com/en-us/rest/api/storageservices/fileservices/setting-timeouts-for-blob-service-operations">Setting
    * Timeouts for Blob Service Operations.</a>
    */
-  timeoutParameter?: number;
+  timeout?: number;
   /**
    * Provides a client-generated, opaque value with a 1 KB character limit that is recorded in the
    * analytics logs when storage analytics logging is enabled.
@@ -648,7 +648,7 @@ export interface ServiceListContainersSegmentOptionalParams {
    * href="https://docs.microsoft.com/en-us/rest/api/storageservices/fileservices/setting-timeouts-for-blob-service-operations">Setting
    * Timeouts for Blob Service Operations.</a>
    */
-  timeoutParameter?: number;
+  timeout?: number;
   /**
    * Provides a client-generated, opaque value with a 1 KB character limit that is recorded in the
    * analytics logs when storage analytics logging is enabled.
@@ -665,7 +665,7 @@ export interface ContainerCreateOptionalParams {
    * href="https://docs.microsoft.com/en-us/rest/api/storageservices/fileservices/setting-timeouts-for-blob-service-operations">Setting
    * Timeouts for Blob Service Operations.</a>
    */
-  timeoutParameter?: number;
+  timeout?: number;
   /**
    * Optional. Specifies a user-defined name-value pair associated with the blob. If no name-value
    * pairs are specified, the operation will copy the metadata from the source blob or file to the
@@ -697,7 +697,7 @@ export interface ContainerGetPropertiesOptionalParams {
    * href="https://docs.microsoft.com/en-us/rest/api/storageservices/fileservices/setting-timeouts-for-blob-service-operations">Setting
    * Timeouts for Blob Service Operations.</a>
    */
-  timeoutParameter?: number;
+  timeout?: number;
   /**
    * Provides a client-generated, opaque value with a 1 KB character limit that is recorded in the
    * analytics logs when storage analytics logging is enabled.
@@ -718,7 +718,7 @@ export interface ContainerDeleteMethodOptionalParams {
    * href="https://docs.microsoft.com/en-us/rest/api/storageservices/fileservices/setting-timeouts-for-blob-service-operations">Setting
    * Timeouts for Blob Service Operations.</a>
    */
-  timeoutParameter?: number;
+  timeout?: number;
   /**
    * Provides a client-generated, opaque value with a 1 KB character limit that is recorded in the
    * analytics logs when storage analytics logging is enabled.
@@ -743,7 +743,7 @@ export interface ContainerSetMetadataOptionalParams {
    * href="https://docs.microsoft.com/en-us/rest/api/storageservices/fileservices/setting-timeouts-for-blob-service-operations">Setting
    * Timeouts for Blob Service Operations.</a>
    */
-  timeoutParameter?: number;
+  timeout?: number;
   /**
    * Optional. Specifies a user-defined name-value pair associated with the blob. If no name-value
    * pairs are specified, the operation will copy the metadata from the source blob or file to the
@@ -778,7 +778,7 @@ export interface ContainerGetAccessPolicyOptionalParams {
    * href="https://docs.microsoft.com/en-us/rest/api/storageservices/fileservices/setting-timeouts-for-blob-service-operations">Setting
    * Timeouts for Blob Service Operations.</a>
    */
-  timeoutParameter?: number;
+  timeout?: number;
   /**
    * Provides a client-generated, opaque value with a 1 KB character limit that is recorded in the
    * analytics logs when storage analytics logging is enabled.
@@ -803,7 +803,7 @@ export interface ContainerSetAccessPolicyOptionalParams {
    * href="https://docs.microsoft.com/en-us/rest/api/storageservices/fileservices/setting-timeouts-for-blob-service-operations">Setting
    * Timeouts for Blob Service Operations.</a>
    */
-  timeoutParameter?: number;
+  timeout?: number;
   /**
    * Specifies whether data in the container may be accessed publicly and the level of access.
    * Possible values include: 'container', 'blob'
@@ -833,7 +833,7 @@ export interface ContainerAcquireLeaseOptionalParams {
    * href="https://docs.microsoft.com/en-us/rest/api/storageservices/fileservices/setting-timeouts-for-blob-service-operations">Setting
    * Timeouts for Blob Service Operations.</a>
    */
-  timeoutParameter?: number;
+  timeout?: number;
   /**
    * Specifies the duration of the lease, in seconds, or negative one (-1) for a lease that never
    * expires. A non-infinite lease can be between 15 and 60 seconds. A lease duration cannot be
@@ -866,7 +866,7 @@ export interface ContainerReleaseLeaseOptionalParams {
    * href="https://docs.microsoft.com/en-us/rest/api/storageservices/fileservices/setting-timeouts-for-blob-service-operations">Setting
    * Timeouts for Blob Service Operations.</a>
    */
-  timeoutParameter?: number;
+  timeout?: number;
   /**
    * Provides a client-generated, opaque value with a 1 KB character limit that is recorded in the
    * analytics logs when storage analytics logging is enabled.
@@ -887,7 +887,7 @@ export interface ContainerRenewLeaseOptionalParams {
    * href="https://docs.microsoft.com/en-us/rest/api/storageservices/fileservices/setting-timeouts-for-blob-service-operations">Setting
    * Timeouts for Blob Service Operations.</a>
    */
-  timeoutParameter?: number;
+  timeout?: number;
   /**
    * Provides a client-generated, opaque value with a 1 KB character limit that is recorded in the
    * analytics logs when storage analytics logging is enabled.
@@ -908,7 +908,7 @@ export interface ContainerBreakLeaseOptionalParams {
    * href="https://docs.microsoft.com/en-us/rest/api/storageservices/fileservices/setting-timeouts-for-blob-service-operations">Setting
    * Timeouts for Blob Service Operations.</a>
    */
-  timeoutParameter?: number;
+  timeout?: number;
   /**
    * For a break operation, proposed duration the lease should continue before it is broken, in
    * seconds, between 0 and 60. This break period is only used if it is shorter than the time
@@ -939,7 +939,7 @@ export interface ContainerChangeLeaseOptionalParams {
    * href="https://docs.microsoft.com/en-us/rest/api/storageservices/fileservices/setting-timeouts-for-blob-service-operations">Setting
    * Timeouts for Blob Service Operations.</a>
    */
-  timeoutParameter?: number;
+  timeout?: number;
   /**
    * Provides a client-generated, opaque value with a 1 KB character limit that is recorded in the
    * analytics logs when storage analytics logging is enabled.
@@ -985,7 +985,7 @@ export interface ContainerListBlobFlatSegmentOptionalParams {
    * href="https://docs.microsoft.com/en-us/rest/api/storageservices/fileservices/setting-timeouts-for-blob-service-operations">Setting
    * Timeouts for Blob Service Operations.</a>
    */
-  timeoutParameter?: number;
+  timeout?: number;
   /**
    * Provides a client-generated, opaque value with a 1 KB character limit that is recorded in the
    * analytics logs when storage analytics logging is enabled.
@@ -1027,7 +1027,7 @@ export interface ContainerListBlobHierarchySegmentOptionalParams {
    * href="https://docs.microsoft.com/en-us/rest/api/storageservices/fileservices/setting-timeouts-for-blob-service-operations">Setting
    * Timeouts for Blob Service Operations.</a>
    */
-  timeoutParameter?: number;
+  timeout?: number;
   /**
    * Provides a client-generated, opaque value with a 1 KB character limit that is recorded in the
    * analytics logs when storage analytics logging is enabled.
@@ -1051,7 +1051,7 @@ export interface BlobDownloadOptionalParams {
    * href="https://docs.microsoft.com/en-us/rest/api/storageservices/fileservices/setting-timeouts-for-blob-service-operations">Setting
    * Timeouts for Blob Service Operations.</a>
    */
-  timeoutParameter?: number;
+  timeout?: number;
   /**
    * Return only the bytes of the blob in the specified range.
    */
@@ -1092,7 +1092,7 @@ export interface BlobGetPropertiesOptionalParams {
    * href="https://docs.microsoft.com/en-us/rest/api/storageservices/fileservices/setting-timeouts-for-blob-service-operations">Setting
    * Timeouts for Blob Service Operations.</a>
    */
-  timeoutParameter?: number;
+  timeout?: number;
   /**
    * Provides a client-generated, opaque value with a 1 KB character limit that is recorded in the
    * analytics logs when storage analytics logging is enabled.
@@ -1124,7 +1124,7 @@ export interface BlobDeleteMethodOptionalParams {
    * href="https://docs.microsoft.com/en-us/rest/api/storageservices/fileservices/setting-timeouts-for-blob-service-operations">Setting
    * Timeouts for Blob Service Operations.</a>
    */
-  timeoutParameter?: number;
+  timeout?: number;
   /**
    * Required if the blob has associated snapshots. Specify one of the following two options:
    * include: Delete the base blob and all of its snapshots. only: Delete only the blob's snapshots
@@ -1155,7 +1155,7 @@ export interface BlobUndeleteOptionalParams {
    * href="https://docs.microsoft.com/en-us/rest/api/storageservices/fileservices/setting-timeouts-for-blob-service-operations">Setting
    * Timeouts for Blob Service Operations.</a>
    */
-  timeoutParameter?: number;
+  timeout?: number;
   /**
    * Provides a client-generated, opaque value with a 1 KB character limit that is recorded in the
    * analytics logs when storage analytics logging is enabled.
@@ -1172,7 +1172,7 @@ export interface BlobSetHTTPHeadersOptionalParams {
    * href="https://docs.microsoft.com/en-us/rest/api/storageservices/fileservices/setting-timeouts-for-blob-service-operations">Setting
    * Timeouts for Blob Service Operations.</a>
    */
-  timeoutParameter?: number;
+  timeout?: number;
   /**
    * Provides a client-generated, opaque value with a 1 KB character limit that is recorded in the
    * analytics logs when storage analytics logging is enabled.
@@ -1201,7 +1201,7 @@ export interface BlobSetMetadataOptionalParams {
    * href="https://docs.microsoft.com/en-us/rest/api/storageservices/fileservices/setting-timeouts-for-blob-service-operations">Setting
    * Timeouts for Blob Service Operations.</a>
    */
-  timeoutParameter?: number;
+  timeout?: number;
   /**
    * Optional. Specifies a user-defined name-value pair associated with the blob. If no name-value
    * pairs are specified, the operation will copy the metadata from the source blob or file to the
@@ -1236,7 +1236,7 @@ export interface BlobAcquireLeaseOptionalParams {
    * href="https://docs.microsoft.com/en-us/rest/api/storageservices/fileservices/setting-timeouts-for-blob-service-operations">Setting
    * Timeouts for Blob Service Operations.</a>
    */
-  timeoutParameter?: number;
+  timeout?: number;
   /**
    * Specifies the duration of the lease, in seconds, or negative one (-1) for a lease that never
    * expires. A non-infinite lease can be between 15 and 60 seconds. A lease duration cannot be
@@ -1269,7 +1269,7 @@ export interface BlobReleaseLeaseOptionalParams {
    * href="https://docs.microsoft.com/en-us/rest/api/storageservices/fileservices/setting-timeouts-for-blob-service-operations">Setting
    * Timeouts for Blob Service Operations.</a>
    */
-  timeoutParameter?: number;
+  timeout?: number;
   /**
    * Provides a client-generated, opaque value with a 1 KB character limit that is recorded in the
    * analytics logs when storage analytics logging is enabled.
@@ -1290,7 +1290,7 @@ export interface BlobRenewLeaseOptionalParams {
    * href="https://docs.microsoft.com/en-us/rest/api/storageservices/fileservices/setting-timeouts-for-blob-service-operations">Setting
    * Timeouts for Blob Service Operations.</a>
    */
-  timeoutParameter?: number;
+  timeout?: number;
   /**
    * Provides a client-generated, opaque value with a 1 KB character limit that is recorded in the
    * analytics logs when storage analytics logging is enabled.
@@ -1311,7 +1311,7 @@ export interface BlobChangeLeaseOptionalParams {
    * href="https://docs.microsoft.com/en-us/rest/api/storageservices/fileservices/setting-timeouts-for-blob-service-operations">Setting
    * Timeouts for Blob Service Operations.</a>
    */
-  timeoutParameter?: number;
+  timeout?: number;
   /**
    * Provides a client-generated, opaque value with a 1 KB character limit that is recorded in the
    * analytics logs when storage analytics logging is enabled.
@@ -1332,7 +1332,7 @@ export interface BlobBreakLeaseOptionalParams {
    * href="https://docs.microsoft.com/en-us/rest/api/storageservices/fileservices/setting-timeouts-for-blob-service-operations">Setting
    * Timeouts for Blob Service Operations.</a>
    */
-  timeoutParameter?: number;
+  timeout?: number;
   /**
    * For a break operation, proposed duration the lease should continue before it is broken, in
    * seconds, between 0 and 60. This break period is only used if it is shorter than the time
@@ -1363,7 +1363,7 @@ export interface BlobCreateSnapshotOptionalParams {
    * href="https://docs.microsoft.com/en-us/rest/api/storageservices/fileservices/setting-timeouts-for-blob-service-operations">Setting
    * Timeouts for Blob Service Operations.</a>
    */
-  timeoutParameter?: number;
+  timeout?: number;
   /**
    * Optional. Specifies a user-defined name-value pair associated with the blob. If no name-value
    * pairs are specified, the operation will copy the metadata from the source blob or file to the
@@ -1398,7 +1398,7 @@ export interface BlobStartCopyFromURLOptionalParams {
    * href="https://docs.microsoft.com/en-us/rest/api/storageservices/fileservices/setting-timeouts-for-blob-service-operations">Setting
    * Timeouts for Blob Service Operations.</a>
    */
-  timeoutParameter?: number;
+  timeout?: number;
   /**
    * Optional. Specifies a user-defined name-value pair associated with the blob. If no name-value
    * pairs are specified, the operation will copy the metadata from the source blob or file to the
@@ -1437,7 +1437,7 @@ export interface BlobAbortCopyFromURLOptionalParams {
    * href="https://docs.microsoft.com/en-us/rest/api/storageservices/fileservices/setting-timeouts-for-blob-service-operations">Setting
    * Timeouts for Blob Service Operations.</a>
    */
-  timeoutParameter?: number;
+  timeout?: number;
   /**
    * Provides a client-generated, opaque value with a 1 KB character limit that is recorded in the
    * analytics logs when storage analytics logging is enabled.
@@ -1458,7 +1458,7 @@ export interface BlobSetTierOptionalParams {
    * href="https://docs.microsoft.com/en-us/rest/api/storageservices/fileservices/setting-timeouts-for-blob-service-operations">Setting
    * Timeouts for Blob Service Operations.</a>
    */
-  timeoutParameter?: number;
+  timeout?: number;
   /**
    * Provides a client-generated, opaque value with a 1 KB character limit that is recorded in the
    * analytics logs when storage analytics logging is enabled.
@@ -1475,7 +1475,7 @@ export interface PageBlobCreateOptionalParams {
    * href="https://docs.microsoft.com/en-us/rest/api/storageservices/fileservices/setting-timeouts-for-blob-service-operations">Setting
    * Timeouts for Blob Service Operations.</a>
    */
-  timeoutParameter?: number;
+  timeout?: number;
   /**
    * Optional. Specifies a user-defined name-value pair associated with the blob. If no name-value
    * pairs are specified, the operation will copy the metadata from the source blob or file to the
@@ -1520,7 +1520,7 @@ export interface PageBlobUploadPagesOptionalParams {
    * href="https://docs.microsoft.com/en-us/rest/api/storageservices/fileservices/setting-timeouts-for-blob-service-operations">Setting
    * Timeouts for Blob Service Operations.</a>
    */
-  timeoutParameter?: number;
+  timeout?: number;
   /**
    * Return only the bytes of the blob in the specified range.
    */
@@ -1553,7 +1553,7 @@ export interface PageBlobClearPagesOptionalParams {
    * href="https://docs.microsoft.com/en-us/rest/api/storageservices/fileservices/setting-timeouts-for-blob-service-operations">Setting
    * Timeouts for Blob Service Operations.</a>
    */
-  timeoutParameter?: number;
+  timeout?: number;
   /**
    * Return only the bytes of the blob in the specified range.
    */
@@ -1593,7 +1593,7 @@ export interface PageBlobGetPageRangesOptionalParams {
    * href="https://docs.microsoft.com/en-us/rest/api/storageservices/fileservices/setting-timeouts-for-blob-service-operations">Setting
    * Timeouts for Blob Service Operations.</a>
    */
-  timeoutParameter?: number;
+  timeout?: number;
   /**
    * Return only the bytes of the blob in the specified range.
    */
@@ -1629,7 +1629,7 @@ export interface PageBlobGetPageRangesDiffOptionalParams {
    * href="https://docs.microsoft.com/en-us/rest/api/storageservices/fileservices/setting-timeouts-for-blob-service-operations">Setting
    * Timeouts for Blob Service Operations.</a>
    */
-  timeoutParameter?: number;
+  timeout?: number;
   /**
    * Optional in version 2015-07-08 and newer. The prevsnapshot parameter is a DateTime value that
    * specifies that the response will contain only pages that were changed between target blob and
@@ -1667,7 +1667,7 @@ export interface PageBlobResizeOptionalParams {
    * href="https://docs.microsoft.com/en-us/rest/api/storageservices/fileservices/setting-timeouts-for-blob-service-operations">Setting
    * Timeouts for Blob Service Operations.</a>
    */
-  timeoutParameter?: number;
+  timeout?: number;
   /**
    * Provides a client-generated, opaque value with a 1 KB character limit that is recorded in the
    * analytics logs when storage analytics logging is enabled.
@@ -1692,7 +1692,7 @@ export interface PageBlobUpdateSequenceNumberOptionalParams {
    * href="https://docs.microsoft.com/en-us/rest/api/storageservices/fileservices/setting-timeouts-for-blob-service-operations">Setting
    * Timeouts for Blob Service Operations.</a>
    */
-  timeoutParameter?: number;
+  timeout?: number;
   /**
    * Set for page blobs only. The sequence number is a user-controlled value that you can use to
    * track requests. The value of the sequence number must be between 0 and 2^63 - 1. Default
@@ -1723,7 +1723,7 @@ export interface PageBlobCopyIncrementalOptionalParams {
    * href="https://docs.microsoft.com/en-us/rest/api/storageservices/fileservices/setting-timeouts-for-blob-service-operations">Setting
    * Timeouts for Blob Service Operations.</a>
    */
-  timeoutParameter?: number;
+  timeout?: number;
   /**
    * Optional. Specifies a user-defined name-value pair associated with the blob. If no name-value
    * pairs are specified, the operation will copy the metadata from the source blob or file to the
@@ -1754,7 +1754,7 @@ export interface AppendBlobCreateOptionalParams {
    * href="https://docs.microsoft.com/en-us/rest/api/storageservices/fileservices/setting-timeouts-for-blob-service-operations">Setting
    * Timeouts for Blob Service Operations.</a>
    */
-  timeoutParameter?: number;
+  timeout?: number;
   /**
    * Optional. Specifies a user-defined name-value pair associated with the blob. If no name-value
    * pairs are specified, the operation will copy the metadata from the source blob or file to the
@@ -1793,7 +1793,7 @@ export interface AppendBlobAppendBlockOptionalParams {
    * href="https://docs.microsoft.com/en-us/rest/api/storageservices/fileservices/setting-timeouts-for-blob-service-operations">Setting
    * Timeouts for Blob Service Operations.</a>
    */
-  timeoutParameter?: number;
+  timeout?: number;
   /**
    * Provides a client-generated, opaque value with a 1 KB character limit that is recorded in the
    * analytics logs when storage analytics logging is enabled.
@@ -1822,7 +1822,7 @@ export interface BlockBlobUploadOptionalParams {
    * href="https://docs.microsoft.com/en-us/rest/api/storageservices/fileservices/setting-timeouts-for-blob-service-operations">Setting
    * Timeouts for Blob Service Operations.</a>
    */
-  timeoutParameter?: number;
+  timeout?: number;
   /**
    * Optional. Specifies a user-defined name-value pair associated with the blob. If no name-value
    * pairs are specified, the operation will copy the metadata from the source blob or file to the
@@ -1861,7 +1861,7 @@ export interface BlockBlobStageBlockOptionalParams {
    * href="https://docs.microsoft.com/en-us/rest/api/storageservices/fileservices/setting-timeouts-for-blob-service-operations">Setting
    * Timeouts for Blob Service Operations.</a>
    */
-  timeoutParameter?: number;
+  timeout?: number;
   /**
    * Provides a client-generated, opaque value with a 1 KB character limit that is recorded in the
    * analytics logs when storage analytics logging is enabled.
@@ -1890,7 +1890,7 @@ export interface BlockBlobStageBlockFromURLOptionalParams {
    * href="https://docs.microsoft.com/en-us/rest/api/storageservices/fileservices/setting-timeouts-for-blob-service-operations">Setting
    * Timeouts for Blob Service Operations.</a>
    */
-  timeoutParameter?: number;
+  timeout?: number;
   /**
    * Provides a client-generated, opaque value with a 1 KB character limit that is recorded in the
    * analytics logs when storage analytics logging is enabled.
@@ -1911,7 +1911,7 @@ export interface BlockBlobCommitBlockListOptionalParams {
    * href="https://docs.microsoft.com/en-us/rest/api/storageservices/fileservices/setting-timeouts-for-blob-service-operations">Setting
    * Timeouts for Blob Service Operations.</a>
    */
-  timeoutParameter?: number;
+  timeout?: number;
   /**
    * Optional. Specifies a user-defined name-value pair associated with the blob. If no name-value
    * pairs are specified, the operation will copy the metadata from the source blob or file to the
@@ -1957,7 +1957,7 @@ export interface BlockBlobGetBlockListOptionalParams {
    * href="https://docs.microsoft.com/en-us/rest/api/storageservices/fileservices/setting-timeouts-for-blob-service-operations">Setting
    * Timeouts for Blob Service Operations.</a>
    */
-  timeoutParameter?: number;
+  timeout?: number;
   /**
    * Provides a client-generated, opaque value with a 1 KB character limit that is recorded in the
    * analytics logs when storage analytics logging is enabled.

@@ -2,9 +2,11 @@ import BlobStorageContext from "../context/BlobStorageContext";
 import NotImplementedError from "../errors/NotImplementedError";
 import StorageError from "../errors/StorageError";
 import * as Models from "../generated/artifacts/models";
+import { requestId } from "../generated/artifacts/parameters";
 import Context from "../generated/Context";
 import IContainerHandler from "../generated/handlers/IContainerHandler";
 import { API_VERSION } from "../utils/constants";
+import { newEtag } from "../utils/utils";
 import BaseHandler from "./BaseHandler";
 
 /**
@@ -23,19 +25,20 @@ export default class ContainerHandler extends BaseHandler
   ): Promise<Models.ContainerCreateResponse> {
     const blobCtx = new BlobStorageContext(context);
 
-    const etag = "etag";
+    const etag = `"${new Date().getTime()}"`;
     const lastModified = new Date();
 
     try {
-      await this.dataSource.createContainer({
+      await this.dataStore.createContainer({
         metadata: options.metadata,
         name: blobCtx.container!,
         properties: {
           etag,
           lastModified,
-        }
+        },
       });
     } catch (err) {
+      // TODO: Create a StorageErrorFactory class to represent common Azure Storage Errors
       throw new StorageError(
         409,
         "ContainerAlreadyExists",
@@ -44,7 +47,7 @@ export default class ContainerHandler extends BaseHandler
       );
     }
 
-    const resposne: Models.ContainerCreateResponse = {
+    const response: Models.ContainerCreateResponse = {
       eTag: etag,
       lastModified,
       requestId: blobCtx.contextID,
@@ -52,28 +55,70 @@ export default class ContainerHandler extends BaseHandler
       version: API_VERSION,
     };
 
-    return resposne;
+    return response;
   }
 
   public async getProperties(
     options: Models.ContainerGetPropertiesOptionalParams,
     context: Context
   ): Promise<Models.ContainerGetPropertiesResponse> {
-    throw new NotImplementedError(context.contextID);
+    const blobCtx = new BlobStorageContext(context);
+
+    const container = await this.dataStore.getContainer<Models.ContainerItem>(
+      blobCtx.container!
+    );
+
+    const response: Models.ContainerGetPropertiesResponse = {
+      eTag: container.properties.etag,
+      ...container.properties,
+      requestId: blobCtx.contextID,
+      statusCode: 200,
+    };
+
+    return response;
   }
 
   public async delete(
     options: Models.ContainerDeleteMethodOptionalParams,
     context: Context
   ): Promise<Models.ContainerDeleteResponse> {
-    throw new NotImplementedError(context.contextID);
+    const blobCtx = new BlobStorageContext(context);
+
+    await this.dataStore.deleteContainer(blobCtx.container!);
+
+    const response: Models.ContainerDeleteResponse = {
+      date: new Date(),
+      requestId: blobCtx.contextID,
+      statusCode: 202,
+      version: API_VERSION,
+    };
+
+    return response;
   }
 
   public async setMetadata(
     options: Models.ContainerSetMetadataOptionalParams,
     context: Context
   ): Promise<Models.ContainerSetMetadataResponse> {
-    throw new NotImplementedError(context.contextID);
+    const blobCtx = new BlobStorageContext(context);
+
+    const container = await this.dataStore.getContainer<Models.ContainerItem>(
+      blobCtx.container!
+    );
+    container.metadata = options.metadata;
+    container.properties.lastModified = new Date();
+
+    await this.dataStore.updateContainer(container);
+
+    const response: Models.ContainerSetMetadataResponse = {
+      date: container.properties.lastModified,
+      eTag: newEtag(),
+      lastModified: container.properties.lastModified,
+      requestId: blobCtx.contextID,
+      statusCode: 200,
+    };
+
+    return response;
   }
 
   public async getAccessPolicy(

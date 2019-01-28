@@ -20,7 +20,7 @@ export default class ServiceHandler extends BaseHandler
     options: Models.ServiceSetPropertiesOptionalParams,
     context: Context
   ): Promise<Models.ServiceSetPropertiesResponse> {
-    await this.dataSource.setServiceProperties(storageServiceProperties);
+    await this.dataStore.setServiceProperties(storageServiceProperties);
     const response: Models.ServiceSetPropertiesResponse = {
       requestId: context.contextID,
       statusCode: 202,
@@ -33,7 +33,7 @@ export default class ServiceHandler extends BaseHandler
     options: Models.ServiceGetPropertiesOptionalParams,
     context: Context
   ): Promise<Models.ServiceGetPropertiesResponse> {
-    const properties = await this.dataSource.getServiceProperties();
+    const properties = await this.dataStore.getServiceProperties();
     const response: Models.ServiceGetPropertiesResponse = {
       ...properties,
       requestId: context.contextID,
@@ -56,10 +56,15 @@ export default class ServiceHandler extends BaseHandler
   ): Promise<Models.ServiceListContainersSegmentResponse> {
     const LIST_CONTAINERS_MAX_RESULTS_DEFAULT = 2000;
 
-    options.maxresults = options.maxresults === undefined ? LIST_CONTAINERS_MAX_RESULTS_DEFAULT : options.maxresults;
+    options.maxresults =
+      options.maxresults === undefined
+        ? LIST_CONTAINERS_MAX_RESULTS_DEFAULT
+        : options.maxresults;
     options.prefix = options.prefix || "";
 
-    const containers = await this.dataSource.listContainers(options.prefix, options.maxresults);
+    const containers = await this.dataStore.listContainers<
+      Models.ContainerItem
+    >(options.prefix, options.maxresults);
 
     const res: Models.ServiceListContainersSegmentResponse = {
       containerItems: containers,
@@ -76,14 +81,6 @@ export default class ServiceHandler extends BaseHandler
   public async getAccountInfo(
     context: Context
   ): Promise<Models.ServiceGetAccountInfoResponse> {
-    throw new NotImplementedError(context.contextID);
-  }
-
-  public async serviceSetProperties(
-    _storageServiceProperties: Models.StorageServiceProperties,
-    _options: Models.ServiceSetPropertiesOptionalParams,
-    context: Context
-  ): Promise<Models.ServiceSetPropertiesResponse> {
     throw new NotImplementedError(context.contextID);
   }
 }

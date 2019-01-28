@@ -12,6 +12,6 @@ import IBlobDataStore from "../persistence/IBlobDataStore";
  * @implements {IHandler}
  */
 export default class BaseHandler {
-  constructor(protected readonly dataSource: IBlobDataStore, protected readonly logger: ILogger) {
+  constructor(protected readonly dataStore: IBlobDataStore, protected readonly logger: ILogger) {
   }
 }

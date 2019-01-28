@@ -1,6 +1,7 @@
 import Operation from "../artifacts/Operation";
 import Specifications from "../artifacts/specifications";
 import Context from "../Context";
+import DeserializationError from "../errors/DeserializationError";
 import OperationMismatchError from "../errors/OperationMismatchError";
 import IRequest from "../IRequest";
 import { NextFunction } from "../MiddlewareFactory";
@@ -50,5 +51,9 @@ export default function deserializerMiddleware(
       context.handlerParameters = parameters;
     })
     .then(next)
-    .catch(next);
+    .catch((err) => {
+      const deserializationError = new DeserializationError(err.message);
+      deserializationError.stack = err.stack;
+      next(deserializationError);
+    });
 }

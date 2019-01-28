@@ -1,9 +1,16 @@
 import Loki from "lokijs";
 
-import { ContainerItem } from "../generated/artifacts/models";
-import * as Models from "../generated/artifacts/models";
-import { LOKI_DB_PATH } from "../utils/constants";
-import IBlobDataStore from "./IBlobDataStore";
+import { API_VERSION } from "../utils/constants";
+import { IBlobDataStore, IContainer } from "./IBlobDataStore";
+
+function cloneToDoc<T extends any>(doc: T, updated: T) {
+  for (const key in updated) {
+    if (updated.hasOwnProperty(key)) {
+      const element = updated[key];
+      doc.key = updated;
+    }
+  }
+}
 
 /**
  * This is a simple sample of persistency layer data source.
@@ -12,16 +19,15 @@ import IBlobDataStore from "./IBlobDataStore";
  * @class SimpleDataStore
  */
 export default class LokiBlobDataStore implements IBlobDataStore {
-  public containers: { [key: string]: ContainerItem } = {};
   private readonly db: Loki;
   // private readonly lokiDBPath: string;
 
   private readonly CONTAINERS_COLLECTION = "$containers$";
   private readonly SERVICE_PROPERTIES_COLLECTION = "$serviceproperties$";
 
-  private readonly defaultServiceProperties: Models.StorageServiceProperties = {
+  private readonly defaultServiceProperties = {
     cors: [],
-    defaultServiceVersion: LOKI_DB_PATH, // Move it to constants.ts
+    defaultServiceVersion: API_VERSION, // Move it to constants.ts
     hourMetrics: {
       enabled: false,
       retentionPolicy: {
@@ -71,9 +77,7 @@ export default class LokiBlobDataStore implements IBlobDataStore {
     }
   }
 
-  public async setServiceProperties<T>(
-    serviceProperties: Models.StorageServiceProperties
-  ): Promise<T> {
+  public async setServiceProperties<T>(serviceProperties: T): Promise<T> {
     const coll = this.db.getCollection(this.SERVICE_PROPERTIES_COLLECTION);
     const docs = coll.where(() => true);
     if (docs.length > 0) {
@@ -89,10 +93,15 @@ export default class LokiBlobDataStore implements IBlobDataStore {
     return doc;
   }
 
-  public async createContainer<T>(container: Models.ContainerItem): Promise<T> {
+  public async createContainer<T extends IContainer>(container: T): Promise<T> {
     const coll = this.db.getCollection(this.CONTAINERS_COLLECTION);
     this.db.addCollection(container.name);
     return coll.insert(container);
+  }
+
+  public async getContainer<T>(container: string): Promise<T> {
+    const coll = this.db.getCollection(this.CONTAINERS_COLLECTION);
+    return coll.findOne({ name: { $eq: container } });
   }
 
   public async deleteContainer(container: string): Promise<void> {
@@ -102,12 +111,24 @@ export default class LokiBlobDataStore implements IBlobDataStore {
       .find({ name: { $eq: container } })
       .remove();
 
+    this.db.removeCollection(container);
+
     // TODO: Remove all entities on disk
     // const entities = this.db
     //   .getCollection(container)
     //   .chain()
     //   .find({ name: { $contains: "" } })
     //   .data();
+  }
+
+  public async updateContainer<T extends IContainer>(
+    container: T
+  ): Promise<T> {
+    const doc = await this.getContainer<T>(container.name);
+    const coll = this.db.getCollection(container.name);
+
+    cloneToDoc(doc, container);
+    return coll.update(doc);
   }
 
   public async listContainers<T>(

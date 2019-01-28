@@ -112,8 +112,14 @@ export async function deserialize(
       bodyParameter.mapper.serializedName!
     );
 
-    setParametersValue(parameters, bodyParameter.parameterPath, parsedBody);
+    // Validation purpose only, because only serialize supports validation
+    // TODO: Inject convenience layer error into deserialize; Drop @azure/ms-rest-js, move logic into generated code
+    spec.serializer.serialize(
+      bodyParameter.mapper,
+      parsedBody
+    );
 
+    setParametersValue(parameters, bodyParameter.parameterPath, parsedBody);
     setParametersValue(parameters, "body", req);
   }
 
