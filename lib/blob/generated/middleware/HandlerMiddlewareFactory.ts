@@ -1,3 +1,5 @@
+import { inspect } from "util";
+
 import Operation from "../artifacts/Operation";
 import Specifications from "../artifacts/specifications";
 import Context from "../Context";
@@ -38,9 +40,9 @@ export default class HandlerMiddlewareFactory {
   ) => void {
     return (context: Context, next: NextFunction) => {
       this.logger.info(
-        `HandlerMiddleware: DeserializedParameters=${JSON.stringify(
+        `HandlerMiddleware: DeserializedParameters=${inspect(
           context.handlerParameters
-        )}`,
+        , {breakLength: Infinity, depth: 4})}`,
         context.contextID
       );
 

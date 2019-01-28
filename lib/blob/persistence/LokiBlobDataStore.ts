@@ -75,10 +75,15 @@ export default class LokiBlobDataStore implements IBlobDataStore {
     serviceProperties: Models.StorageServiceProperties
   ): Promise<T> {
     const coll = this.db.getCollection(this.SERVICE_PROPERTIES_COLLECTION);
-    return coll.update(serviceProperties);
+    const docs = coll.where(() => true);
+    if (docs.length > 0) {
+      coll.remove(docs[0]);
+    }
+
+    return coll.insert(serviceProperties);
   }
 
-  public async getServiceProperties(): Promise<Models.StorageServiceProperties> {
+  public async getServiceProperties<T>(): Promise<T> {
     const coll = this.db.getCollection(this.SERVICE_PROPERTIES_COLLECTION);
     const doc = coll.where(() => true)[0];
     return doc;
@@ -105,10 +110,10 @@ export default class LokiBlobDataStore implements IBlobDataStore {
     //   .data();
   }
 
-  public async listContainers(
+  public async listContainers<T>(
     prefix: string = "",
     maxResults: number = 2000
-  ): Promise<Models.ContainerItem[]> {
+  ): Promise<T[]> {
     const coll = this.db.getCollection(this.CONTAINERS_COLLECTION);
     return coll
       .chain()
