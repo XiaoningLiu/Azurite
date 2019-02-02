@@ -46,3 +46,7 @@ Following items needs to be done on generator:
 
 1. Clean up unused code in generator itself
 2. Drop @azure/ms-rest-js dependency
+
+## Swagger changes
+
+1. Get container properties can both use get/head, however client swagger only supports get; We can fork a server swagger, rebase to client swagger periodic.

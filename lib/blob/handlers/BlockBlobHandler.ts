@@ -1,21 +1,83 @@
+import { join, resolve } from "path";
+
+import BlobStorageContext from "../context/BlobStorageContext";
 import NotImplementedError from "../errors/NotImplementedError";
+import StorageError from "../errors/StorageError";
 import * as Models from "../generated/artifacts/models";
 import Context from "../generated/Context";
 import IBlockBlobHandler from "../generated/handlers/IBlockBlobHandler";
+import { API_VERSION, BLOB_PATH } from "../utils/constants";
+import { newEtag, streamToLocalFile } from "../utils/utils";
 import BaseHandler from "./BaseHandler";
+
+// tslint:disable:object-literal-sort-keys
 
 export default class BlockBlobHandler extends BaseHandler
   implements IBlockBlobHandler {
-  public upload(
+  public async upload(
     body: NodeJS.ReadableStream,
     contentLength: number,
     options: Models.BlockBlobUploadOptionalParams,
     context: Context
   ): Promise<Models.BlockBlobUploadResponse> {
-    throw new NotImplementedError(context.contextID);
+    const blobCtx = new BlobStorageContext(context);
+    const containerName = blobCtx.container!;
+    const blobName = blobCtx.blob!;
+
+    const container = await this.dataStore.getContainer(containerName);
+    if (!container) {
+      throw new StorageError(
+        404,
+        "Container Not Exist",
+        "Specific container doesn't exist",
+        blobCtx.contextID!
+      );
+    }
+
+    await streamToLocalFile(
+      body,
+      join(resolve(BLOB_PATH), `${containerName}_${blobName}`)
+    );
+
+    const date = new Date();
+    const etag = newEtag();
+    options.blobHTTPHeaders = options.blobHTTPHeaders || {};
+    const blob: Models.BlobItem = {
+      deleted: false,
+      metadata: options.metadata,
+      name: blobName,
+      properties: {
+        creationTime: date,
+        lastModified: date,
+        etag,
+        contentLength,
+        contentType: options.blobHTTPHeaders.blobContentType,
+        contentEncoding: options.blobHTTPHeaders.blobContentEncoding,
+        contentLanguage: options.blobHTTPHeaders.blobContentLanguage,
+        contentMD5: options.blobHTTPHeaders.blobContentMD5,
+        contentDisposition: options.blobHTTPHeaders.blobContentDisposition,
+        cacheControl: options.blobHTTPHeaders.blobCacheControl,
+        blobType: Models.BlobType.BlockBlob,
+      },
+      snapshot: "",
+    };
+
+    await this.dataStore.createBlob(blob, containerName);
+
+    const response: Models.BlockBlobUploadResponse = {
+      statusCode: 201,
+      eTag: etag,
+      lastModified: date,
+      contentMD5: blob.properties.contentMD5,
+      requestId: blobCtx.contextID,
+      version: API_VERSION,
+      date,
+    };
+
+    return response;
   }
 
-  public stageBlock(
+  public async stageBlock(
     blockId: string,
     contentLength: number,
     body: NodeJS.ReadableStream,
@@ -25,7 +87,7 @@ export default class BlockBlobHandler extends BaseHandler
     throw new NotImplementedError(context.contextID);
   }
 
-  public stageBlockFromURL(
+  public async stageBlockFromURL(
     blockId: string,
     contentLength: number,
     sourceUrl: string,
@@ -35,7 +97,7 @@ export default class BlockBlobHandler extends BaseHandler
     throw new NotImplementedError(context.contextID);
   }
 
-  public commitBlockList(
+  public async commitBlockList(
     blocks: Models.BlockLookupList,
     options: Models.BlockBlobCommitBlockListOptionalParams,
     context: Context
@@ -43,7 +105,7 @@ export default class BlockBlobHandler extends BaseHandler
     throw new NotImplementedError(context.contextID);
   }
 
-  public getBlockList(
+  public async getBlockList(
     listType: Models.BlockListType,
     options: Models.BlockBlobGetBlockListOptionalParams,
     context: Context

@@ -14,6 +14,7 @@ export enum Operation {
   Service_GetAccountInfo,
   Container_Create,
   Container_GetProperties,
+  Container_GetPropertiesWithHead,
   Container_Delete,
   Container_SetMetadata,
   Container_GetAccessPolicy,

@@ -1859,6 +1859,115 @@ export const ContainerGetPropertiesHeaders: msRest.CompositeMapper = {
   }
 };
 
+export const ContainerGetPropertiesWithHeadHeaders: msRest.CompositeMapper = {
+  serializedName: "container-getpropertieswithhead-headers",
+  type: {
+    name: "Composite",
+    className: "ContainerGetPropertiesWithHeadHeaders",
+    modelProperties: {
+      metadata: {
+        serializedName: "x-ms-meta",
+        type: {
+          name: "Dictionary",
+          value: {
+            type: {
+              name: "String"
+            }
+          }
+        },
+        headerCollectionPrefix: "x-ms-meta-"
+      },
+      eTag: {
+        serializedName: "etag",
+        type: {
+          name: "String"
+        }
+      },
+      lastModified: {
+        serializedName: "last-modified",
+        type: {
+          name: "DateTimeRfc1123"
+        }
+      },
+      leaseDuration: {
+        serializedName: "x-ms-lease-duration",
+        type: {
+          name: "Enum",
+          allowedValues: [
+            "infinite",
+            "fixed"
+          ]
+        }
+      },
+      leaseState: {
+        serializedName: "x-ms-lease-state",
+        type: {
+          name: "Enum",
+          allowedValues: [
+            "available",
+            "leased",
+            "expired",
+            "breaking",
+            "broken"
+          ]
+        }
+      },
+      leaseStatus: {
+        serializedName: "x-ms-lease-status",
+        type: {
+          name: "Enum",
+          allowedValues: [
+            "locked",
+            "unlocked"
+          ]
+        }
+      },
+      requestId: {
+        serializedName: "x-ms-request-id",
+        type: {
+          name: "String"
+        }
+      },
+      version: {
+        serializedName: "x-ms-version",
+        type: {
+          name: "String"
+        }
+      },
+      date: {
+        serializedName: "date",
+        type: {
+          name: "DateTimeRfc1123"
+        }
+      },
+      blobPublicAccess: {
+        serializedName: "x-ms-blob-public-access",
+        type: {
+          name: "String"
+        }
+      },
+      hasImmutabilityPolicy: {
+        serializedName: "x-ms-has-immutability-policy",
+        type: {
+          name: "Boolean"
+        }
+      },
+      hasLegalHold: {
+        serializedName: "x-ms-has-legal-hold",
+        type: {
+          name: "Boolean"
+        }
+      },
+      errorCode: {
+        serializedName: "x-ms-error-code",
+        type: {
+          name: "String"
+        }
+      }
+    }
+  }
+};
+
 export const ContainerDeleteHeaders: msRest.CompositeMapper = {
   serializedName: "container-delete-headers",
   type: {

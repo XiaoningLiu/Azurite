@@ -39,15 +39,16 @@ export default class StorageError extends MiddlewareError {
       }
     }
 
-    const bodyInXML = `<?xml version="1.0" encoding="utf-8"?><Error>${jsonToXML(
-      bodyInJSON
-    ) as string}</Error>`;
+    const bodyInXML = jsonToXML({ Error: bodyInJSON });
 
     super(
       statusCode,
       storageErrorMessage,
       undefined,
-      { "x-ms-error-code": storageErrorCode, "x-ms-request-id": storageRequestID },
+      {
+        "x-ms-error-code": storageErrorCode,
+        "x-ms-request-id": storageRequestID,
+      },
       bodyInXML,
       "application/xml"
     );

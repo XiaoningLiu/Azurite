@@ -68,7 +68,9 @@ export async function deserialize(
   // Deserialize body
   const bodyParameter = spec.requestBody;
 
-  if (bodyParameter) {
+  if (bodyParameter && bodyParameter.mapper.type.name === "Stream") {
+    setParametersValue(parameters, "body", req.getBodyStream());
+  } else if (bodyParameter) {
     const jsonContentTypes = ["application/json", "text/json"];
     const xmlContentTypes = ["application/xml", "application/atom+xml"];
     const contentType = req.getHeader("content-type") || "";
@@ -87,6 +89,7 @@ export async function deserialize(
     // const isRequestWithStream = false;
 
     const body = await readRequestIntoText(req);
+    req.setBody(body);
     let parsedBody: object = {};
     if (isRequestWithJSON) {
       // read body
@@ -114,13 +117,10 @@ export async function deserialize(
 
     // Validation purpose only, because only serialize supports validation
     // TODO: Inject convenience layer error into deserialize; Drop @azure/ms-rest-js, move logic into generated code
-    spec.serializer.serialize(
-      bodyParameter.mapper,
-      parsedBody
-    );
+    spec.serializer.serialize(bodyParameter.mapper, parsedBody);
 
     setParametersValue(parameters, bodyParameter.parameterPath, parsedBody);
-    setParametersValue(parameters, "body", req);
+    setParametersValue(parameters, "body", req.getBody());
   }
 
   return parameters;
@@ -208,5 +208,16 @@ export async function serialize(
 
     // TODO: Should send response in a serializer?
     res.getBodyStream().write(xmlBody);
+  }
+
+  // Serialize stream body
+  if (handlerResponse.body) {
+    await new Promise((resolve, reject) => {
+      (handlerResponse.body as NodeJS.ReadableStream)
+        .on("error", reject)
+        .pipe(res.getBodyStream())
+        .on("error", reject)
+        .on("close", resolve);
+    });
   }
 }

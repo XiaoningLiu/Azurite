@@ -2,7 +2,6 @@ import BlobStorageContext from "../context/BlobStorageContext";
 import NotImplementedError from "../errors/NotImplementedError";
 import StorageError from "../errors/StorageError";
 import * as Models from "../generated/artifacts/models";
-import { requestId } from "../generated/artifacts/parameters";
 import Context from "../generated/Context";
 import IContainerHandler from "../generated/handlers/IContainerHandler";
 import { API_VERSION } from "../utils/constants";
@@ -76,6 +75,13 @@ export default class ContainerHandler extends BaseHandler
     };
 
     return response;
+  }
+
+  public async getPropertiesWithHead(
+    options: Models.ContainerGetPropertiesOptionalParams,
+    context: Context
+  ): Promise<Models.ContainerGetPropertiesResponse> {
+    return this.getProperties(options, context);
   }
 
   public async delete(

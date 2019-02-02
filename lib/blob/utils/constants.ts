@@ -12,3 +12,5 @@ export const LOGGER_CONFIGS = {};
 export const API_VERSION = "2018-03-28";
 
 export const LOKI_DB_PATH = "__blobstorage__";
+
+export const BLOB_PATH = "tempdatastore";

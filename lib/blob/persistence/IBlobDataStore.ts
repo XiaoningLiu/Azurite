@@ -2,6 +2,10 @@ export interface IContainer {
   name: string;
 }
 
+export interface IBlob {
+  name: string;
+}
+
 export interface IBlobDataStore {
   /**
    * Data store initial steps. Such as initial DB connections.
@@ -24,6 +28,8 @@ export interface IBlobDataStore {
   updateContainer<T extends IContainer>(container: T): Promise<T>;
 
   listContainers<T>(prefix?: string, maxResults?: number): Promise<T[]>;
+
+  createBlob<T extends IBlob>(blob: T, container: string): Promise<T>;
 
   /**
    * Data store close steps. Such as close DB connections.

@@ -15,6 +15,7 @@ import Context from "../Context";
 export default interface IContainerHandler {
   create(options: Models.ContainerCreateOptionalParams, context: Context): Promise<Models.ContainerCreateResponse>;
   getProperties(options: Models.ContainerGetPropertiesOptionalParams, context: Context): Promise<Models.ContainerGetPropertiesResponse>;
+  getPropertiesWithHead(options: Models.ContainerGetPropertiesWithHeadOptionalParams, context: Context): Promise<Models.ContainerGetPropertiesWithHeadResponse>;
   delete(options: Models.ContainerDeleteMethodOptionalParams, context: Context): Promise<Models.ContainerDeleteResponse>;
   setMetadata(options: Models.ContainerSetMetadataOptionalParams, context: Context): Promise<Models.ContainerSetMetadataResponse>;
   getAccessPolicy(options: Models.ContainerGetAccessPolicyOptionalParams, context: Context): Promise<Models.ContainerGetAccessPolicyResponse>;

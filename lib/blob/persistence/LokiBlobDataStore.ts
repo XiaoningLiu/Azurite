@@ -1,13 +1,13 @@
 import Loki from "lokijs";
 
 import { API_VERSION } from "../utils/constants";
-import { IBlobDataStore, IContainer } from "./IBlobDataStore";
+import { IBlob, IBlobDataStore, IContainer } from "./IBlobDataStore";
 
 function cloneToDoc<T extends any>(doc: T, updated: T) {
   for (const key in updated) {
     if (updated.hasOwnProperty(key)) {
       const element = updated[key];
-      doc.key = updated;
+      doc.key = element;
     }
   }
 }
@@ -142,6 +142,16 @@ export default class LokiBlobDataStore implements IBlobDataStore {
       .simplesort("name")
       .limit(maxResults)
       .data();
+  }
+
+  public async createBlob<T extends IBlob>(blob: T, container: string): Promise<T> {
+    const coll = this.db.getCollection(container);
+    const blobDoc = coll.findOne({name: {$eq: blob.name}});
+    if (blobDoc !== undefined && blobDoc !== null) {
+      coll.remove(blobDoc);
+    }
+
+    return coll.insert(blob);
   }
 
   public async close(): Promise<void> {

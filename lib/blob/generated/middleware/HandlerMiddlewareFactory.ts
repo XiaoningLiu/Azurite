@@ -42,7 +42,7 @@ export default class HandlerMiddlewareFactory {
       this.logger.info(
         `HandlerMiddleware: DeserializedParameters=${inspect(
           context.handlerParameters
-        , {breakLength: Infinity, depth: 4})}`,
+        , {breakLength: Infinity, depth: 3})}`,
         context.contextID
       );
 

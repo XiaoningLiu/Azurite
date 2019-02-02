@@ -1,60 +1,74 @@
+import { createReadStream } from "fs";
+
+import BlobStorageContext from "../context/BlobStorageContext";
 import NotImplementedError from "../errors/NotImplementedError";
 import * as Models from "../generated/artifacts/models";
 import Context from "../generated/Context";
 import IBlobHandler from "../generated/handlers/IBlobHandler";
 import BaseHandler from "./BaseHandler";
 
+// tslint:disable:object-literal-sort-keys
+
 export default class BlobHandler extends BaseHandler implements IBlobHandler {
-  public download(
+  public async download(
     options: Models.BlobDownloadOptionalParams,
     context: Context
   ): Promise<Models.BlobDownloadResponse> {
-    throw new NotImplementedError(context.contextID);
+    const blobCtx = new BlobStorageContext(context);
+    const containerName = blobCtx.container!;
+    const blobName = blobCtx.blob!;
+
+    const response: Models.BlobDownloadResponse = {
+      statusCode: 200,
+      body: createReadStream(`${containerName}/${blobName}`),
+    };
+
+    return response;
   }
 
-  public getProperties(
+  public async getProperties(
     options: Models.BlobGetPropertiesOptionalParams,
     context: Context
   ): Promise<Models.BlobGetPropertiesResponse> {
     throw new NotImplementedError(context.contextID);
   }
 
-  public delete(
+  public async delete(
     options: Models.BlobDeleteMethodOptionalParams,
     context: Context
   ): Promise<Models.BlobDeleteResponse> {
     throw new NotImplementedError(context.contextID);
   }
 
-  public undelete(
+  public async undelete(
     options: Models.BlobUndeleteOptionalParams,
     context: Context
   ): Promise<Models.BlobUndeleteResponse> {
     throw new NotImplementedError(context.contextID);
   }
 
-  public setHTTPHeaders(
+  public async setHTTPHeaders(
     options: Models.BlobSetHTTPHeadersOptionalParams,
     context: Context
   ): Promise<Models.BlobSetHTTPHeadersResponse> {
     throw new NotImplementedError(context.contextID);
   }
 
-  public setMetadata(
+  public async setMetadata(
     options: Models.BlobSetMetadataOptionalParams,
     context: Context
   ): Promise<Models.BlobSetMetadataResponse> {
     throw new NotImplementedError(context.contextID);
   }
 
-  public acquireLease(
+  public async acquireLease(
     options: Models.BlobAcquireLeaseOptionalParams,
     context: Context
   ): Promise<Models.BlobAcquireLeaseResponse> {
     throw new NotImplementedError(context.contextID);
   }
 
-  public releaseLease(
+  public async releaseLease(
     leaseId: string,
     options: Models.BlobReleaseLeaseOptionalParams,
     context: Context
@@ -62,7 +76,7 @@ export default class BlobHandler extends BaseHandler implements IBlobHandler {
     throw new NotImplementedError(context.contextID);
   }
 
-  public renewLease(
+  public async renewLease(
     leaseId: string,
     options: Models.BlobRenewLeaseOptionalParams,
     context: Context
@@ -70,7 +84,7 @@ export default class BlobHandler extends BaseHandler implements IBlobHandler {
     throw new NotImplementedError(context.contextID);
   }
 
-  public changeLease(
+  public async changeLease(
     leaseId: string,
     proposedLeaseId: string,
     options: Models.BlobChangeLeaseOptionalParams,
@@ -79,21 +93,21 @@ export default class BlobHandler extends BaseHandler implements IBlobHandler {
     throw new NotImplementedError(context.contextID);
   }
 
-  public breakLease(
+  public async breakLease(
     options: Models.BlobBreakLeaseOptionalParams,
     context: Context
   ): Promise<Models.BlobBreakLeaseResponse> {
     throw new NotImplementedError(context.contextID);
   }
 
-  public createSnapshot(
+  public async createSnapshot(
     options: Models.BlobCreateSnapshotOptionalParams,
     context: Context
   ): Promise<Models.BlobCreateSnapshotResponse> {
     throw new NotImplementedError(context.contextID);
   }
 
-  public startCopyFromURL(
+  public async startCopyFromURL(
     copySource: string,
     options: Models.BlobStartCopyFromURLOptionalParams,
     context: Context
@@ -101,7 +115,7 @@ export default class BlobHandler extends BaseHandler implements IBlobHandler {
     throw new NotImplementedError(context.contextID);
   }
 
-  public abortCopyFromURL(
+  public async abortCopyFromURL(
     copyId: string,
     options: Models.BlobAbortCopyFromURLOptionalParams,
     context: Context
@@ -109,7 +123,7 @@ export default class BlobHandler extends BaseHandler implements IBlobHandler {
     throw new NotImplementedError(context.contextID);
   }
 
-  public setTier(
+  public async setTier(
     tier: Models.AccessTier,
     options: Models.BlobSetTierOptionalParams,
     context: Context
@@ -117,7 +131,7 @@ export default class BlobHandler extends BaseHandler implements IBlobHandler {
     throw new NotImplementedError(context.contextID);
   }
 
-  public getAccountInfo(
+  public async getAccountInfo(
     context: Context
   ): Promise<Models.BlobGetAccountInfoResponse> {
     throw new NotImplementedError(context.contextID);

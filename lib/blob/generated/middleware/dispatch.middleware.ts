@@ -25,7 +25,7 @@ export default function dispatchMiddleware(
   context: Context,
   req: IRequest,
   next: NextFunction,
-  logger: ILogger,
+  logger: ILogger
 ): void {
   logger.verbose(
     `DispatchMiddleware: Dispatching request...`,
@@ -100,6 +100,13 @@ function isRequestAgainstOperation(
       ) {
         return false;
       }
+
+      if (
+        queryParameter.mapper.isConstant &&
+        queryParameter.mapper.defaultValue !== queryValue
+      ) {
+        return false;
+      }
     }
   }
 
@@ -118,6 +125,13 @@ function isRequestAgainstOperation(
         headerParameter.mapper.type.allowedValues.findIndex((val) => {
           return val === headerValue;
         }) < 0
+      ) {
+        return false;
+      }
+
+      if (
+        headerParameter.mapper.isConstant &&
+        headerParameter.mapper.defaultValue !== headerValue
       ) {
         return false;
       }

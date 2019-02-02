@@ -26,7 +26,7 @@ export default function blobStorageContextMiddleware(
   blobContext.startTime = new Date();
 
   logger.info(
-    `BlobStorageContextMiddleware: RequestURL=${req.protocol}://${req.hostname}${
+    `BlobStorageContextMiddleware: RequestMethod=${req.method} RequestURL=${req.protocol}://${req.hostname}${
       req.url
     } RequestHeaders:${JSON.stringify(req.headers)} ClientIP=${
       req.ip

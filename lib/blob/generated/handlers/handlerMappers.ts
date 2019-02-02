@@ -58,6 +58,13 @@ operationHandlerMapping[Operation.Container_GetProperties] = {
   handler: "containerHandler",
   method: "getProperties"
 };
+operationHandlerMapping[Operation.Container_GetPropertiesWithHead] = {
+  arguments: [
+    "options"
+  ],
+  handler: "containerHandler",
+  method: "getPropertiesWithHead"
+};
 operationHandlerMapping[Operation.Container_Delete] = {
   arguments: [
     "options"

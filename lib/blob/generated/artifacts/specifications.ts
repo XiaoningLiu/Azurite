@@ -215,6 +215,33 @@ const containerGetPropertiesOperationSpec: msRest.OperationSpec = {
   serializer
 };
 
+const containerGetPropertiesWithHeadOperationSpec: msRest.OperationSpec = {
+  httpMethod: "HEAD",
+  path: "{containerName}",
+  urlParameters: [
+    Parameters.url
+  ],
+  queryParameters: [
+    Parameters.timeout,
+    Parameters.restype2
+  ],
+  headerParameters: [
+    Parameters.version,
+    Parameters.requestId,
+    Parameters.leaseId0
+  ],
+  responses: {
+    200: {
+      headersMapper: Mappers.ContainerGetPropertiesWithHeadHeaders
+    },
+    default: {
+      bodyMapper: Mappers.StorageError
+    }
+  },
+  isXML: true,
+  serializer
+};
+
 const containerDeleteOperationSpec: msRest.OperationSpec = {
   httpMethod: "DELETE",
   path: "{containerName}",
@@ -1720,6 +1747,7 @@ Specifications[Operation.Service_ListContainersSegment] = serviceListContainersS
 Specifications[Operation.Service_GetAccountInfo] = serviceGetAccountInfoOperationSpec;
 Specifications[Operation.Container_Create] = containerCreateOperationSpec;
 Specifications[Operation.Container_GetProperties] = containerGetPropertiesOperationSpec;
+Specifications[Operation.Container_GetPropertiesWithHead] = containerGetPropertiesWithHeadOperationSpec;
 Specifications[Operation.Container_Delete] = containerDeleteOperationSpec;
 Specifications[Operation.Container_SetMetadata] = containerSetMetadataOperationSpec;
 Specifications[Operation.Container_GetAccessPolicy] = containerGetAccessPolicyOperationSpec;
