@@ -1,33 +1,48 @@
+import { createWriteStream, stat } from "fs";
 import Loki from "lokijs";
+import { join } from "path";
 
+import * as Models from "../generated/artifacts/models";
 import { API_VERSION } from "../utils/constants";
-import { IBlob, IBlobDataStore, IContainer } from "./IBlobDataStore";
+import { IBlobDataStore } from "./IBlobDataStore";
 
-function cloneToDoc<T extends any>(doc: T, updated: T) {
-  for (const key in updated) {
-    if (updated.hasOwnProperty(key)) {
-      const element = updated[key];
-      doc.key = element;
-    }
-  }
-}
+// function cloneToDoc<T extends any>(doc: T, updated: T) {
+//   for (const key in updated) {
+//     if (updated.hasOwnProperty(key)) {
+//       const element = updated[key];
+//       doc.key = element;
+//     }
+//   }
+// }
 
 /**
- * This is a simple sample of persistency layer data source.
+ * This is a persistency layer data source implementation based on loki DB.
+ *
+ * Loki DB includes following collections and documents
+ * -- SERVICE_PROPERTIES_COLLECTION // Collection contains service properties
+ *                                  // Only 1 document
+ * -- CONTAINERS_COLLECTION // Collection contains all container items
+ *                          // Each document maps to 1 container
+ *                          // Unique name
+ * -- CONTAINER_COLLECTION // Every container maps to a container collection
+ *                         // Container collection contains all blobs under a container
+ *                         // Each document maps to 1 blob
+ *                         // Unique name
  *
  * @export
- * @class SimpleDataStore
+ * @class LokiBlobDataStore
  */
 export default class LokiBlobDataStore implements IBlobDataStore {
   private readonly db: Loki;
-  // private readonly lokiDBPath: string;
 
   private readonly CONTAINERS_COLLECTION = "$containers$";
   private readonly SERVICE_PROPERTIES_COLLECTION = "$serviceproperties$";
 
+  private SERVICE_PROPERTIES_DOCUMENT_LOKI_ID?: number;
+
   private readonly defaultServiceProperties = {
     cors: [],
-    defaultServiceVersion: API_VERSION, // Move it to constants.ts
+    defaultServiceVersion: API_VERSION,
     hourMetrics: {
       enabled: false,
       retentionPolicy: {
@@ -57,9 +72,9 @@ export default class LokiBlobDataStore implements IBlobDataStore {
   };
 
   public constructor(
-    lokiDBPath: string // private readonly logger: ILogger
+    private readonly lokiDBPath: string,
+    private readonly persistencePath: string // private readonly logger: ILogger
   ) {
-    // this.lokiDBPath = lokiDBPath;
     this.db = new Loki(lokiDBPath, {
       autosave: true,
       autosaveInterval: 5000,
@@ -67,86 +82,213 @@ export default class LokiBlobDataStore implements IBlobDataStore {
   }
 
   public async init(): Promise<void> {
-    if (!this.db.getCollection(this.CONTAINERS_COLLECTION)) {
-      this.db.addCollection(this.CONTAINERS_COLLECTION);
+    // TODO: Native Promise doesn't have promisifyAll method. Create it as utility manually
+    await new Promise<void>((resolve, reject) => {
+      stat(this.lokiDBPath, (statError, stats) => {
+        if (!statError) {
+          this.db.loadDatabase({}, (dbError) => {
+            if (dbError) {
+              reject(dbError);
+            } else {
+              resolve();
+            }
+          });
+        } else {
+          // when DB file doesn't exist, ignore the error because following will re-initialize
+          resolve();
+        }
+      });
+    });
+
+    // In loki DB implementation, these operations are all sync. Doesn't need an async lock
+    // Create containers collection if not exists
+    if (this.db.getCollection(this.CONTAINERS_COLLECTION) === null) {
+      this.db.addCollection(this.CONTAINERS_COLLECTION, { unique: ["name"] });
     }
 
-    if (!this.db.getCollection(this.SERVICE_PROPERTIES_COLLECTION)) {
-      this.db.addCollection(this.SERVICE_PROPERTIES_COLLECTION);
+    // Create service properties collection if not exists
+    let servicePropertiesColl = this.db.getCollection(
+      this.SERVICE_PROPERTIES_COLLECTION
+    );
+    if (servicePropertiesColl === null) {
+      servicePropertiesColl = this.db.addCollection(
+        this.SERVICE_PROPERTIES_COLLECTION
+      );
+    }
+
+    // Create default service properties document if not exists
+    // Get SERVICE_PROPERTIES_DOCUMENT_LOKI_ID from DB if not exists
+    const servicePropertiesDocs = servicePropertiesColl.where(() => true);
+    if (servicePropertiesDocs.length === 0) {
       await this.setServiceProperties(this.defaultServiceProperties);
-    }
-  }
-
-  public async setServiceProperties<T>(serviceProperties: T): Promise<T> {
-    const coll = this.db.getCollection(this.SERVICE_PROPERTIES_COLLECTION);
-    const docs = coll.where(() => true);
-    if (docs.length > 0) {
-      coll.remove(docs[0]);
+    } else if (servicePropertiesDocs.length === 1) {
+      this.SERVICE_PROPERTIES_DOCUMENT_LOKI_ID = servicePropertiesDocs[0].$loki;
+    } else {
+      throw new Error(
+        "LokiDB initialization error: Service properties collection has more than one document."
+      );
     }
 
-    return coll.insert(serviceProperties);
+    await new Promise((resolve, reject) => {
+      this.db.saveDatabase((err) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve();
+        }
+      });
+    });
   }
 
-  public async getServiceProperties<T>(): Promise<T> {
+  /**
+   * Update blob service properties. Create service properties document if not exists in DB.
+   * Assume service properties collection has been created.
+   *
+   * @template T
+   * @param {T} serviceProperties
+   * @returns {Promise<T>}
+   * @memberof LokiBlobDataStore
+   */
+  public async setServiceProperties<T extends Models.StorageServiceProperties>(
+    serviceProperties: T
+  ): Promise<T> {
     const coll = this.db.getCollection(this.SERVICE_PROPERTIES_COLLECTION);
-    const doc = coll.where(() => true)[0];
+    if (this.SERVICE_PROPERTIES_DOCUMENT_LOKI_ID !== undefined) {
+      const existingDocument = coll.get(
+        this.SERVICE_PROPERTIES_DOCUMENT_LOKI_ID
+      );
+      coll.remove(existingDocument);
+    }
+
+    const doc = coll.insert(serviceProperties);
+    this.SERVICE_PROPERTIES_DOCUMENT_LOKI_ID = doc.$loki;
     return doc;
   }
 
-  public async createContainer<T extends IContainer>(container: T): Promise<T> {
-    const coll = this.db.getCollection(this.CONTAINERS_COLLECTION);
+  /**
+   * Get service properties.
+   * Assume service properties collection has already be initialized with 1 document.
+   *
+   * @template T
+   * @returns {Promise<T>}
+   * @memberof LokiBlobDataStore
+   */
+  public async getServiceProperties<
+    T extends Models.StorageServiceProperties
+  >(): Promise<T> {
+    const coll = this.db.getCollection(this.SERVICE_PROPERTIES_COLLECTION);
+    return coll.get(this.SERVICE_PROPERTIES_DOCUMENT_LOKI_ID!); // Only 1 document in service properties collection
+  }
+
+  /**
+   * Create a new container to DB.
+   * Assumes the container with same name doesn't exist.
+   *
+   * @template T
+   * @param {T} container
+   * @returns {Promise<T>}
+   * @memberof LokiBlobDataStore
+   */
+  public async createContainer<T extends Models.ContainerItem>(
+    container: T
+  ): Promise<T> {
     this.db.addCollection(container.name);
+    const coll = this.db.getCollection(this.CONTAINERS_COLLECTION);
     return coll.insert(container);
   }
 
-  public async getContainer<T>(container: string): Promise<T> {
+  /**
+   * Get a container item from DB by container name.
+   *
+   * @template T
+   * @param {string} container
+   * @returns {Promise<T>}
+   * @memberof LokiBlobDataStore
+   */
+  public async getContainer<T extends Models.ContainerItem>(
+    container: string
+  ): Promise<T | undefined> {
     const coll = this.db.getCollection(this.CONTAINERS_COLLECTION);
-    return coll.findOne({ name: { $eq: container } });
+    const doc = coll.by("name", container);
+    return doc ? doc : undefined;
   }
 
+  /**
+   * Delete container item from DB.
+   * Note that this method will remove container related collections and documents from DB.
+   * Make sure blobs under the container has been properly removed before calling this method.
+   *
+   * @param {string} container
+   * @returns {Promise<void>}
+   * @memberof LokiBlobDataStore
+   */
   public async deleteContainer(container: string): Promise<void> {
     const coll = this.db.getCollection(this.CONTAINERS_COLLECTION);
-    coll
-      .chain()
-      .find({ name: { $eq: container } })
-      .remove();
+    const doc = coll.by("name", container);
+    coll.remove(doc);
 
+    // Following line will remove all blobs documents under that container
     this.db.removeCollection(container);
-
-    // TODO: Remove all entities on disk
-    // const entities = this.db
-    //   .getCollection(container)
-    //   .chain()
-    //   .find({ name: { $contains: "" } })
-    //   .data();
   }
 
-  public async updateContainer<T extends IContainer>(
+  /**
+   * Update container item in DB.
+   * Parameter container should be a valid loki DB document object retrieved by calling getContainer().
+   *
+   * @template T
+   * @param {T} container A container loki document object got from getContainer()
+   * @returns {Promise<T>}
+   * @memberof LokiBlobDataStore
+   */
+  public async updateContainer<T extends Models.ContainerItem>(
     container: T
   ): Promise<T> {
-    const doc = await this.getContainer<T>(container.name);
-    const coll = this.db.getCollection(container.name);
-
-    cloneToDoc(doc, container);
-    return coll.update(doc);
+    const coll = this.db.getCollection(this.CONTAINERS_COLLECTION);
+    return coll.update(container);
   }
 
-  public async listContainers<T>(
+  /**
+   * List containers with query conditions specified.
+   *
+   * @template T
+   * @param {string} [prefix=""]
+   * @param {number} [maxResults=2000]
+   * @param {number} [marker=0]
+   * @returns {(Promise<[T[], number | undefined]>)} Return a tuple with [LIST_CONTAINERS, NEXT_MARKER]
+   * @memberof LokiBlobDataStore
+   */
+  public async listContainers<T extends Models.ContainerItem>(
     prefix: string = "",
-    maxResults: number = 2000
-  ): Promise<T[]> {
+    maxResults: number = 2000,
+    marker: number = 0
+  ): Promise<[T[], number | undefined]> {
     const coll = this.db.getCollection(this.CONTAINERS_COLLECTION);
-    return coll
+
+    const query =
+      prefix === ""
+        ? { $loki: { $gt: marker } }
+        : { name: { $regex: `^${prefix}` }, $loki: { $gt: marker } };
+
+    const docs = coll
       .chain()
-      .find({ name: { $regex: `^${prefix}` } })
-      .simplesort("name")
+      .find(query)
       .limit(maxResults)
       .data();
+
+    if (docs.length < maxResults) {
+      return [docs, undefined];
+    } else {
+      const nextMarker = docs[docs.length - 1].$loki;
+      return [docs, nextMarker];
+    }
   }
 
-  public async createBlob<T extends IBlob>(blob: T, container: string): Promise<T> {
+  public async createBlob<T extends Models.BlobItem>(
+    blob: T,
+    container: string
+  ): Promise<T> {
     const coll = this.db.getCollection(container);
-    const blobDoc = coll.findOne({name: {$eq: blob.name}});
+    const blobDoc = coll.findOne({ name: { $eq: blob.name } });
     if (blobDoc !== undefined && blobDoc !== null) {
       coll.remove(blobDoc);
     }
@@ -154,7 +296,36 @@ export default class LokiBlobDataStore implements IBlobDataStore {
     return coll.insert(blob);
   }
 
+  public async writeBlobData(
+    container: string,
+    blob: string,
+    data: NodeJS.ReadableStream
+  ): Promise<void> {
+    return new Promise<void>((resolve, reject) => {
+      const path = join(this.persistencePath, container, blob);
+      const ws = createWriteStream(path);
+      data
+        .pipe(ws)
+        .on("close", resolve)
+        .on("error", reject);
+    });
+  }
+
+  /**
+   * Close loki DB.
+   *
+   * @returns {Promise<void>}
+   * @memberof LokiBlobDataStore
+   */
   public async close(): Promise<void> {
-    throw new Error("Method not implemented.");
+    return new Promise<void>((resolve, reject) => {
+      this.db.close((err) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve();
+        }
+      });
+    });
   }
 }

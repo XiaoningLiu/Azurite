@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 
 import StorageError from "../errors/StorageError";
-import { CONTEXT_PATH } from "../utils/constants";
+import { DEFAULT_CONTEXT_PATH } from "../utils/constants";
 import logger from "../utils/log/Logger";
 import BlobStorageContext from "./BlobStorageContext";
 
@@ -21,7 +21,7 @@ export default function blobStorageContextMiddleware(
   // TODO: Use GUID for a server request ID
   const requestID = new Date().getTime().toString();
 
-  const blobContext = new BlobStorageContext(res.locals, CONTEXT_PATH);
+  const blobContext = new BlobStorageContext(res.locals, DEFAULT_CONTEXT_PATH);
   blobContext.xMsRequestID = requestID;
   blobContext.startTime = new Date();
 

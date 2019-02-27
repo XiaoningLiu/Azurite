@@ -32,12 +32,20 @@ export default function dispatchMiddleware(
     context.contextID
   );
 
+  // Sometimes, more than one operations specifications are all valid against current request
+  // Such as a SetContainerMetadata request will fit both CreateContainer and SetContainerMetadata specifications
+  // We need to avoid this kind of situation when define swagger
+  // However, following code will try to find most suitable operation by selecting operation which
+  // have most required conditions met
+  let conditionsMet: number = 0;
+
   for (const key in Operation) {
     if (Operation.hasOwnProperty(key)) {
       const operation = parseInt(key, 10);
-      if (isRequestAgainstOperation(req, Specifications[operation])) {
+      const res = isRequestAgainstOperation(req, Specifications[operation]);
+      if (res[0] && res[1] > conditionsMet) {
         context.operation = operation;
-        break;
+        conditionsMet = res[1];
       }
     }
   }
@@ -59,17 +67,25 @@ export default function dispatchMiddleware(
   next();
 }
 
+/**
+ * Validation whether current request meets request operation specification.
+ *
+ * @param {IRequest} req
+ * @param {msRest.OperationSpec} spec
+ * @returns {[boolean, number]} Tuple includes validation result and number of met required conditions
+ */
 function isRequestAgainstOperation(
   req: IRequest,
   spec: msRest.OperationSpec
-): boolean {
+): [boolean, number] {
+  let metConditionsNum = 0;
   if (req === undefined || spec === undefined) {
-    return false;
+    return [false, metConditionsNum];
   }
 
   // Validate HTTP method
   if (req.getMethod() !== spec.httpMethod) {
-    return false;
+    return [false, metConditionsNum++];
   }
 
   // Validate URL path
@@ -79,7 +95,7 @@ function isRequestAgainstOperation(
       : `/${spec.path}`
     : "/";
   if (!isURITemplateMatch(req.getPath(), path)) {
-    return false;
+    return [false, metConditionsNum++];
   }
 
   // Validate required queryParameters
@@ -89,7 +105,7 @@ function isRequestAgainstOperation(
         queryParameter.mapper.serializedName || ""
       );
       if (queryValue === undefined) {
-        return false;
+        return [false, metConditionsNum];
       }
 
       if (
@@ -98,15 +114,17 @@ function isRequestAgainstOperation(
           return val === queryValue;
         }) < 0
       ) {
-        return false;
+        return [false, metConditionsNum];
       }
 
       if (
         queryParameter.mapper.isConstant &&
         queryParameter.mapper.defaultValue !== queryValue
       ) {
-        return false;
+        return [false, metConditionsNum];
       }
+
+      metConditionsNum++;
     }
   }
 
@@ -117,7 +135,7 @@ function isRequestAgainstOperation(
         headerParameter.mapper.serializedName || ""
       );
       if (headerValue === undefined) {
-        return false;
+        return [false, metConditionsNum];
       }
 
       if (
@@ -126,17 +144,19 @@ function isRequestAgainstOperation(
           return val === headerValue;
         }) < 0
       ) {
-        return false;
+        return [false, metConditionsNum];
       }
 
       if (
         headerParameter.mapper.isConstant &&
         headerParameter.mapper.defaultValue !== headerValue
       ) {
-        return false;
+        return [false, metConditionsNum];
       }
+
+      metConditionsNum++;
     }
   }
 
-  return true;
+  return [true, metConditionsNum];
 }

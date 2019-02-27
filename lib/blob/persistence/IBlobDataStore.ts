@@ -1,43 +1,34 @@
-export interface IContainer {
-  name: string;
-}
+import * as Models from "../generated/artifacts/models";
+import { IDataStore } from "./IDataStore";
 
-export interface IBlob {
-  name: string;
-}
+export interface IBlobDataStore extends IDataStore {
+  setServiceProperties<T extends Models.StorageServiceProperties>(
+    serviceProperties: T
+  ): Promise<T>;
 
-export interface IBlobDataStore {
-  /**
-   * Data store initial steps. Such as initial DB connections.
-   *
-   * @returns {Promise<void>}
-   * @memberof IBlobDataStore
-   */
-  init(): Promise<void>;
+  getServiceProperties<T extends Models.StorageServiceProperties>(): Promise<T>;
 
-  setServiceProperties<T>(serviceProperties: T): Promise<T>;
+  createContainer<T extends Models.ContainerItem>(container: T): Promise<T>;
 
-  getServiceProperties<T>(): Promise<T>;
-
-  createContainer<T extends IContainer>(container: T): Promise<T>;
-
-  getContainer<T>(container: string): Promise<T>;
+  getContainer<T extends Models.ContainerItem>(container: string): Promise<T | undefined>;
 
   deleteContainer(container: string): Promise<void>;
 
-  updateContainer<T extends IContainer>(container: T): Promise<T>;
+  updateContainer<T extends Models.ContainerItem>(container: T): Promise<T>;
 
-  listContainers<T>(prefix?: string, maxResults?: number): Promise<T[]>;
+  listContainers<T extends Models.ContainerItem>(
+    prefix?: string,
+    maxResults?: number,
+    marker?: number
+  ): Promise<[T[], number | undefined]>;
 
-  createBlob<T extends IBlob>(blob: T, container: string): Promise<T>;
+  createBlob<T extends Models.BlobItem>(blob: T, container: string): Promise<T>;
 
-  /**
-   * Data store close steps. Such as close DB connections.
-   *
-   * @returns {Promise<void>}
-   * @memberof IBlobDataStore
-   */
-  close(): Promise<void>;
+  writeBlobData(
+    container: string,
+    blob: string,
+    data: NodeJS.ReadableStream
+  ): Promise<void>;
 }
 
 export default IBlobDataStore;

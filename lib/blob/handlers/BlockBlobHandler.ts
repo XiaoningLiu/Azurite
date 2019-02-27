@@ -1,13 +1,11 @@
-import { join, resolve } from "path";
-
 import BlobStorageContext from "../context/BlobStorageContext";
 import NotImplementedError from "../errors/NotImplementedError";
 import StorageError from "../errors/StorageError";
 import * as Models from "../generated/artifacts/models";
 import Context from "../generated/Context";
 import IBlockBlobHandler from "../generated/handlers/IBlockBlobHandler";
-import { API_VERSION, BLOB_PATH } from "../utils/constants";
-import { newEtag, streamToLocalFile } from "../utils/utils";
+import { API_VERSION } from "../utils/constants";
+import { newEtag } from "../utils/utils";
 import BaseHandler from "./BaseHandler";
 
 // tslint:disable:object-literal-sort-keys
@@ -34,10 +32,7 @@ export default class BlockBlobHandler extends BaseHandler
       );
     }
 
-    await streamToLocalFile(
-      body,
-      join(resolve(BLOB_PATH), `${containerName}_${blobName}`)
-    );
+    await this.dataStore.writeBlobData(containerName, blobName, body);
 
     const date = new Date();
     const etag = newEtag();

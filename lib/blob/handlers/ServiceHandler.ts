@@ -7,7 +7,7 @@ import BaseHandler from "./BaseHandler";
 
 /**
  * Manually implement handlers by implementing IServiceHandler interface.
- * Handlers will take to persistency layer directly.
+ * Handlers will talk with persistency layer directly.
  *
  * @export
  * @class SimpleHandler
@@ -55,23 +55,21 @@ export default class ServiceHandler extends BaseHandler
     context: Context
   ): Promise<Models.ServiceListContainersSegmentResponse> {
     const LIST_CONTAINERS_MAX_RESULTS_DEFAULT = 2000;
-
-    options.maxresults =
-      options.maxresults === undefined
-        ? LIST_CONTAINERS_MAX_RESULTS_DEFAULT
-        : options.maxresults;
+    options.maxresults = options.maxresults || LIST_CONTAINERS_MAX_RESULTS_DEFAULT;
     options.prefix = options.prefix || "";
+
+    const marker = parseInt(options.marker || "0", 10);
 
     const containers = await this.dataStore.listContainers<
       Models.ContainerItem
-    >(options.prefix, options.maxresults);
+    >(options.prefix, options.maxresults, marker);
 
     const res: Models.ServiceListContainersSegmentResponse = {
-      containerItems: containers,
+      containerItems: containers[0],
       maxResults: options.maxresults,
-      nextMarker: "",
+      nextMarker: `${containers[1] || ""}`,
       prefix: options.prefix,
-      serviceEndpoint: "serviceEndpoint",
+      serviceEndpoint: `http://127.0.0.1:1000`, // TODO: Update Context to include req and res and get server URLs
       statusCode: 200,
     };
 

@@ -1,10 +1,11 @@
 import BlobStorageContext from "../context/BlobStorageContext";
 import NotImplementedError from "../errors/NotImplementedError";
-import StorageError from "../errors/StorageError";
+import StorageErrorFactory from "../errors/StorageErrorFactory";
 import * as Models from "../generated/artifacts/models";
 import Context from "../generated/Context";
 import IContainerHandler from "../generated/handlers/IContainerHandler";
 import { API_VERSION } from "../utils/constants";
+import Mutex from "../utils/Mutex";
 import { newEtag } from "../utils/utils";
 import BaseHandler from "./BaseHandler";
 
@@ -23,28 +24,24 @@ export default class ContainerHandler extends BaseHandler
     context: Context
   ): Promise<Models.ContainerCreateResponse> {
     const blobCtx = new BlobStorageContext(context);
+    const containerName = blobCtx.container!;
 
     const etag = `"${new Date().getTime()}"`;
     const lastModified = new Date();
 
-    try {
-      await this.dataStore.createContainer({
-        metadata: options.metadata,
-        name: blobCtx.container!,
-        properties: {
-          etag,
-          lastModified,
-        },
-      });
-    } catch (err) {
-      // TODO: Create a StorageErrorFactory class to represent common Azure Storage Errors
-      throw new StorageError(
-        409,
-        "ContainerAlreadyExists",
-        "The specified container already exists.",
-        blobCtx.contextID!
-      );
+    const container = await this.dataStore.getContainer(containerName);
+    if (container) {
+      throw StorageErrorFactory.getContainerAlreadyExists(blobCtx.contextID!);
     }
+
+    await this.dataStore.createContainer({
+      metadata: options.metadata,
+      name: containerName,
+      properties: {
+        etag,
+        lastModified,
+      },
+    });
 
     const response: Models.ContainerCreateResponse = {
       eTag: etag,
@@ -67,9 +64,14 @@ export default class ContainerHandler extends BaseHandler
       blobCtx.container!
     );
 
+    if (!container) {
+      throw StorageErrorFactory.getContainerNotFoundError(blobCtx.contextID!);
+    }
+
     const response: Models.ContainerGetPropertiesResponse = {
       eTag: container.properties.etag,
       ...container.properties,
+      metadata: container.metadata,
       requestId: blobCtx.contextID,
       statusCode: 200,
     };
@@ -89,8 +91,13 @@ export default class ContainerHandler extends BaseHandler
     context: Context
   ): Promise<Models.ContainerDeleteResponse> {
     const blobCtx = new BlobStorageContext(context);
+    const containerName = blobCtx.container!;
 
-    await this.dataStore.deleteContainer(blobCtx.container!);
+    if (this.dataStore.getContainer(containerName)) {
+      throw StorageErrorFactory.getContainerNotFoundError(blobCtx.contextID!);
+    }
+
+    await this.dataStore.deleteContainer(containerName);
 
     const response: Models.ContainerDeleteResponse = {
       date: new Date(),
@@ -102,19 +109,29 @@ export default class ContainerHandler extends BaseHandler
     return response;
   }
 
+  // TODO: Serializer doesn't handle x-ms-meta headers for now
   public async setMetadata(
     options: Models.ContainerSetMetadataOptionalParams,
     context: Context
   ): Promise<Models.ContainerSetMetadataResponse> {
     const blobCtx = new BlobStorageContext(context);
+    const containerName = blobCtx.container!;
+
+    await Mutex.lock(containerName);
 
     const container = await this.dataStore.getContainer<Models.ContainerItem>(
-      blobCtx.container!
+      containerName
     );
+    if (!container) {
+      await Mutex.unlock(containerName);
+      throw StorageErrorFactory.getContainerNotFoundError(blobCtx.contextID!);
+    }
+
     container.metadata = options.metadata;
     container.properties.lastModified = new Date();
 
     await this.dataStore.updateContainer(container);
+    await Mutex.unlock(containerName);
 
     const response: Models.ContainerSetMetadataResponse = {
       date: container.properties.lastModified,

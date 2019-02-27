@@ -1,4 +1,4 @@
-import express from "express";
+import express, { Application } from "express";
 
 import blobStorageContextMiddleware from "./context/blobStorageContext.middleware";
 import ExpressMiddlewareFactory from "./generated/ExpressMiddlewareFactory";
@@ -11,67 +11,61 @@ import ContainerHandler from "./handlers/ContainerHandler";
 import PageBlobHandler from "./handlers/PageBlobHandler";
 import ServiceHandler from "./handlers/ServiceHandler";
 import IBlobDataStore from "./persistence/IBlobDataStore";
-import LokiBlobDataStore from "./persistence/LokiBlobDataStore";
-import { CONTEXT_PATH, LOKI_DB_PATH } from "./utils/constants";
+import { DEFAULT_CONTEXT_PATH } from "./utils/constants";
 import logger from "./utils/log/Logger";
 
-const app = express().disable("x-powered-by");
+export default function getAPP(dataStore: IBlobDataStore): Application {
+  const app = express().disable("x-powered-by");
 
-// MiddlewareFactory is a factory to create auto-generated middleware
-const middlewareFactory: MiddlewareFactory = new ExpressMiddlewareFactory(
-  logger,
-  CONTEXT_PATH
-);
+  // MiddlewareFactory is a factory to create auto-generated middleware
+  const middlewareFactory: MiddlewareFactory = new ExpressMiddlewareFactory(
+    logger,
+    DEFAULT_CONTEXT_PATH
+  );
 
-// Data source is persistency layer entry
-const dataSource: IBlobDataStore = new LokiBlobDataStore(LOKI_DB_PATH);
+  // Create handlers into handler middleware factory
+  const handlers: IHandlers = {
+    appendBlobHandler: new AppendBlobHandler(dataStore, logger),
+    blobHandler: new BlobHandler(dataStore, logger),
+    blockBlobHandler: new BlockBlobHandler(dataStore, logger),
+    containerHandler: new ContainerHandler(dataStore, logger),
+    pageBlobHandler: new PageBlobHandler(dataStore, logger),
+    serviceHandler: new ServiceHandler(dataStore, logger),
+  };
 
-// TODO: This is a potential async call, considering handling it with await or then
-// For Loki based implementation, it's not async actually, leave it here
-dataSource.init();
+  /*
+   * Generated middleware should follow strict orders
+   * Manually created middleware can be injected into any points
+   */
 
-// Create handlers into handler middleware factory
-const handlers: IHandlers = {
-  appendBlobHandler: new AppendBlobHandler(dataSource, logger),
-  blobHandler: new BlobHandler(dataSource, logger),
-  blockBlobHandler: new BlockBlobHandler(dataSource, logger),
-  containerHandler: new ContainerHandler(dataSource, logger),
-  pageBlobHandler: new PageBlobHandler(dataSource, logger),
-  serviceHandler: new ServiceHandler(dataSource, logger),
-};
+  // Manually created middleware to deserialize feature related context which swagger doesn't know
+  app.use(blobStorageContextMiddleware);
 
-/*
- * Generated middleware should follow strict orders
- * Manually created middleware can be injected into any points
- */
+  // Dispatch incoming HTTP request to specific operation
+  // Emulator's URL pattern is like http://hostname:port/account/container
+  // Create a router to exclude account name from req.path, as url path in swagger doesn't include account
+  // Exclude account name from req.path for dispatchMiddleware
+  app.use(
+    "/:account",
+    express.Router().use(middlewareFactory.createDispatchMiddleware())
+  );
 
-// Manually created middleware to deserialize feature related context which swagger doesn't know
-app.use(blobStorageContextMiddleware);
+  // TODO: AuthN middleware, like shared key auth or SAS auth
 
-// Dispatch incoming HTTP request to specific operation
-// Emulator's URL pattern is like http://hostname:port/account/container
-// Create a router to exclude account name from req.path, as url path in swagger doesn't include account
-// Exclude account name from req.path for dispatchMiddleware
-app.use(
-  "/:account",
-  express.Router().use(middlewareFactory.createDispatchMiddleware())
-);
+  // Generated, will do basic validation defined in swagger
+  app.use(middlewareFactory.createDeserializerMiddleware());
 
-// TODO: AuthN middleware, like shared key auth or SAS auth
+  // Generated, inject handlers to create a handler middleware
+  app.use(middlewareFactory.createHandlerMiddleware(handlers));
 
-// Generated, will do basic validation defined in swagger
-app.use(middlewareFactory.createDeserializerMiddleware());
+  // Generated, will serialize response models into HTTP response
+  app.use(middlewareFactory.createSerializerMiddleware());
 
-// Generated, inject handlers to create a handler middleware
-app.use(middlewareFactory.createHandlerMiddleware(handlers));
+  // Generated, will return MiddlewareError and Errors thrown in previous middleware/handlers to HTTP response
+  app.use(middlewareFactory.createErrorMiddleware());
 
-// Generated, will serialize response models into HTTP response
-app.use(middlewareFactory.createSerializerMiddleware());
+  // Generated, will end and return HTTP response immediately
+  app.use(middlewareFactory.createEndMiddleware());
 
-// Generated, will return MiddlewareError and Errors thrown in previous middleware/handlers to HTTP response
-app.use(middlewareFactory.createErrorMiddleware());
-
-// Generated, will end and return HTTP response immediately
-app.use(middlewareFactory.createEndMiddleware());
-
-export default app;
+  return app;
+}
