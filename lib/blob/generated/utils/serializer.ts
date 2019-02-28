@@ -50,19 +50,49 @@ export async function deserialize(
       );
     }
 
-    const headerKey = headerParameter.mapper.serializedName;
-    const headerValueOriginal = req.getHeader(headerKey);
-    const headerValue = spec.serializer.deserialize(
-      headerParameter.mapper,
-      headerValueOriginal,
-      headerKey
-    );
+    const headerCollectionPrefix:
+      | string
+      | undefined = (headerParameter.mapper as msRest.DictionaryMapper)
+      .headerCollectionPrefix;
+    if (headerCollectionPrefix) {
+      const dictionary: any = {};
+      const headers = req.getHeaders();
+      for (const headerKey of Object.keys(headers)) {
+        if (
+          headerKey
+            .toLowerCase()
+            .startsWith(headerCollectionPrefix.toLocaleLowerCase())
+        ) {
+          // TODO: Validate collection type by serializer
+          dictionary[
+            headerKey.substring(headerCollectionPrefix.length)
+          ] = spec.serializer.serialize(
+            (headerParameter.mapper as msRest.DictionaryMapper).type.value,
+            headers[headerKey],
+            headerKey
+          );
+        }
+      }
+      setParametersValue(parameters, headerParameter.parameterPath, dictionary);
+    } else {
+      const headerKey = headerParameter.mapper.serializedName;
+      const headerValueOriginal = req.getHeader(headerKey);
+      const headerValue = spec.serializer.deserialize(
+        headerParameter.mapper,
+        headerValueOriginal,
+        headerKey
+      );
 
-    // TODO: Currently validation is only in serialize method,
-    // remove when adding validateConstraints to deserialize()
-    spec.serializer.serialize(headerParameter.mapper, headerValue);
+      // TODO: Currently validation is only in serialize method,
+      // remove when adding validateConstraints to deserialize()
+      spec.serializer.serialize(headerParameter.mapper, headerValue);
 
-    setParametersValue(parameters, headerParameter.parameterPath, headerValue);
+      setParametersValue(
+        parameters,
+        headerParameter.parameterPath,
+        headerValue
+      );
+    }
   }
 
   // Deserialize body
@@ -182,14 +212,40 @@ export async function serialize(
 
   // Serialize headers
   const headerSerializer = new msRest.Serializer(Mappers);
-  const rawHeaders = headerSerializer.serialize(
-    responseSpec.headersMapper!,
-    handlerResponse
-  );
-  for (const headerKey in rawHeaders) {
-    if (rawHeaders.hasOwnProperty(headerKey)) {
-      const headerValue = rawHeaders[headerKey];
-      res.setHeader(headerKey, headerValue);
+  const headersMapper = responseSpec.headersMapper;
+  if (headersMapper && headersMapper.type.name === "Composite") {
+    const mappersForAllHeaders = headersMapper.type.modelProperties || {};
+
+    // Handle headerMapper one by one
+    for (const key in mappersForAllHeaders) {
+      if (mappersForAllHeaders.hasOwnProperty(key)) {
+        const headerMapper = mappersForAllHeaders[key];
+        const headerName = headerMapper.serializedName;
+        const headerValueOriginal = handlerResponse[key];
+        const headerValueSerialized = headerSerializer.serialize(
+          headerMapper,
+          headerValueOriginal
+        );
+
+        // Handle collection of headers starting with same prefix, such as x-ms-meta prefix
+        const headerCollectionPrefix = (headerMapper as msRest.DictionaryMapper)
+          .headerCollectionPrefix;
+        if (headerCollectionPrefix !== undefined && headerValueOriginal !== undefined) {
+          for (const collectionHeaderPartialName in headerValueSerialized) {
+            if (headerValueSerialized.hasOwnProperty(collectionHeaderPartialName)) {
+              const collectionHeaderValueSerialized = headerValueSerialized[collectionHeaderPartialName];
+              const collectionHeaderName = `${headerCollectionPrefix}${collectionHeaderPartialName}`;
+              if (collectionHeaderName && collectionHeaderValueSerialized) {
+                res.setHeader(collectionHeaderName, collectionHeaderValueSerialized);
+              }
+            }
+          }
+        } else {
+          if (headerName && headerValueSerialized) {
+            res.setHeader(headerName, headerValueSerialized);
+          }
+        }
+      }
     }
   }
 
