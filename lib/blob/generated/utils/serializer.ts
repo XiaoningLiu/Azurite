@@ -230,13 +230,22 @@ export async function serialize(
         // Handle collection of headers starting with same prefix, such as x-ms-meta prefix
         const headerCollectionPrefix = (headerMapper as msRest.DictionaryMapper)
           .headerCollectionPrefix;
-        if (headerCollectionPrefix !== undefined && headerValueOriginal !== undefined) {
+        if (
+          headerCollectionPrefix !== undefined &&
+          headerValueOriginal !== undefined
+        ) {
           for (const collectionHeaderPartialName in headerValueSerialized) {
-            if (headerValueSerialized.hasOwnProperty(collectionHeaderPartialName)) {
-              const collectionHeaderValueSerialized = headerValueSerialized[collectionHeaderPartialName];
+            if (
+              headerValueSerialized.hasOwnProperty(collectionHeaderPartialName)
+            ) {
+              const collectionHeaderValueSerialized =
+                headerValueSerialized[collectionHeaderPartialName];
               const collectionHeaderName = `${headerCollectionPrefix}${collectionHeaderPartialName}`;
               if (collectionHeaderName && collectionHeaderValueSerialized) {
-                res.setHeader(collectionHeaderName, collectionHeaderValueSerialized);
+                res.setHeader(
+                  collectionHeaderName,
+                  collectionHeaderValueSerialized
+                );
               }
             }
           }
@@ -250,7 +259,11 @@ export async function serialize(
   }
 
   // Serialize XML bodies
-  if (spec.isXML && responseSpec.bodyMapper) {
+  if (
+    spec.isXML &&
+    responseSpec.bodyMapper &&
+    responseSpec.bodyMapper.type.name !== "Stream"
+  ) {
     const body = spec.serializer.serialize(
       responseSpec.bodyMapper!,
       handlerResponse
@@ -267,7 +280,11 @@ export async function serialize(
   }
 
   // Serialize stream body
-  if (handlerResponse.body) {
+  if (
+    handlerResponse.body &&
+    responseSpec.bodyMapper &&
+    responseSpec.bodyMapper.type.name === "Stream"
+  ) {
     await new Promise((resolve, reject) => {
       (handlerResponse.body as NodeJS.ReadableStream)
         .on("error", reject)

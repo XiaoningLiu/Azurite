@@ -8,8 +8,6 @@ export interface IBlobDataStore extends IDataStore {
 
   getServiceProperties<T extends Models.StorageServiceProperties>(): Promise<T>;
 
-  createContainer<T extends Models.ContainerItem>(container: T): Promise<T>;
-
   getContainer<T extends Models.ContainerItem>(container: string): Promise<T | undefined>;
 
   deleteContainer(container: string): Promise<void>;
@@ -22,13 +20,19 @@ export interface IBlobDataStore extends IDataStore {
     marker?: number
   ): Promise<[T[], number | undefined]>;
 
-  createBlob<T extends Models.BlobItem>(blob: T, container: string): Promise<T>;
+  updateBlob<T extends Models.BlobItem>(container: string, blob: T): Promise<T>;
 
-  writeBlobData(
+  getBlob<T extends Models.BlobItem>(container: string, blob: string): Promise<T | undefined>;
+
+  deleteBlob(container: string, blob: string): Promise<void>;
+
+  writeBlobPayload(
     container: string,
     blob: string,
-    data: NodeJS.ReadableStream
+    payload: NodeJS.ReadableStream
   ): Promise<void>;
+
+  readBlobPayload(container: string, blob: string): Promise<NodeJS.ReadableStream>;
 }
 
 export default IBlobDataStore;

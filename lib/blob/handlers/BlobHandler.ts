@@ -1,15 +1,17 @@
-import { createReadStream } from "fs";
-
 import BlobStorageContext from "../context/BlobStorageContext";
 import NotImplementedError from "../errors/NotImplementedError";
+import StorageErrorFactory from "../errors/StorageErrorFactory";
 import * as Models from "../generated/artifacts/models";
 import Context from "../generated/Context";
 import IBlobHandler from "../generated/handlers/IBlobHandler";
+import { API_VERSION } from "../utils/constants";
 import BaseHandler from "./BaseHandler";
 
 // tslint:disable:object-literal-sort-keys
 
 export default class BlobHandler extends BaseHandler implements IBlobHandler {
+  // TODO: Implement download cross blocks; Implement page blob download and append blob download;
+  // TODO: Implement partial download
   public async download(
     options: Models.BlobDownloadOptionalParams,
     context: Context
@@ -18,9 +20,26 @@ export default class BlobHandler extends BaseHandler implements IBlobHandler {
     const containerName = blobCtx.container!;
     const blobName = blobCtx.blob!;
 
+    const container = await this.dataStore.getContainer(containerName);
+    if (!container) {
+      throw StorageErrorFactory.getContainerNotFoundError(blobCtx.contextID!);
+    }
+
+    const blob = await this.dataStore.getBlob(containerName, blobName);
+    if (!blob) {
+      throw StorageErrorFactory.getBlobNotFound(blobCtx.contextID!);
+    }
+
+    const body = await this.dataStore.readBlobPayload(containerName, blobName);
     const response: Models.BlobDownloadResponse = {
       statusCode: 200,
-      body: createReadStream(`${containerName}/${blobName}`),
+      body,
+      metadata: blob.metadata,
+      ...blob.properties,
+      eTag: blob.properties.etag,
+      requestId: blobCtx.contextID,
+      date: new Date(),
+      version: API_VERSION,
     };
 
     return response;
@@ -37,7 +56,30 @@ export default class BlobHandler extends BaseHandler implements IBlobHandler {
     options: Models.BlobDeleteMethodOptionalParams,
     context: Context
   ): Promise<Models.BlobDeleteResponse> {
-    throw new NotImplementedError(context.contextID);
+    const blobCtx = new BlobStorageContext(context);
+    const containerName = blobCtx.container!;
+    const blobName = blobCtx.blob!;
+
+    const container = await this.dataStore.getContainer(containerName);
+    if (!container) {
+      throw StorageErrorFactory.getContainerNotFoundError(blobCtx.contextID!);
+    }
+
+    const blob = await this.dataStore.getBlob(containerName, blobName);
+    if (!blob) {
+      throw StorageErrorFactory.getBlobNotFound(blobCtx.contextID!);
+    }
+
+    await this.dataStore.deleteBlob(containerName, blobName);
+
+    const response: Models.BlobDeleteResponse = {
+      statusCode: 202,
+      requestId: blobCtx.contextID,
+      date: new Date(),
+      version: API_VERSION,
+    };
+
+    return response;
   }
 
   public async undelete(

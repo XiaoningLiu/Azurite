@@ -1,6 +1,6 @@
 import BlobStorageContext from "../context/BlobStorageContext";
 import NotImplementedError from "../errors/NotImplementedError";
-import StorageError from "../errors/StorageError";
+import StorageErrorFactory from "../errors/StorageErrorFactory";
 import * as Models from "../generated/artifacts/models";
 import Context from "../generated/Context";
 import IBlockBlobHandler from "../generated/handlers/IBlockBlobHandler";
@@ -24,15 +24,10 @@ export default class BlockBlobHandler extends BaseHandler
 
     const container = await this.dataStore.getContainer(containerName);
     if (!container) {
-      throw new StorageError(
-        404,
-        "Container Not Exist",
-        "Specific container doesn't exist",
-        blobCtx.contextID!
-      );
+      throw StorageErrorFactory.getContainerNotFoundError(blobCtx.contextID!);
     }
 
-    await this.dataStore.writeBlobData(containerName, blobName, body);
+    await this.dataStore.writeBlobPayload(containerName, blobName, body);
 
     const date = new Date();
     const etag = newEtag();
@@ -57,7 +52,7 @@ export default class BlockBlobHandler extends BaseHandler
       snapshot: "",
     };
 
-    await this.dataStore.createBlob(blob, containerName);
+    await this.dataStore.updateBlob(containerName, blob);
 
     const response: Models.BlockBlobUploadResponse = {
       statusCode: 201,

@@ -34,7 +34,7 @@ export default class ContainerHandler extends BaseHandler
       throw StorageErrorFactory.getContainerAlreadyExists(blobCtx.contextID!);
     }
 
-    await this.dataStore.createContainer({
+    await this.dataStore.updateContainer({
       metadata: options.metadata,
       name: containerName,
       properties: {

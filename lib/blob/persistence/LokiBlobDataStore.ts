@@ -1,4 +1,4 @@
-import { createWriteStream, stat } from "fs";
+import { createReadStream, createWriteStream, stat } from "fs";
 import Loki from "lokijs";
 import { join } from "path";
 
@@ -192,7 +192,7 @@ export default class LokiBlobDataStore implements IBlobDataStore {
   public async createContainer<T extends Models.ContainerItem>(
     container: T
   ): Promise<T> {
-    this.db.addCollection(container.name);
+    this.db.addCollection(container.name, { unique: ["name"] });
     const coll = this.db.getCollection(this.CONTAINERS_COLLECTION);
     return coll.insert(container);
   }
@@ -214,7 +214,7 @@ export default class LokiBlobDataStore implements IBlobDataStore {
   }
 
   /**
-   * Delete container item from DB.
+   * Delete container item if exists from DB.
    * Note that this method will remove container related collections and documents from DB.
    * Make sure blobs under the container has been properly removed before calling this method.
    *
@@ -232,11 +232,12 @@ export default class LokiBlobDataStore implements IBlobDataStore {
   }
 
   /**
-   * Update container item in DB.
-   * Parameter container should be a valid loki DB document object retrieved by calling getContainer().
+   * Update a container item in DB. If the container doesn't exist, it will be created.
+   * For a update operation, parameter container should be a valid loki DB document object
+   * retrieved by calling getContainer().
    *
    * @template T
-   * @param {T} container A container loki document object got from getContainer()
+   * @param {T} container For a update operation, the container should be a loki document object got from getContainer()
    * @returns {Promise<T>}
    * @memberof LokiBlobDataStore
    */
@@ -244,7 +245,15 @@ export default class LokiBlobDataStore implements IBlobDataStore {
     container: T
   ): Promise<T> {
     const coll = this.db.getCollection(this.CONTAINERS_COLLECTION);
-    return coll.update(container);
+    const doc = coll.by("name", container.name);
+    if (doc) {
+      return coll.update(container);
+    } else {
+      if (!this.db.getCollection(container.name)) {
+        this.db.addCollection(container.name, { unique: ["name"] });
+      }
+      return coll.insert(container);
+    }
   }
 
   /**
@@ -283,32 +292,90 @@ export default class LokiBlobDataStore implements IBlobDataStore {
     }
   }
 
-  public async createBlob<T extends Models.BlobItem>(
-    blob: T,
-    container: string
+  /**
+   * Update blob item in DB. Will create if blob doesn't exist.
+   * For a update operation, blob item should be a valid loki DB document object
+   * retrieved by calling getBlob().
+   *
+   * @template T A BlobItem model compatible object
+   * @param {string} container Container name
+   * @param {T} blob For a update operation, blob should be a valid loki DB document object retrieved by getBlob()
+   * @returns {Promise<T>}
+   * @memberof LokiBlobDataStore
+   */
+  public async updateBlob<T extends Models.BlobItem>(
+    container: string,
+    blob: T
   ): Promise<T> {
     const coll = this.db.getCollection(container);
     const blobDoc = coll.findOne({ name: { $eq: blob.name } });
     if (blobDoc !== undefined && blobDoc !== null) {
-      coll.remove(blobDoc);
+      return coll.update(blob);
+    } else {
+      return coll.insert(blob);
     }
-
-    return coll.insert(blob);
   }
 
-  public async writeBlobData(
+  public async getBlob<T extends Models.BlobItem>(
+    container: string,
+    blob: string
+  ): Promise<T | undefined> {
+    const containerItem = await this.getContainer(container);
+    if (!containerItem) {
+      return undefined;
+    }
+
+    const coll = this.db.getCollection(container);
+    if (!coll) {
+      return undefined;
+    }
+
+    const blobItem = coll.by("name", blob);
+    if (!blobItem) {
+      return undefined;
+    }
+
+    return blobItem;
+  }
+
+  /**
+   * Delete a blob item from loki DB if exists.
+   *
+   * @param {string} container
+   * @param {string} blob
+   * @returns {Promise<void>}
+   * @memberof LokiBlobDataStore
+   */
+  public async deleteBlob(container: string, blob: string): Promise<void> {
+    const blobItem = await this.getBlob(container, blob);
+    if (blobItem) {
+      const coll = this.db.getCollection(container);
+      coll.remove(blobItem);
+    }
+  }
+
+  public async writeBlobPayload(
     container: string,
     blob: string,
-    data: NodeJS.ReadableStream
+    payload: NodeJS.ReadableStream
   ): Promise<void> {
     return new Promise<void>((resolve, reject) => {
-      const path = join(this.persistencePath, container, blob);
+      // TODO: Create a class for mapping between blob with local disk file path
+      const path = join(this.persistencePath, `${container}_${blob}`);
       const ws = createWriteStream(path);
-      data
+      payload
         .pipe(ws)
         .on("close", resolve)
         .on("error", reject);
     });
+  }
+
+  public async readBlobPayload(
+    container: string,
+    blob: string
+  ): Promise<NodeJS.ReadableStream> {
+    const path = join(this.persistencePath, `${container}_${blob}`);
+    return createReadStream(path);
   }
 
   /**
