@@ -4,7 +4,7 @@
   "description": "A lightweight server clone of Azure Storage that simulates most of the commands supported by it with minimal dependencies.",
   "main": "index.js",
   "bin": {
-    "azurite": "./blob/dist/server.js"
+    "azurite": "./dist/bin.js"
   },
   "engines": {
     "node": ">=8.0.0"
@@ -33,7 +33,7 @@
     "build": "tsc",
     "build:autorest": "autorest ./swagger/blob.md --typescript --use=E:/GitHub/XiaoningLiu/autorest.typescript.server",
     "build:autorestdebug": "autorest ./swagger/blob.md --typescript --typescript.debugger --use=E:/GitHub/XiaoningLiu/autorest.typescript.server",
-    "clean": "rimraf dist typings *.log",
+    "clean": "rimraf dist typings *.log coverage",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -46,7 +46,6 @@
     "Storage",
     "Blob",
     "Queue",
-    "Table",
     "Emulator",
     "Microsoft"
   ],
