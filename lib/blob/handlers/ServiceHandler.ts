@@ -69,7 +69,7 @@ export default class ServiceHandler extends BaseHandler
       maxResults: options.maxresults,
       nextMarker: `${containers[1] || ""}`,
       prefix: options.prefix,
-      serviceEndpoint: `http://127.0.0.1:1000`, // TODO: Update Context to include req and res and get server URLs
+      serviceEndpoint: `http://127.0.0.1:1000`, // TODO: Update Context to include req and res and get server endpoint
       statusCode: 200,
     };
 

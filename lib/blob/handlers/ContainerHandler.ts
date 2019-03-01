@@ -26,7 +26,7 @@ export default class ContainerHandler extends BaseHandler
     const blobCtx = new BlobStorageContext(context);
     const containerName = blobCtx.container!;
 
-    const etag = `"${new Date().getTime()}"`;
+    const etag = `"${new Date().getTime()}"`; // TODO: Implement etag
     const lastModified = new Date();
 
     const container = await this.dataStore.getContainer(containerName);
@@ -93,10 +93,14 @@ export default class ContainerHandler extends BaseHandler
     const blobCtx = new BlobStorageContext(context);
     const containerName = blobCtx.container!;
 
-    if (this.dataStore.getContainer(containerName)) {
+    if (this.dataStore.getContainer(containerName) === undefined) {
       throw StorageErrorFactory.getContainerNotFoundError(blobCtx.contextID!);
     }
 
+    // TODO: Mark container as being deleted status, then (mark) delete all blobs async
+    // When above finishes, execute following delete container operation
+    // Because following delete container operation will only delete DB metadata for container and
+    // blobs under the container, but will not clean up blob data in disk
     await this.dataStore.deleteContainer(containerName);
 
     const response: Models.ContainerDeleteResponse = {
@@ -109,7 +113,6 @@ export default class ContainerHandler extends BaseHandler
     return response;
   }
 
-  // TODO: Serializer doesn't handle x-ms-meta headers for now
   public async setMetadata(
     options: Models.ContainerSetMetadataOptionalParams,
     context: Context
