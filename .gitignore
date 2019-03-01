@@ -4,3 +4,4 @@ coverage/
 dist
 typings/
 __blobstorage__
+__blobpersistence__

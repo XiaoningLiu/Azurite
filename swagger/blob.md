@@ -15,3 +15,7 @@ model-date-time-as-string: true
 optional-response-headers: true
 enum-types: true
 ```
+
+## Swagger Changes between Client
+
+1. Get container properties can both use get/head, however client swagger only supports get; We can fork a server swagger, rebase to client swagger periodic.

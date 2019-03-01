@@ -4,7 +4,7 @@ export const DEFAULT_SERVER_LISTENING_PORT = 10000;
 
 export const DEFAULT_LOKI_DB_PATH = "__blobstorage__";
 
-export const DEFAULT_BLOB_PERSISTENCE_PATH = "tempdatastore";
+export const DEFAULT_BLOB_PERSISTENCE_PATH = "__blobpersistence__";
 
 export const DEFAULT_CONTEXT_PATH = "azurite_blob_context";
 

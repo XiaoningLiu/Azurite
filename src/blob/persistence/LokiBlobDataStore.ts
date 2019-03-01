@@ -1,7 +1,8 @@
-import { createReadStream, createWriteStream, stat } from "fs";
+import { createReadStream, createWriteStream, mkdir, stat } from "fs";
 import Loki from "lokijs";
 import { join } from "path";
 
+import { promisify } from "util";
 import * as Models from "../generated/artifacts/models";
 import { API_VERSION } from "../utils/constants";
 import { IBlobDataStore } from "./IBlobDataStore";
@@ -99,6 +100,14 @@ export default class LokiBlobDataStore implements IBlobDataStore {
         }
       });
     });
+
+    const statAsync = promisify(stat);
+    const mkdirAsync = promisify(mkdir);
+    try {
+      await statAsync(this.persistencePath);
+    } catch {
+      await mkdirAsync(this.persistencePath);
+    }
 
     // In loki DB implementation, these operations are all sync. Doesn't need an async lock
     // Create containers collection if not exists

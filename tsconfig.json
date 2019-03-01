@@ -16,10 +16,10 @@
     "declarationMap": true,
     "importHelpers": true,
     "declarationDir": "./typings",
-    "lib": ["es5", "es6", "es7", "esnext"],
+    "lib": ["es5", "es6", "es7", "esnext", "dom"],
     "esModuleInterop": true
   },
   "compileOnSave": true,
   "exclude": ["node_modules"],
-  "include": ["./src/**/*.ts"]
+  "include": ["./src/**/*.ts", "./tests/**/*.ts"]
 }

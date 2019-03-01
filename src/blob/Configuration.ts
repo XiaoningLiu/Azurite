@@ -18,10 +18,15 @@ export default class Configuration {
   public readonly persistencePath?: string;
 
   // TODO: Add an overload constructor to parsing configurations from command line arguments or environment variables
-  public constructor() {
-    this.host = DEFAULT_SERVER_HOST_NAME;
-    this.port = DEFAULT_SERVER_LISTENING_PORT;
-    this.dbPath = DEFAULT_LOKI_DB_PATH;
-    this.persistencePath = DEFAULT_BLOB_PERSISTENCE_PATH;
+  public constructor(
+    host?: string,
+    port?: number,
+    dbPath?: string,
+    persistencePath?: string
+  ) {
+    this.host = host || DEFAULT_SERVER_HOST_NAME;
+    this.port = port || DEFAULT_SERVER_LISTENING_PORT;
+    this.dbPath = dbPath || DEFAULT_LOKI_DB_PATH;
+    this.persistencePath = persistencePath || DEFAULT_BLOB_PERSISTENCE_PATH;
   }
 }
