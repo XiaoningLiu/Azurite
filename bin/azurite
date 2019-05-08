@@ -1,0 +1,8 @@
+#!/usr/bin/env node
+
+const blob = require("../dist/src/blob/main");
+
+blob.main().catch(err => {
+  console.error(`Exit due to unhandled error: ${err.message}`);
+  process.exit();
+});

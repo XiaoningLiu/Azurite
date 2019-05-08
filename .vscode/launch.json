@@ -25,6 +25,15 @@
     {
       "type": "node",
       "request": "launch",
+      "name": "Current JS File",
+      "cwd": "${workspaceFolder}",
+      "runtimeArgs": [],
+      "args": ["${workspaceFolder}/${relativeFile}"],
+      "outputCapture": "std"
+    },
+    {
+      "type": "node",
+      "request": "launch",
       "name": "Current Mocha TS File",
       "cwd": "${workspaceFolder}",
       "runtimeArgs": ["-r", "ts-node/register"],

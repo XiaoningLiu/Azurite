@@ -18,7 +18,7 @@ const accessAsync = promisify(access);
 /**
  * Entry for Azurite blob service.
  */
-async function main() {
+export async function main() {
   // Initialize and validate environment values from command line parameters
   const env = new Environment();
   await accessAsync(env.location);
@@ -75,8 +75,3 @@ async function main() {
       });
     });
 }
-
-main().catch(err => {
-  console.error(err.message);
-  process.exit();
-});
