@@ -2,6 +2,7 @@ import { stat } from "fs";
 import Loki from "lokijs";
 import uuid from "uuid/v4";
 
+import { promisify } from "util";
 import IGCExtentProvider from "../../common/IGCExtentProvider";
 import {
   convertDateTimeStringMsTo7Digital,
@@ -25,6 +26,7 @@ import ContainerReadLeaseValidator from "../lease/ContainerReadLeaseValidator";
 import { ILease } from "../lease/ILeaseState";
 import LeaseFactory from "../lease/LeaseFactory";
 import {
+  BLOB_METADATA_LOKI_COLLECTIONS_COUNT,
   DEFAULT_LIST_BLOBS_MAX_RESULTS,
   DEFAULT_LIST_CONTAINERS_MAX_RESULTS
 } from "../utils/constants";
@@ -56,6 +58,8 @@ import IBlobMetadataStore, {
   ServicePropertiesModel,
   SetContainerAccessPolicyOptions
 } from "./IBlobMetadataStore";
+
+const statAsync = promisify(stat);
 
 /**
  * This is a metadata source implementation for blob based on loki DB.
@@ -95,6 +99,7 @@ export default class LokiBlobMetadataStore
   private readonly CONTAINERS_COLLECTION = "$CONTAINERS_COLLECTION$";
   private readonly BLOBS_COLLECTION = "$BLOBS_COLLECTION$";
   private readonly BLOCKS_COLLECTION = "$BLOCKS_COLLECTION$";
+  private readonly COLLECTIONS_COUNT = BLOB_METADATA_LOKI_COLLECTIONS_COUNT; // Must aligned with collections count
 
   private readonly pageBlobRangesManager = new PageBlobRangesManager();
 
@@ -115,22 +120,38 @@ export default class LokiBlobMetadataStore
   }
 
   public async init(): Promise<void> {
-    await new Promise<void>((resolve, reject) => {
-      stat(this.lokiDBPath, (statError, stats) => {
-        if (!statError) {
-          this.db.loadDatabase({}, dbError => {
-            if (dbError) {
-              reject(dbError);
-            } else {
-              resolve();
-            }
-          });
-        } else {
-          // when DB file doesn't exist, ignore the error because following will re-create the file
-          resolve();
-        }
+    let lokiDBFileExist = false;
+    try {
+      const res = await statAsync(this.lokiDBPath);
+      lokiDBFileExist = res.isFile();
+    } catch (_err) {
+      /* Noop */
+    }
+
+    // After switching to loki lfsa adapter, make sure all metdata files exists
+    let lokiAllDBFilesExist = true;
+    for (let i = 0; i < this.COLLECTIONS_COUNT; i++) {
+      try {
+        await statAsync(`${this.lokiDBPath}.${i}`); // Required by loki lfsa adapter
+      } catch (_err) {
+        lokiAllDBFilesExist = false;
+        throw Error(
+          `Existing Azurite metedata files in workspace are not compatible with current version. Clean up existing workspace and restart Azurite, or select another empty workspace location by "--location" parameter.`
+        );
+      }
+    }
+
+    if (lokiDBFileExist && lokiAllDBFilesExist) {
+      await new Promise<void>((resolve, reject) => {
+        this.db.loadDatabase({}, dbError => {
+          if (dbError) {
+            reject(dbError);
+          } else {
+            resolve();
+          }
+        });
       });
-    });
+    }
 
     // In loki DB implementation, these operations are all sync. Doesn't need an async lock
 
