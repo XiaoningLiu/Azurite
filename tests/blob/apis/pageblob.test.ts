@@ -3,7 +3,7 @@ import {
   BlobServiceClient,
   StorageSharedKeyCredential
 } from "@azure/storage-blob";
-import assert = require("assert");
+import assert from "assert";
 
 import { SequenceNumberActionType } from "../../../src/blob/generated/artifacts/models";
 import { configLogger } from "../../../src/common/Logger";

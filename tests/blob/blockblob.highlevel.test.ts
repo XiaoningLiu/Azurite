@@ -4,7 +4,7 @@ import {
   newPipeline,
   StorageSharedKeyCredential
 } from "@azure/storage-blob";
-import assert = require("assert");
+import assert from "assert";
 import * as fs from "fs";
 import { join } from "path";
 import { PassThrough } from "stream";

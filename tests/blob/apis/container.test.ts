@@ -3,7 +3,7 @@ import {
   newPipeline,
   StorageSharedKeyCredential
 } from "@azure/storage-blob";
-import assert = require("assert");
+import assert from "assert";
 import StorageErrorFactory from "../../../src/blob/errors/StorageErrorFactory";
 
 import { configLogger } from "../../../src/common/Logger";

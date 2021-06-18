@@ -21,7 +21,8 @@ import PreflightMiddlewareFactory from "./middlewares/PreflightMiddlewareFactory
 import { IQueueMetadataStore } from "./persistence/IQueueMetadataStore";
 import { DEFAULT_QUEUE_CONTEXT_PATH } from "./utils/constants";
 
-import morgan = require("morgan");
+import morgan from "morgan";
+
 import { OAuthLevel } from "../common/models";
 import IAuthenticator from "./authentication/IAuthenticator";
 import createQueueStorageContextMiddleware from "./middlewares/queueStorageContext.middleware";

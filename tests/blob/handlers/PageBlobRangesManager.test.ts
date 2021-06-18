@@ -1,4 +1,4 @@
-import assert = require("assert");
+import assert from "assert";
 
 import PageBlobRangesManager from "../../../src/blob/handlers/PageBlobRangesManager";
 
@@ -258,7 +258,7 @@ describe("PageBlobRangesManager", () => {
 
     const manager = new PageBlobRangesManager();
 
-    testCases.forEach(testCase => {
+    testCases.forEach((testCase) => {
       const results = manager.selectImpactedRanges(
         testCase.ranges as any,
         testCase.start,

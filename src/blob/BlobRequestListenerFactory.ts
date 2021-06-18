@@ -29,7 +29,8 @@ import StrictModelMiddlewareFactory, {
 import IBlobMetadataStore from "./persistence/IBlobMetadataStore";
 import { DEFAULT_CONTEXT_PATH } from "./utils/constants";
 
-import morgan = require("morgan");
+// import morgan = require("morgan");
+import morgan from "morgan";
 import { OAuthLevel } from "../common/models";
 import IAuthenticator from "./authentication/IAuthenticator";
 import createStorageBlobContextMiddleware from "./middlewares/blobStorageContext.middleware";

@@ -1,4 +1,4 @@
-import dns = require("dns");
+import dns from "dns";
 
 import {
   BlobServiceClient,
@@ -6,7 +6,7 @@ import {
   StorageSharedKeyCredential,
   BlockBlobClient
 } from "@azure/storage-blob";
-import assert = require("assert");
+import assert from "assert";
 
 import { configLogger } from "../../src/common/Logger";
 import BlobTestServerFactory from "../BlobTestServerFactory";

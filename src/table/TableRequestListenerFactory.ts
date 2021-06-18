@@ -20,7 +20,7 @@ import createTableStorageContextMiddleware from "./middleware/tableStorageContex
 import ITableMetadataStore from "./persistence/ITableMetadataStore";
 import { DEFAULT_TABLE_CONTEXT_PATH } from "./utils/constants";
 
-import morgan = require("morgan");
+import morgan from "morgan";
 import TableSharedKeyAuthenticator from "./authentication/TableSharedKeyAuthenticator";
 import TableSharedKeyLiteAuthenticator from "./authentication/TableSharedKeyLiteAuthenticator";
 /**

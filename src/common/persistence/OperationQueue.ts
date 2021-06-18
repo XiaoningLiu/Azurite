@@ -3,7 +3,7 @@ import { EventEmitter } from "events";
 import ILogger from "../ILogger";
 import IOperationQueue from "./IOperationQueue";
 
-import uuid = require("uuid");
+import uuid from "uuid";
 interface IOperation {
   id: string;
   op: () => Promise<any>;
@@ -45,7 +45,7 @@ export default class OperationQueue implements IOperationQueue {
     this.execute(contextId);
     return new Promise<T>((resolve, reject) => {
       this.emitter
-        .once(id, res => {
+        .once(id, (res) => {
           this.logger.debug(
             `OperationQueue.operate() Job ${id} completes callback, resolve.`,
             contextId
@@ -58,7 +58,7 @@ export default class OperationQueue implements IOperationQueue {
             this.execute(contextId);
           });
         })
-        .once("error_" + id, err => {
+        .once("error_" + id, (err) => {
           this.logger.debug(
             `OperationQueue.operate() Job ${id} error, reject.`,
             contextId

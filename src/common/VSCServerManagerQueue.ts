@@ -18,7 +18,7 @@ import VSCEnvironment from "./VSCEnvironment";
 import VSCServerManagerBase from "./VSCServerManagerBase";
 import VSCServerManagerClosedState from "./VSCServerManagerClosedState";
 
-import rimraf = require("rimraf");
+import rimraf from "rimraf";
 const accessAsync = promisify(access);
 const rimrafAsync = promisify(rimraf);
 

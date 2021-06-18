@@ -8,11 +8,11 @@ import {
   stat,
   unlink
 } from "fs";
-import multistream = require("multistream");
 import { join } from "path";
 import { Writable } from "stream";
 import { promisify } from "util";
-import uuid = require("uuid");
+import uuid from "uuid";
+import multistream from "multistream";
 
 import { ZERO_EXTENT_ID } from "../../blob/persistence/IBlobMetadataStore";
 import ILogger from "../ILogger";
@@ -370,7 +370,7 @@ export default class FSExtentStore implements IExtentStore {
    * @memberof FSExtentStore
    */
   public async readExtents(
-    extentChunkArray: (IExtentChunk)[],
+    extentChunkArray: IExtentChunk[],
     offset: number = 0,
     count: number = Infinity,
     contextId?: string
@@ -501,7 +501,7 @@ export default class FSExtentStore implements IExtentStore {
       let count: number = 0;
       let wsEnd = false;
 
-      rs.on("data", data => {
+      rs.on("data", (data) => {
         count += data.length;
         if (!ws.write(data)) {
           rs.pause();
@@ -537,7 +537,7 @@ export default class FSExtentStore implements IExtentStore {
             wsEnd = true;
           }
         })
-        .on("error", err => {
+        .on("error", (err) => {
           this.logger.debug(
             `FSExtentStore:streamPipe() Readable stream triggers error event, error:${JSON.stringify(
               err
@@ -556,7 +556,7 @@ export default class FSExtentStore implements IExtentStore {
               `FSExtentStore:streamPipe() Writable stream triggers finish event, after ${count} bytes piped. Flush data to fd:${fd}.`,
               contextId
             );
-            fdatasync(fd, err => {
+            fdatasync(fd, (err) => {
               if (err) {
                 this.logger.debug(
                   `FSExtentStore:streamPipe() Flush data to fd:${fd} failed with error:${JSON.stringify(
@@ -581,7 +581,7 @@ export default class FSExtentStore implements IExtentStore {
             resolve(count);
           }
         })
-        .on("error", err => {
+        .on("error", (err) => {
           this.logger.debug(
             `FSExtentStore:streamPipe() Writable stream triggers error event, error:${JSON.stringify(
               err

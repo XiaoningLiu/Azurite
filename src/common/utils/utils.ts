@@ -1,5 +1,6 @@
 import { createHash, createHmac } from "crypto";
-import rimraf = require("rimraf");
+import rimraf from "rimraf";
+
 import { parse } from "url";
 import { promisify } from "util";
 

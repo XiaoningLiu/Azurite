@@ -12,3 +12,10 @@ __*
 temp
 **/.DS_Store.DS_Store
 *.pem
+disk.esc
+disk.esc/
+azurite-linux
+azurite-macos
+azurite-win.exe
+azurite.exe
+azurite.js

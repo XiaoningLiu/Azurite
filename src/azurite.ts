@@ -1,4 +1,3 @@
-#!/usr/bin/env node
 import { access } from "fs";
 import { dirname, join } from "path";
 import { promisify } from "util";
